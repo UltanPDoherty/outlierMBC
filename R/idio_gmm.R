@@ -9,7 +9,7 @@
 #' @param max_out Maximum number of outliers.
 #' @param mnames Model names for mixture::gpcm.
 #' @param seed Seed.
-#' @param print_progress Should iteration count be printed?
+#' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return List of
 #' * distrib_diffs
@@ -27,7 +27,7 @@
 #' plot(faithful, col = faithful_idio_gmm$oGMM_labels)
 #' par(mfrow = c(1, 1))
 idio_gmm <- function(x, G, max_out, mnames = "VVV", seed = 123,
-                      print_progress = FALSE) {
+                     print_interval = Inf) {
 
   x <- as.matrix(x)
   x0 <- x
@@ -39,7 +39,7 @@ idio_gmm <- function(x, G, max_out, mnames = "VVV", seed = 123,
   distrib_diffs <- c()
   outlier_rank <- rep(0, nrow(x))
   for (i in seq_len(max_out + 1)) {
-    if (print_progress) cat("i = ", i, "\n")
+    if (i %% print_interval == 0) cat("i = ", i, "\n")
 
     set.seed(seed)
     mix <- mixture::gpcm(x, G = G, mnames = mnames, start = z0)

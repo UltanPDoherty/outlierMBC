@@ -4,7 +4,7 @@
 \alias{idio_gmm}
 \title{idio_gmm}
 \usage{
-idio_gmm(x, G, max_out, mnames = "VVV", seed = 123, print_progress = FALSE)
+idio_gmm(x, G, max_out, mnames = "VVV", seed = 123, print_interval = Inf)
 }
 \arguments{
 \item{x}{Data.}
@@ -17,7 +17,7 @@ idio_gmm(x, G, max_out, mnames = "VVV", seed = 123, print_progress = FALSE)
 
 \item{seed}{Seed.}
 
-\item{print_progress}{Should iteration count be printed?}
+\item{print_interval}{How frequently the iteration count is printed.}
 }
 \value{
 List of
