@@ -63,13 +63,20 @@ distrib_diff_gmm_g <- function(x, z_g, mu_g, Sigma_g) {
   sorted_scaled_mahalas_g <- sort(scaled_mahalas_g)
 
   mahala_ewcdf_g_func <- spatstat.geom::ewcdf(scaled_mahalas_g, w_g)
-  mahala_ewcdf_g <- mahala_ewcdf_g_func(sorted_scaled_mahalas_g)
 
+  mahala_ewcdf_g <- mahala_ewcdf_g_func(sorted_scaled_mahalas_g)
   beta_cdf_g <- stats::pbeta(sorted_scaled_mahalas_g,
                              var_num / 2, (n_g - var_num - 1) / 2)
 
+  # checkpoints <- stats::qbeta(seq(0.01, 0.99, by = 0.01),
+  #                             var_num / 2, (n_g - var_num - 1) / 2)
+  # mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints)
+  # beta_cdf_g <- stats::pbeta(checkpoints,
+  #                            var_num / 2, (n_g - var_num - 1) / 2)
+
   distrib_diff_g <- sum(abs(mahala_ewcdf_g - beta_cdf_g)) / obs_num
   # distrib_diff_g <- max(abs(mahala_ewcdf_g - beta_cdf_g))
+
 
   dens_g_factor <- (2 * pi)^(- 0.5 * var_num) * det(Sigma_g)^(-0.5)
   dens_g <- dens_g_factor * exp(- 0.5 * mahalas_g)
