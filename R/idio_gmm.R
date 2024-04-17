@@ -30,8 +30,9 @@ idio_gmm <- function(x, G, max_out, mnames = "VVV", seed = 123,
                       print_progress = FALSE) {
 
   x <- as.matrix(x)
-
   x0 <- x
+
+  z0 <- 2
 
   var_num <- ncol(x)
 
