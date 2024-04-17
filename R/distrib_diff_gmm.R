@@ -51,28 +51,20 @@ distrib_diff_gmm <- function(x, z, mu, Sigma) {
 distrib_diff_gmm_g <- function(x, z_g, mu_g, Sigma_g) {
   var_num <- ncol(x)
   obs_num <- nrow(x)
-
   n_g <- sum(z_g)
-  mahalas_g <- stats::mahalanobis(x, mu_g, (n_g / (n_g - 1)) * Sigma_g)
-
-  w_g <- z_g / n_g
-
-  scaling_g <- (n_g) / (n_g - 1)^2
-
-  scaled_mahalas_g <- scaling_g * mahalas_g
-
-  mahala_ewcdf_g_func <- spatstat.geom::ewcdf(scaled_mahalas_g, w_g)
 
   check_seq <- seq(0.001, 0.999, 0.001)
   checkpoints <- stats::qbeta(check_seq, var_num / 2, (n_g - var_num - 1) / 2)
 
+  mahalas_g <- stats::mahalanobis(x, mu_g, (n_g / (n_g - 1)) * Sigma_g)
+  scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
+  mahala_ewcdf_g_func <- spatstat.geom::ewcdf(scaled_mahalas_g, z_g / n_g)
+
   mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints)
   beta_cdf_g <- stats::pbeta(checkpoints, var_num / 2, (n_g - var_num - 1) / 2)
-
   distrib_diff_g <- mean(abs(mahala_ewcdf_g - beta_cdf_g))
 
-  dens_g_factor <- (2 * pi)^(- 0.5 * var_num) * det(Sigma_g)^(-0.5)
-  dens_g <- dens_g_factor * exp(- 0.5 * mahalas_g)
+  dens_g <- (2 * pi)^(-var_num / 2) * det(Sigma_g)^(-0.5) * exp(-mahalas_g / 2)
 
   return(list(distrib_diff_g = distrib_diff_g,
               scaled_mahalas_g = scaled_mahalas_g,
