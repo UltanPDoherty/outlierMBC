@@ -41,8 +41,8 @@ idio_gmm <- function(x, G, max_out, mnames = "VVV", seed = 123,
     if (print_progress) cat("i = ", i, "\n")
 
     set.seed(seed)
+    mix <- mixture::gpcm(x, G = G, mnames = mnames, start = z0)
 
-    mix <- mixture::gpcm(x, G = G, mnames = mnames)
     if (any(colSums(mix$z) < var_num + 1)) {
       warning(paste0("One of the components became too small after removing ",
                      i - 1, " outliers."))
@@ -60,6 +60,7 @@ idio_gmm <- function(x, G, max_out, mnames = "VVV", seed = 123,
 
     outlier_rank[!outlier_rank][out$choice_id] <- i
     x <- x[-out$choice_id, ]
+    z0 <- mix$z[-out$choice_id, ]
   }
 
   outlier_num <- which.min(distrib_diffs) - 1
