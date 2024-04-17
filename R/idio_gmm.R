@@ -33,6 +33,8 @@ idio_gmm <- function(x, G, max_out, mnames = "VVV", seed = 123,
 
   x0 <- x
 
+  var_num <- ncol(x)
+
   distrib_diffs <- c()
   outlier_rank <- rep(0, nrow(x))
   for (i in seq_len(max_out + 1)) {
@@ -41,6 +43,11 @@ idio_gmm <- function(x, G, max_out, mnames = "VVV", seed = 123,
     set.seed(seed)
 
     mix <- mixture::gpcm(x, G = G, mnames = mnames)
+    if (any(colSums(mix$z) < var_num + 1)) {
+      warning(paste0("One of the components became too small after removing ",
+                     i - 1, " outliers."))
+      break()
+    }
 
     out <- distrib_diff_gmm(
       x,
