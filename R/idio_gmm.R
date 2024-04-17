@@ -68,9 +68,10 @@ idio_gmm <- function(x, G, max_out, mnames = "VVV", seed = 123,
 
   outlier_bool <- outlier_rank <= outlier_num & outlier_rank != 0
 
-  oGMM_labels <- rep(1, nrow(x0))
   set.seed(seed)
   mix <- mixture::gpcm(x0[!outlier_bool, ], G = G, mnames = mnames)
+
+  oGMM_labels <- rep(1, nrow(x0))
   oGMM_labels[!outlier_bool] <- 1 + mix$map
 
   return(list(distrib_diffs = distrib_diffs,
