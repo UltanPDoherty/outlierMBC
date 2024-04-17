@@ -6,6 +6,7 @@
 
 ## usethis namespace: start
 #' @importFrom mixture gpcm
+#' @importFrom mvtnorm dmvnorm
 #' @importFrom spatstat.geom ewcdf
 ## usethis namespace: end
 NULL

@@ -35,7 +35,7 @@ Iterative Detection & Identification of Outliers while Clustering
 \examples{
 faithful_idio_gmm <- idio_gmm(faithful, G = 2, max_out = 20, seed = 123)
 par(mfrow = c(1, 2))
-plot(faithful_idio_gmm$distrib_diffs, type = "l")
+plot(0:20, faithful_idio_gmm$distrib_diffs, type = "l")
 abline(v = faithful_idio_gmm$outlier_num)
 plot(faithful, col = faithful_idio_gmm$oGMM_labels)
 par(mfrow = c(1, 1))

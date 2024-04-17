@@ -64,7 +64,7 @@ distrib_diff_gmm_g <- function(x, z_g, mu_g, Sigma_g) {
 
   mahala_ewcdf_g_func <- spatstat.geom::ewcdf(scaled_mahalas_g, w_g)
   mahala_ewcdf_g <- mahala_ewcdf_g_func(sorted_scaled_mahalas_g)
-browser()
+
   beta_cdf_g <- stats::pbeta(sorted_scaled_mahalas_g,
                              var_num / 2, (n_g - var_num - 1) / 2)
 
