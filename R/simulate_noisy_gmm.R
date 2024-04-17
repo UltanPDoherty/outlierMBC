@@ -45,10 +45,6 @@ simulate_noisy_gmm <- function(
   dim_widths <- range_mat[, 2] - range_mat[, 1]
 
   chisq_crit <- stats::qchisq(crit_val, df = var_num)
-  gmm_crit <- rep((2 * pi)^(- var_num / 2) * exp(- chisq_crit / 2), comp_num)
-  for (g in seq_len(comp_num)) {
-    gmm_crit <-  gmm_crit * (det(Sigma[[g]]))^(- 1 / 2)
-  }
 
   set.seed(123)
   count <- 0
@@ -64,9 +60,9 @@ simulate_noisy_gmm <- function(
     }
 
     for (g in seq_len(comp_num)) {
-      out_dens <- mvtnorm::dmvnorm(unif_samp[count + 1, ], mu[[g]], Sigma[[g]])
-
-      checks[g] <- out_dens < gmm_crit[g]
+      unif_mahala <- stats::mahalanobis(unif_samp[count + 1, ],
+                                        mu[[g]], Sigma[[g]])
+      checks[g] <- unif_mahala > chisq_crit
     }
 
     count <- count + all(checks)
