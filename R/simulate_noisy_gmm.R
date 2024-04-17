@@ -44,7 +44,7 @@ simulate_noisy_gmm <- function(
   dim_means <- rowMeans(range_mat)
   dim_widths <- range_mat[, 2] - range_mat[, 1]
 
-  chisq_crit <- stats::qchisq(0.999, df = var_num)
+  chisq_crit <- stats::qchisq(crit_val, df = var_num)
   gmm_crit <- rep((2 * pi)^(- var_num / 2) * exp(- chisq_crit / 2), comp_num)
   for (g in seq_len(comp_num)) {
     gmm_crit <-  gmm_crit * (det(Sigma[[g]]))^(- 1 / 2)
