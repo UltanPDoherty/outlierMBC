@@ -30,14 +30,13 @@
 #'   outlier_num = 40, seed = 123, crit_val = 0.9999,
 #'   unif_range_multiplier = 1.5
 #' )
-#' idio_gmm_p2g3 <- idio_gmm(noisy_gmm_p2g3[, 1:2], comp_num = 3, max_out = 100,
-#'                           print_interval = 10)
-#' par(mfrow = c(1, 2))
-#' plot(0:100, idio_gmm_p2g3$distrib_diffs, type = "l")
-#' abline(v = idio_gmm_p2g3$outlier_num)
-#' plot(noisy_gmm_p2g3[, 1:2], col = idio_gmm_p2g3$gmm_labels,
-#'      pch = 1 + noisy_gmm_p2g3[, 3])
-#' par(mfrow = c(1, 1))
+#' idio_gmm_p2g3 <- idio_gmm(noisy_gmm_p2g3[, 1:2], comp_num = 3, max_out = 80)
+#' # par(mfrow = c(1, 2))
+#' # plot(0:80, idio_gmm_p2g3$distrib_diffs, type = "l")
+#' # abline(v = idio_gmm_p2g3$outlier_num)
+#' # plot(noisy_gmm_p2g3[, 1:2], col = idio_gmm_p2g3$gmm_labels,
+#' #      pch = 1 + noisy_gmm_p2g3[, 3])
+#' # par(mfrow = c(1, 1))
 idio_gmm <- function(x, comp_num, max_out, mnames = "VVV", seed = 123,
                      print_interval = Inf) {
 

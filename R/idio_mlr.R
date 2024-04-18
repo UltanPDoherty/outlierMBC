@@ -29,13 +29,13 @@
 #'                                    outlier_num = 20, seed = 123,
 #'                                    crit_val = 0.9999)
 #' idio_mlr_p1 <- idio_mlr(noisy_mlr_p1$covariates, noisy_mlr_p1$responses,
-#'                            max_out = 50, print_interval = 10)
-#' par(mfrow = c(1, 2))
-#' plot(0:50, idio_mlr_p1$distrib_diffs, type = "l")
-#' abline(v = idio_mlr_p1$outlier_num)
-#' plot(x = noisy_mlr_p1$covariates[, 1], y = noisy_mlr_p1$responses,
-#'      pch = 1 + noisy_mlr_p1$labels, col = 1 + idio_mlr_p1$outlier_bool)
-#' par(mfrow = c(1, 1))
+#'                         max_out = 40)
+#' # par(mfrow = c(1, 2))
+#' # plot(0:40, idio_mlr_p1$distrib_diffs, type = "l")
+#' # abline(v = idio_mlr_p1$outlier_num)
+#' # plot(x = noisy_mlr_p1$covariates[, 1], y = noisy_mlr_p1$responses,
+#' #      pch = 1 + noisy_mlr_p1$labels, col = 1 + idio_mlr_p1$outlier_bool)
+#' # par(mfrow = c(1, 1))
 idio_mlr <- function(x, y, max_out, print_interval = Inf) {
 
   x <- as.matrix(x)
