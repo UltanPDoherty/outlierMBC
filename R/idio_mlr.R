@@ -18,14 +18,22 @@
 #' @export
 #'
 #' @examples
-#' faithful_plus <- rbind(faithful, c(4.5, 60), c(4.5, 55), c(4.5, 50), c(4.5, 45), c(4.5, 40))
-#' faithful_idio_mlr <- idio_mlr(faithful_plus[, 1], faithful_plus[, 2],
-#'                               max_out = 20)
+#' n_vec <- c(1000)
+#' mu_list <- list(+1)
+#' Sigma_list <- list(as.matrix(0.1))
+#' beta_list <- list(c(1, 1))
+#' error_sd_vec <- c(0.1)
+#' noisy_mlr_p1 <- simulate_noisy_mlr(n_vec, mu_list, Sigma_list, beta_list,
+#'                                    error_sd_vec,
+#'                                    outlier_num = 20, seed = 123,
+#'                                    crit_val = 0.9999)
+#' idio_mlr_p1 <- idio_mlr(noisy_mlr_p1$covariates, noisy_mlr_p1$responses,
+#'                            max_out = 50, print_interval = 10)
 #' par(mfrow = c(1, 2))
-#' plot(0:20, faithful_idio_mlr$distrib_diffs, type = "l")
-#' abline(v = faithful_idio_mlr$outlier_num)
-#' plot(faithful_plus, col = 1 + faithful_idio_mlr$outlier_bool)
-#' abline(faithful_idio_mlr$mod)
+#' plot(0:50, idio_mlr_p1$distrib_diffs, type = "l")
+#' abline(v = idio_mlr_p1$outlier_num)
+#' plot(x = noisy_mlr_p1$covariates[, 1], y = noisy_mlr_p1$responses,
+#'      pch = 1 + noisy_mlr_p1$labels, col = 1 + idio_mlr_p1$outlier_bool)
 #' par(mfrow = c(1, 1))
 idio_mlr <- function(x, y, max_out, print_interval = Inf) {
 
@@ -44,7 +52,7 @@ idio_mlr <- function(x, y, max_out, print_interval = Inf) {
     mod <- stats::lm(y ~ x)
 
     out <- distrib_diff_mlr(
-      stats::rstudent(mod),
+      stats::rstandard(mod),
       obs_num - var_num
     )
 
