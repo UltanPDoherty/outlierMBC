@@ -16,11 +16,12 @@
 #' n_vec <- c(100, 100)
 #' mu_list <- list(c(-1, -1), c(1, 1))
 #' Sigma_list <- list(diag(c(0.1, 0.1)), diag(c(0.1, 0.1)))
-#' noisy_gmm <- simulate_noisy_gmm(n_vec, mu_list, Sigma_list, 123, 20)
+#' noisy_gmm <- simulate_noisy_gmm(n_vec, mu_list, Sigma_list,
+#'                                 outlier_num = 20, seed = 123)
 #' plot(noisy_gmm[, 1:2], col = 1 + noisy_gmm[, 3])
 simulate_noisy_gmm <- function(
     n, mu, Sigma,
-    outlier_num, seed = 123, crit_val = 0.999, unif_range_multiplier = 1.5
+    outlier_num, seed = 123, crit_val = 0.9999, unif_range_multiplier = 1.5
 ) {
   var_num <- length(mu[[1]])
   comp_num <- length(n)
@@ -44,8 +45,6 @@ simulate_noisy_gmm <- function(
   dim_means <- rowMeans(range_mat)
   dim_widths <- range_mat[, 2] - range_mat[, 1]
 
-  chisq_crit <- stats::qchisq(crit_val, df = var_num)
-
   set.seed(123)
   count <- 0
   checks <- rep(NA, comp_num)
@@ -62,7 +61,7 @@ simulate_noisy_gmm <- function(
     for (g in seq_len(comp_num)) {
       unif_mahala <- stats::mahalanobis(unif_samp[count + 1, ],
                                         mu[[g]], Sigma[[g]])
-      checks[g] <- unif_mahala > chisq_crit
+      checks[g] <- stats::pchisq(unif_mahala, df = var_num) > crit_val
     }
 
     count <- count + all(checks)
