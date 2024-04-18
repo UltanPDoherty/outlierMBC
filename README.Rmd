@@ -46,16 +46,17 @@ ggplot(as.data.frame(noisy_gmm_p2g3),
 ### `idio_gmm`
 
 ```{r}
-idio_gmm_p2g3 <- idio_gmm(noisy_gmm_p2g3[, 1:2], comp_num = 3, max_out = 100,
+idio_gmm_p2g3 <- idio_gmm(noisy_gmm_p2g3[, 1:2], comp_num = 3, max_out = 80,
                          print_interval = Inf)
 ```
 
 ```{r}
-ggplot(cbind(outliers_removed = 0:100, as.data.frame(idio_gmm_p2g3)),
+ggplot(data.frame(outliers_removed = 0:80, 
+                  distrib_diffs = idio_gmm_p2g3$distrib_diffs),
        aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
+  geom_vline(xintercept = idio_gmm_p2g3$outlier_num)
 ```
 
 ```{r}
@@ -75,7 +76,7 @@ n_vec <- c(1000)
 mu_list <- list(+1)
 sigma_list <- list(as.matrix(0.1))
 beta_list <- list(c(1, 1))
-error_sd_vec <- c(0.1)
+error_sd_vec <- c(0.5)
 
 noisy_mlr_p1 <- simulate_noisy_mlr(n_vec, mu_list, sigma_list, beta_list,
                                    error_sd_vec,
@@ -96,11 +97,11 @@ ggplot(as.data.frame(noisy_mlr_p1),
 
 ```{r}
 idio_mlr_p1 <- idio_mlr(noisy_mlr_p1$covariates, noisy_mlr_p1$responses,
-                        max_out = 50, print_interval = Inf)
+                        max_out = 40, print_interval = Inf)
 ```
 
 ```{r}
-ggplot(data.frame(outliers_removed = 0:50,
+ggplot(data.frame(outliers_removed = 0:40,
                   distrib_diffs = idio_mlr_p1$distrib_diffs,
                   outlier_num = idio_mlr_p1$outlier_num),
        aes(x = outliers_removed, y = distrib_diffs)) +

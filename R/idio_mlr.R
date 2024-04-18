@@ -23,7 +23,7 @@
 #' mu_list <- list(+1)
 #' sigma_list <- list(as.matrix(0.1))
 #' beta_list <- list(c(1, 1))
-#' error_sd_vec <- c(0.1)
+#' error_sd_vec <- c(0.5)
 #' noisy_mlr_p1 <- simulate_noisy_mlr(n_vec, mu_list, sigma_list, beta_list,
 #'                                    error_sd_vec,
 #'                                    outlier_num = 20, seed = 123,
