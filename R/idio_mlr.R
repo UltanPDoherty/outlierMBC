@@ -1,7 +1,8 @@
 #' idio_mlr
 #'
 #' @description
-#' Iterative Detection & Identification of Outliers while Clustering
+#' Iterative Detection & Identification of Outliers for Multiple Linear
+#' Regression
 #'
 #'
 #' @param x Covariate data.

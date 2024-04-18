@@ -1,5 +1,8 @@
 #' simulate_noisy_mlr
 #'
+#' @description
+#' Simulate a multiple linear regression model with response variable outliers.
+#'
 #' @param n Vector of component sizes.
 #' @param mu List of component mean vectors.
 #' @param sigma List of component covariance matrices.

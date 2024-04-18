@@ -40,7 +40,7 @@ samples be than the range of the Normal samples?}
 Matrix with a label column.
 }
 \description{
-simulate_noisy_mlr
+Simulate a multiple linear regression model with response variable outliers.
 }
 \examples{
 n_vec <- c(1000)

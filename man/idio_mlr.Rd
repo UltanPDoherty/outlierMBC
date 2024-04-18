@@ -26,7 +26,8 @@ List of
 }
 }
 \description{
-Iterative Detection & Identification of Outliers while Clustering
+Iterative Detection & Identification of Outliers for Multiple Linear
+Regression
 }
 \examples{
 n_vec <- c(1000)

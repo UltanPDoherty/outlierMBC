@@ -34,7 +34,7 @@ samples be than the range of the Normal samples?}
 Matrix with a label column.
 }
 \description{
-simulate_noisy_gmm
+Simulate a Gaussian mixture model with multivariate outliers.
 }
 \examples{
 n_vec <- c(2000, 1000, 1000)

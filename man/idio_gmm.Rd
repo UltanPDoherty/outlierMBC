@@ -37,7 +37,7 @@ List of
 }
 }
 \description{
-Iterative Detection & Identification of Outliers while Clustering
+Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 }
 \examples{
 n_vec <- c(2000, 1000, 1000)

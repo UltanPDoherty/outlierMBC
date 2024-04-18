@@ -1,5 +1,8 @@
 #' simulate_noisy_gmm
 #'
+#' @description
+#' Simulate a Gaussian mixture model with multivariate outliers.
+#'
 #' @param n Vector of component sizes.
 #' @param mu List of component mean vectors.
 #' @param sigma List of component covariance matrices.

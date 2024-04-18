@@ -1,7 +1,7 @@
 #' idio_gmm
 #'
 #' @description
-#' Iterative Detection & Identification of Outliers while Clustering
+#' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 #'
 #'
 #' @param x Data.
