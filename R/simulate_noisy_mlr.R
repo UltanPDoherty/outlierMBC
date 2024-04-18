@@ -27,7 +27,7 @@
 #' noisy_mlr_p1 <- simulate_noisy_mlr(n_vec, mu_list, sigma_list, beta_list,
 #'                                    error_sd_vec,
 #'                                    outlier_num = 20, seed = 123,
-#'                                    crit_val = 0.999)
+#'                                    crit_val = 0.9999)
 #' plot(x = noisy_mlr_p1$covariates[, 1], y = noisy_mlr_p1$responses,
 #'      col = 1 + noisy_mlr_p1$labels, pch = 1 + noisy_mlr_p1$labels)
 simulate_noisy_mlr <- function(
@@ -57,8 +57,7 @@ simulate_noisy_mlr <- function(
   colnames(samp) <- paste0("V", seq_len(var_num))
   resp <- Reduce(c, responses)
 
-  resp_mean <- mean(resp)
-  resp_width <- diff(range(resp))
+  err_width <- diff(range(Reduce(c, errors)))
 
   set.seed(123)
   count <- 0
@@ -67,22 +66,26 @@ simulate_noisy_mlr <- function(
   checks <- rep(NA, comp_num)
   attempts <- 0
   out_norm <- matrix(nrow = outlier_num, ncol = var_num)
+  err_unif <- rep(NA, outlier_num)
   out_unif <- rep(NA, outlier_num)
   while (count < outlier_num) {
     out_g <- sample(seq_len(comp_num), 1)
 
     out_norm[count + 1, ] <- mvtnorm::rmvnorm(1, mu[[out_g]], sigma[[out_g]])
 
-    out_unif[count + 1] <- stats::runif(
+    err_unif[count + 1] <- stats::runif(
       1,
-      resp_mean - (unif_range_multiplier / 2) * resp_width,
-      resp_mean + (unif_range_multiplier / 2) * resp_width
+      0 - (unif_range_multiplier / 2) * err_width,
+      0 + (unif_range_multiplier / 2) * err_width
     )
 
+    out_unif[count + 1] <- (beta[[g]][1]
+                            + sum(out_norm[count + 1, ] * beta[[g]][-1])
+                            + err_unif[count + 1])
+
     for (g in seq_len(comp_num)) {
-      out_pred[g] <- beta[[g]][1] + sum(out_norm[count + 1, ] * beta[[g]][-1])
-      out_error[g] <- out_unif[count + 1] - out_pred[g]
-      checks[g] <- stats::pnorm(abs(out_error[g]), 0, error_sd[g]) > crit_val
+      checks[g] <- (stats::pnorm(abs(err_unif[count + 1]), 0, error_sd[g])
+                    > crit_val)
     }
 
     count <- count + all(checks)
