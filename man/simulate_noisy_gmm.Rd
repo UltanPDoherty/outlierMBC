@@ -7,10 +7,10 @@
 simulate_noisy_gmm(
   n,
   mu,
-  Sigma,
+  sigma,
   outlier_num,
   seed = 123,
-  crit_val = 0.999,
+  crit_val = 0.9999,
   unif_range_multiplier = 1.5
 )
 }
@@ -19,7 +19,7 @@ simulate_noisy_gmm(
 
 \item{mu}{List of component mean vectors.}
 
-\item{Sigma}{List of component covariance matrices.}
+\item{sigma}{List of component covariance matrices.}
 
 \item{outlier_num}{Desired number of outliers.}
 
@@ -37,9 +37,16 @@ Matrix with a label column.
 simulate_noisy_gmm
 }
 \examples{
-n_vec <- c(100, 100)
-mu_list <- list(c(-1, -1), c(1, 1))
-Sigma_list <- list(diag(c(0.1, 0.1)), diag(c(0.1, 0.1)))
-noisy_gmm <- simulate_noisy_gmm(n_vec, mu_list, Sigma_list, 123, 20)
-plot(noisy_gmm[, 1:2], col = 1 + noisy_gmm[, 3])
+n_vec <- c(2000, 1000, 1000)
+mu_list <- list(c(-1, 0), c(+1, -1), c(+1, +1))
+sigma_list <- list(diag(c(0.2, 4 * 0.2)),
+                   diag(c(0.2, 0.2)),
+                   diag(c(0.2, 0.2)))
+noisy_gmm_p2g3 <- simulate_noisy_gmm(
+  n_vec, mu_list, sigma_list,
+  outlier_num = 40, seed = 123, crit_val = 0.9999,
+  unif_range_multiplier = 1.5
+)
+plot(noisy_gmm_p2g3[, 1:2],
+     col = 1 + noisy_gmm_p2g3[, 3], pch = 1 + noisy_gmm_p2g3[, 3])
 }

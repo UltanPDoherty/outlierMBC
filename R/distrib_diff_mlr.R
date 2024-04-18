@@ -15,7 +15,6 @@ distrib_diff_mlr <- function(student_resids, df) {
   check_seq <- seq(eps, 1 - eps, eps)
   checkpoints <- stats::qbeta(check_seq, 1 / 2, (df - 1) / 2)
 
-  # sq_st_res_ecdf_func <- stats::ecdf(sq_st_res)
   sq_st_res_ecdf_func <- spatstat.geom::ewcdf(sq_st_res, 1)
 
   sq_st_res_ecdf <- sq_st_res_ecdf_func(checkpoints)

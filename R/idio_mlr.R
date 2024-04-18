@@ -20,10 +20,10 @@
 #' @examples
 #' n_vec <- c(1000)
 #' mu_list <- list(+1)
-#' Sigma_list <- list(as.matrix(0.1))
+#' sigma_list <- list(as.matrix(0.1))
 #' beta_list <- list(c(1, 1))
 #' error_sd_vec <- c(0.1)
-#' noisy_mlr_p1 <- simulate_noisy_mlr(n_vec, mu_list, Sigma_list, beta_list,
+#' noisy_mlr_p1 <- simulate_noisy_mlr(n_vec, mu_list, sigma_list, beta_list,
 #'                                    error_sd_vec,
 #'                                    outlier_num = 20, seed = 123,
 #'                                    crit_val = 0.9999)
@@ -68,7 +68,9 @@ idio_mlr <- function(x, y, max_out, print_interval = Inf) {
 
   outlier_bool <- outlier_rank <= outlier_num & outlier_rank != 0
 
-  mod <- stats::lm(y0[!outlier_bool] ~ x0[!outlier_bool, , drop = FALSE])
+
+  mod <- stats::lm(y0 ~ x0, data = list(x0 = x0, y0 = y0),
+                   subset = !outlier_bool)
 
   return(list(distrib_diffs = distrib_diffs,
               outlier_bool = outlier_bool,

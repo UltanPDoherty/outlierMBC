@@ -4,7 +4,7 @@
 \alias{distrib_diff_gmm_g}
 \title{distrib_diff_gmm_g}
 \usage{
-distrib_diff_gmm_g(x, z_g, mu_g, Sigma_g)
+distrib_diff_gmm_g(x, z_g, mu_g, sigma_g)
 }
 \arguments{
 \item{x}{Data.}
@@ -13,7 +13,7 @@ distrib_diff_gmm_g(x, z_g, mu_g, Sigma_g)
 
 \item{mu_g}{Component mean vector.}
 
-\item{Sigma_g}{Component covariance matrix.}
+\item{sigma_g}{Component covariance matrix.}
 }
 \value{
 List of

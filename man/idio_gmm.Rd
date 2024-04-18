@@ -4,12 +4,19 @@
 \alias{idio_gmm}
 \title{idio_gmm}
 \usage{
-idio_gmm(x, G, max_out, mnames = "VVV", seed = 123, print_interval = Inf)
+idio_gmm(
+  x,
+  comp_num,
+  max_out,
+  mnames = "VVV",
+  seed = 123,
+  print_interval = Inf
+)
 }
 \arguments{
 \item{x}{Data.}
 
-\item{G}{Number of components.}
+\item{comp_num}{Number of components.}
 
 \item{max_out}{Maximum number of outliers.}
 
@@ -26,17 +33,29 @@ List of
 \item outlier_bool
 \item outlier_num
 \item outlier_rank
-\item oGMM_labels
+\item gmm_labels
 }
 }
 \description{
 Iterative Detection & Identification of Outliers while Clustering
 }
 \examples{
-faithful_idio_gmm <- idio_gmm(faithful, G = 2, max_out = 20, seed = 123)
+n_vec <- c(2000, 1000, 1000)
+mu_list <- list(c(-1, 0), c(+1, -1), c(+1, +1))
+sigma_list <- list(diag(c(0.2, 4 * 0.2)),
+                   diag(c(0.2, 0.2)),
+                   diag(c(0.2, 0.2)))
+noisy_gmm_p2g3 <- simulate_noisy_gmm(
+  n_vec, mu_list, sigma_list,
+  outlier_num = 40, seed = 123, crit_val = 0.9999,
+  unif_range_multiplier = 1.5
+)
+idio_gmm_p2g3 <- idio_gmm(noisy_gmm_p2g3[, 1:2], comp_num = 3, max_out = 100,
+                          print_interval = 10)
 par(mfrow = c(1, 2))
-plot(0:20, faithful_idio_gmm$distrib_diffs, type = "l")
-abline(v = faithful_idio_gmm$outlier_num)
-plot(faithful, col = faithful_idio_gmm$oGMM_labels)
+plot(0:100, idio_gmm_p2g3$distrib_diffs, type = "l")
+abline(v = idio_gmm_p2g3$outlier_num)
+plot(noisy_gmm_p2g3[, 1:2], col = idio_gmm_p2g3$gmm_labels,
+     pch = 1 + noisy_gmm_p2g3[, 3])
 par(mfrow = c(1, 1))
 }
