@@ -11,6 +11,7 @@
 #' @param crit_val Critical value for uniform sample rejection.
 #' @param unif_range_multiplier How much greater should the range of the Uniform
 #'                              samples be than the range of the Normal samples?
+#' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return Matrix with a label column.
 #' @export
@@ -30,7 +31,8 @@
 #'      col = 1 + noisy_gmm_p2g3[, 3], pch = 1 + noisy_gmm_p2g3[, 3])
 simulate_noisy_gmm <- function(
   n, mu, sigma,
-  outlier_num, seed = 123, crit_val = 0.9999, unif_range_multiplier = 1.5
+  outlier_num, seed = 123, crit_val = 0.9999, unif_range_multiplier = 1.5,
+  print_interval = Inf
 ) {
   var_num <- length(mu[[1]])
   comp_num <- length(n)
@@ -77,8 +79,9 @@ simulate_noisy_gmm <- function(
     count <- count + all(checks)
 
     attempts <- attempts + 1
-    cat(paste0("attempts = ", attempts, ", count = ", count, "\n"))
-  }
+    if (attempts %% print_interval == 0) {
+      cat(paste0("attempts = ", attempts, ", count = ", count, "\n"))
+    }  }
 
   labels <- rep(seq_len(comp_num), n)
   labels <- c(labels, rep(0, outlier_num))

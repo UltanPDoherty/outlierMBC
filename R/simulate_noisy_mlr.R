@@ -13,6 +13,7 @@
 #' @param crit_val Critical value for uniform sample rejection.
 #' @param unif_range_multiplier How much greater should the range of the Uniform
 #'                              samples be than the range of the Normal samples?
+#' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return Matrix with a label column.
 #' @export
@@ -23,15 +24,16 @@
 #' sigma_list <- list(as.matrix(0.1))
 #' beta_list <- list(c(1, 1))
 #' error_sd_vec <- c(0.1)
-#' noisy_mlr <- simulate_noisy_mlr(n_vec, mu_list, sigma_list, beta_list,
-#'                                 error_sd_vec,
-#'                                 outlier_num = 20, seed = 123,
-#'                                 crit_val = 0.999)
-#' plot(x = noisy_mlr$covariates[, 1], y = noisy_mlr$responses,
-#'      col = 1 + noisy_mlr$labels)
+#' noisy_mlr_p1 <- simulate_noisy_mlr(n_vec, mu_list, sigma_list, beta_list,
+#'                                    error_sd_vec,
+#'                                    outlier_num = 20, seed = 123,
+#'                                    crit_val = 0.999)
+#' plot(x = noisy_mlr_p1$covariates[, 1], y = noisy_mlr_p1$responses,
+#'      col = 1 + noisy_mlr_p1$labels)
 simulate_noisy_mlr <- function(
   n, mu, sigma, beta, error_sd,
-  outlier_num, seed = 123, crit_val = 0.9999, unif_range_multiplier = 1.5
+  outlier_num, seed = 123, crit_val = 0.9999, unif_range_multiplier = 1.5,
+  print_interval = Inf
 ) {
   var_num <- length(mu[[1]])
   comp_num <- length(n)
@@ -86,7 +88,9 @@ simulate_noisy_mlr <- function(
     count <- count + all(checks)
 
     attempts <- attempts + 1
-    cat(paste0("attempts = ", attempts, ", count = ", count, "\n"))
+    if (attempts %% print_interval == 0) {
+      cat(paste0("attempts = ", attempts, ", count = ", count, "\n"))
+    }
   }
 
   labels <- rep(seq_len(comp_num), n)
