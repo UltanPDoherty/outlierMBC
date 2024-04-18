@@ -52,10 +52,7 @@ idio_mlr <- function(x, y, max_out, print_interval = Inf) {
 
     mod <- stats::lm(y ~ x)
 
-    out <- distrib_diff_mlr(
-      stats::rstandard(mod),
-      obs_num - var_num
-    )
+    out <- distrib_diff_mlr(mod)
 
     distrib_diffs[i] <- out$distrib_diff
 
@@ -68,7 +65,6 @@ idio_mlr <- function(x, y, max_out, print_interval = Inf) {
   outlier_num <- which.min(distrib_diffs) - 1
 
   outlier_bool <- outlier_rank <= outlier_num & outlier_rank != 0
-
 
   mod <- stats::lm(y0 ~ x0, data = list(x0 = x0, y0 = y0),
                    subset = !outlier_bool)
