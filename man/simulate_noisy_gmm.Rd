@@ -11,7 +11,8 @@ simulate_noisy_gmm(
   outlier_num,
   seed = 123,
   crit_val = 0.9999,
-  unif_range_multiplier = 1.5
+  unif_range_multiplier = 1.5,
+  print_interval = Inf
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ simulate_noisy_gmm(
 
 \item{unif_range_multiplier}{How much greater should the range of the Uniform
 samples be than the range of the Normal samples?}
+
+\item{print_interval}{How frequently the iteration count is printed.}
 }
 \value{
 Matrix with a label column.

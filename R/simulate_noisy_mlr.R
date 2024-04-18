@@ -29,7 +29,7 @@
 #'                                    outlier_num = 20, seed = 123,
 #'                                    crit_val = 0.999)
 #' plot(x = noisy_mlr_p1$covariates[, 1], y = noisy_mlr_p1$responses,
-#'      col = 1 + noisy_mlr_p1$labels)
+#'      col = 1 + noisy_mlr_p1$labels, pch = 1 + noisy_mlr_p1$labels)
 simulate_noisy_mlr <- function(
   n, mu, sigma, beta, error_sd,
   outlier_num, seed = 123, crit_val = 0.9999, unif_range_multiplier = 1.5,

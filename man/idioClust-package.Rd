@@ -19,7 +19,7 @@ with response variable outliers.
 }
 }
 \author{
-\strong{Maintainer}: Ultán Doherty \email{dohertyu@tcd.ie} (\href{https://orcid.org/0000-0003-1791-395X}{ORCID})
+\strong{Maintainer}: UltC!n Doherty \email{dohertyu@tcd.ie} (\href{https://orcid.org/0000-0003-1791-395X}{ORCID})
 
 }
 \keyword{internal}
