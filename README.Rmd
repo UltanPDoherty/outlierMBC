@@ -1,28 +1,25 @@
-idioClust
-================
-Ultán P. Doherty
-2024-04-18
+---
+title: "idioClust"
+author: "Ultán P. Doherty"
+date: "2024-04-18"
+output: github_document
+---
 
 ## Iterative Detection & Identification of Outliers while Clustering
 
-- `idio_gmm` - Identify multivariate outliers while clustering the data
-  with a Gaussian mixture model.
-- `idio_mlr` - Identify response variable outliers while fitting a
-  multiple linear regression model to the data.
-- `simulate_noisy_gmm` - Simulate data from a Gaussian mixture model
-  with multivariate outliers.
-- `simulate_noisy_mlr` - Simulate data from a multiple linear regression
-  model with response variable outliers.
+* `idio_gmm` -  Identify multivariate outliers while clustering the data with a Gaussian mixture model.
+* `idio_mlr` - Identify response variable outliers while fitting a multiple linear regression model to the data.
+* `simulate_noisy_gmm` - Simulate data from a Gaussian mixture model with multivariate outliers.
+* `simulate_noisy_mlr` - Simulate data from a multiple linear regression model with response variable outliers.
 
-``` r
+
+```{r}
 devtools::load_all()
 ```
 
-    ## ℹ Loading idioClust
-
 ### `simulate_noisy_gmm`
 
-``` r
+```{r}
 n_vec <- c(2000, 1000, 1000)
 mu_list <- list(c(-1, 0), c(+1, -1), c(+1, +1))
 sigma_list <- list(diag(c(0.2, 4 * 0.2)),
@@ -38,11 +35,9 @@ plot(noisy_gmm_p2g3[, 1:2],
      col = 1 + noisy_gmm_p2g3[, 3], pch = 1 + noisy_gmm_p2g3[, 3])
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
-
 ### `idio_gmm`
 
-``` r
+```{r}
 idio_gmm_p2g3 <- idio_gmm(noisy_gmm_p2g3[, 1:2], comp_num = 3, max_out = 100,
                          print_interval = Inf)
 par(mfrow = c(1, 2))
@@ -52,11 +47,9 @@ plot(noisy_gmm_p2g3[, 1:2], col = idio_gmm_p2g3$gmm_labels,
    pch = 1 + noisy_gmm_p2g3[, 3])
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
-
 ### `simulate_noisy_mlr`
 
-``` r
+```{r}
 n_vec <- c(1000)
 mu_list <- list(+1)
 sigma_list <- list(as.matrix(0.1))
@@ -71,11 +64,9 @@ plot(x = noisy_mlr_p1$covariates[, 1], y = noisy_mlr_p1$responses,
      col = 1 + noisy_mlr_p1$labels, pch = 1 + noisy_mlr_p1$labels)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
-
 ### `idio_mlr`
 
-``` r
+```{r}
 idio_mlr_p1 <- idio_mlr(noisy_mlr_p1$covariates, noisy_mlr_p1$responses,
                         max_out = 50, print_interval = Inf)
 par(mfrow = c(1, 2))
@@ -84,5 +75,3 @@ abline(v = idio_mlr_p1$outlier_num)
 plot(x = noisy_mlr_p1$covariates[, 1], y = noisy_mlr_p1$responses,
      pch = 1 + noisy_mlr_p1$labels, col = 1 + idio_mlr_p1$outlier_bool)
 ```
-
-![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
