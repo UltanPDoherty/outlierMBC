@@ -7,7 +7,6 @@
 #' * scsqst_res
 #' * choice_id
 distrib_diff_mlr <- function(lm_mod) {
-
   student_resids <- stats::rstandard(lm_mod)
 
   scsqst_res <- student_resids^2 / lm_mod$df.residual
@@ -24,7 +23,9 @@ distrib_diff_mlr <- function(lm_mod) {
 
   choice_id <- which.min(dnorm(lm_mod$residuals, sd = stats::sigma(lm_mod)))
 
-  return(list(distrib_diff = distrib_diff,
-              scsqst_res = scsqst_res,
-              choice_id = choice_id))
+  return(list(
+    distrib_diff = distrib_diff,
+    scsqst_res = scsqst_res,
+    choice_id = choice_id
+  ))
 }

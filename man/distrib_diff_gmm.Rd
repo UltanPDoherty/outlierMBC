@@ -4,12 +4,14 @@
 \alias{distrib_diff_gmm}
 \title{distrib_diff_gmm}
 \usage{
-distrib_diff_gmm(x, z, mu, sigma)
+distrib_diff_gmm(x, z, prop, mu, sigma)
 }
 \arguments{
 \item{x}{Data.}
 
 \item{z}{Component assignment probability matrix.}
+
+\item{prop}{Vector of component proportions.}
 
 \item{mu}{List of component mean vectors.}
 

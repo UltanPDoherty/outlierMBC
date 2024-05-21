@@ -30,9 +30,11 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
 
   distrib_diff <- sum(prop * distrib_diff_vec)
 
-  return(list(distrib_diff = distrib_diff,
-              distrib_diff_vec = distrib_diff_vec,
-              choice_id = choice_id))
+  return(list(
+    distrib_diff = distrib_diff,
+    distrib_diff_vec = distrib_diff_vec,
+    choice_id = choice_id
+  ))
 }
 
 #' distrib_diff_gmm_g
@@ -63,7 +65,9 @@ distrib_diff_gmm_g <- function(x, z_g, mu_g, sigma_g) {
 
   dens_g <- (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
 
-  return(list(distrib_diff_g = distrib_diff_g,
-              scaled_mahalas_g = scaled_mahalas_g,
-              dens_g = dens_g))
+  return(list(
+    distrib_diff_g = distrib_diff_g,
+    scaled_mahalas_g = scaled_mahalas_g,
+    dens_g = dens_g
+  ))
 }

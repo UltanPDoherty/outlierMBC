@@ -19,21 +19,23 @@
 #' @examples
 #' n_vec <- c(2000, 1000, 1000)
 #' mu_list <- list(c(-1, 0), c(+1, -1), c(+1, +1))
-#' sigma_list <- list(diag(c(0.2, 4 * 0.2)),
-#'                    diag(c(0.2, 0.2)),
-#'                    diag(c(0.2, 0.2)))
+#' sigma_list <- list(
+#'   diag(c(0.2, 4 * 0.2)),
+#'   diag(c(0.2, 0.2)),
+#'   diag(c(0.2, 0.2))
+#' )
 #' noisy_gmm_p2g3 <- simulate_noisy_gmm(
 #'   n_vec, mu_list, sigma_list,
 #'   outlier_num = 40, seed = 123, crit_val = 0.9999,
 #'   unif_range_multiplier = 1.5
 #' )
 #' plot(noisy_gmm_p2g3[, 1:2],
-#'      col = 1 + noisy_gmm_p2g3[, 3], pch = 1 + noisy_gmm_p2g3[, 3])
+#'   col = 1 + noisy_gmm_p2g3[, 3], pch = 1 + noisy_gmm_p2g3[, 3]
+#' )
 simulate_noisy_gmm <- function(
-  n, mu, sigma,
-  outlier_num, seed = 123, crit_val = 0.9999, unif_range_multiplier = 1.5,
-  print_interval = Inf
-) {
+    n, mu, sigma,
+    outlier_num, seed = 123, crit_val = 0.9999, unif_range_multiplier = 1.5,
+    print_interval = Inf) {
   var_num <- length(mu[[1]])
   comp_num <- length(n)
 
@@ -71,8 +73,10 @@ simulate_noisy_gmm <- function(
     }
 
     for (g in seq_len(comp_num)) {
-      unif_mahala <- stats::mahalanobis(unif_samp[count + 1, ],
-                                        mu[[g]], sigma[[g]])
+      unif_mahala <- stats::mahalanobis(
+        unif_samp[count + 1, ],
+        mu[[g]], sigma[[g]]
+      )
       checks[g] <- stats::pchisq(unif_mahala, df = var_num) > crit_val
     }
 
@@ -81,7 +85,8 @@ simulate_noisy_gmm <- function(
     attempts <- attempts + 1
     if (attempts %% print_interval == 0) {
       cat(paste0("attempts = ", attempts, ", count = ", count, "\n"))
-    }  }
+    }
+  }
 
   labels <- rep(seq_len(comp_num), n)
   labels <- c(labels, rep(0, outlier_num))

@@ -4,18 +4,16 @@
 \alias{distrib_diff_mlr}
 \title{distrib_diff_mlr}
 \usage{
-distrib_diff_mlr(student_resids, df)
+distrib_diff_mlr(lm_mod)
 }
 \arguments{
-\item{student_resids}{Data.}
-
-\item{df}{Component assignment probability matrix.}
+\item{lm_mod}{Output from \code{lm} function.}
 }
 \value{
 List of
 \itemize{
 \item distrib_diff
-\item sq_st_res
+\item scsqst_res
 \item choice_id
 }
 }

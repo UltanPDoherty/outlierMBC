@@ -22,9 +22,11 @@
 #' @examples
 #' n_vec <- c(2000, 1000, 1000)
 #' mu_list <- list(c(-1, 0), c(+1, -1), c(+1, +1))
-#' sigma_list <- list(diag(c(0.2, 4 * 0.2)),
-#'                    diag(c(0.2, 0.2)),
-#'                    diag(c(0.2, 0.2)))
+#' sigma_list <- list(
+#'   diag(c(0.2, 4 * 0.2)),
+#'   diag(c(0.2, 0.2)),
+#'   diag(c(0.2, 0.2))
+#' )
 #' noisy_gmm_p2g3 <- simulate_noisy_gmm(
 #'   n_vec, mu_list, sigma_list,
 #'   outlier_num = 40, seed = 123, crit_val = 0.9999,
@@ -39,7 +41,6 @@
 #' # par(mfrow = c(1, 1))
 idio_gmm <- function(x, comp_num, max_out, mnames = "VVV", seed = 123,
                      print_interval = Inf) {
-
   x <- as.matrix(x)
   x0 <- x
 
@@ -56,14 +57,17 @@ idio_gmm <- function(x, comp_num, max_out, mnames = "VVV", seed = 123,
     mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = z0)
 
     if (any(colSums(mix$z) < var_num + 1)) {
-      warning(paste0("One of the components became too small after removing ",
-                     i - 1, " outliers."))
+      warning(paste0(
+        "One of the components became too small after removing ",
+        i - 1, " outliers."
+      ))
       break()
     }
 
     out <- distrib_diff_gmm(
       x,
       mix$z,
+      mix$best_model$model_obj[[1]]$pi_gs,
       mix$best_model$model_obj[[1]]$mu,
       mix$best_model$model_obj[[1]]$sigs
     )
@@ -85,9 +89,11 @@ idio_gmm <- function(x, comp_num, max_out, mnames = "VVV", seed = 123,
   gmm_labels <- rep(1, nrow(x0))
   gmm_labels[!outlier_bool] <- 1 + mix$map
 
-  return(list(distrib_diffs = distrib_diffs,
-              outlier_bool = outlier_bool,
-              outlier_num = outlier_num,
-              outlier_rank = outlier_rank,
-              gmm_labels = gmm_labels))
+  return(list(
+    distrib_diffs = distrib_diffs,
+    outlier_bool = outlier_bool,
+    outlier_num = outlier_num,
+    outlier_rank = outlier_rank,
+    gmm_labels = gmm_labels
+  ))
 }
