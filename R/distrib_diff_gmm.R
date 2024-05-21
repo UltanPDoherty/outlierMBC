@@ -24,9 +24,7 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
     dens_mat[, g] <- out_g$dens_g
   }
 
-  # mix_dens <- rowSums(z * dens_mat)
-  prop <- colSums(z)
-  mix_dens <- dens_mat %*% prop
+  mix_dens <- dens_mat %*% t(prop)
 
   choice_id <- which.min(mix_dens)
 
