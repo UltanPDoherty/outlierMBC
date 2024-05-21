@@ -2,6 +2,7 @@
 #'
 #' @param x Data.
 #' @param z Component assignment probability matrix.
+#' @param prop Vector of component proportions.
 #' @param mu List of component mean vectors.
 #' @param sigma List of component covariance matrices.
 #'
@@ -9,11 +10,9 @@
 #' * distrib_diff
 #' * distrib_diff_vec
 #' * choice_id
-distrib_diff_gmm <- function(x, z, mu, sigma) {
-
+distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
-  prop <- colMeans(z)
 
   distrib_diff_vec <- c()
   scaled_mahalas <- matrix(nrow = obs_num, ncol = comp_num)
