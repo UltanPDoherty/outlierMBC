@@ -71,8 +71,8 @@ idio_gmm <- function(x, comp_num, max_out, mnames = "VVV", seed = 123,
     distrib_diffs[i] <- out$distrib_diff
 
     outlier_rank[!outlier_rank][out$choice_id] <- i
-    x <- x[-out$choice_id, ]
-    z0 <- mix$z[-out$choice_id, ]
+    x <- x[-out$choice_id, , drop = FALSE]
+    z0 <- mix$z[-out$choice_id, , drop = FALSE]
   }
 
   outlier_num <- which.min(distrib_diffs) - 1
