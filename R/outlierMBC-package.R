@@ -2,9 +2,9 @@
 #' @description
 #'
 #' Exported Functions:
-#' * `idio_gmm` - Identify multivariate outliers while clustering the data with
+#' * `ombc_gmm` - Identify multivariate outliers while clustering the data with
 #'                a Gaussian mixture model.
-#' * `idio_mlr` - Identify response variable outliers while fitting a multiple
+#' * `ombc_mlr` - Identify response variable outliers while fitting a multiple
 #'                linear regression model to the data.
 #' * `simulate_noisy_gmm` - Simulate data from a Gaussian mixture model with
 #'                          multivariate outliers.
