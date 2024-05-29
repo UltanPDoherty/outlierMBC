@@ -1,4 +1,4 @@
-#' idio_gmm
+#' ombc_gmm
 #'
 #' @description
 #' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
@@ -32,14 +32,14 @@
 #'   outlier_num = 40, seed = 123, crit_val = 0.9999,
 #'   unif_range_multiplier = 1.5
 #' )
-#' idio_gmm_p2g3 <- idio_gmm(noisy_gmm_p2g3[, 1:2], comp_num = 3, max_out = 80)
+#' ombc_gmm_p2g3 <- ombc_gmm(noisy_gmm_p2g3[, 1:2], comp_num = 3, max_out = 80)
 #' # par(mfrow = c(1, 2))
-#' # plot(0:80, idio_gmm_p2g3$distrib_diffs, type = "l")
-#' # abline(v = idio_gmm_p2g3$outlier_num)
-#' # plot(noisy_gmm_p2g3[, 1:2], col = idio_gmm_p2g3$gmm_labels,
+#' # plot(0:80, ombc_gmm_p2g3$distrib_diffs, type = "l")
+#' # abline(v = ombc_gmm_p2g3$outlier_num)
+#' # plot(noisy_gmm_p2g3[, 1:2], col = ombc_gmm_p2g3$gmm_labels,
 #' #      pch = 1 + noisy_gmm_p2g3[, 3])
 #' # par(mfrow = c(1, 1))
-idio_gmm <- function(x, comp_num, max_out, mnames = "VVV", seed = 123,
+ombc_gmm <- function(x, comp_num, max_out, mnames = "VVV", seed = 123,
                      print_interval = Inf) {
   x <- as.matrix(x)
   x0 <- x
