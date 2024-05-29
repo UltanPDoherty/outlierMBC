@@ -1,13 +1,13 @@
-idioClust
+outlierMBC
 ================
 Ultán P. Doherty
 2024-04-18
 
-## Iterative Detection & Identification of Outliers while Clustering
+## Outlier Identification for Model-Based Clustering
 
-- `idio_gmm` - Identify multivariate outliers while clustering the data
+- `ombc_gmm` - Identify multivariate outliers while clustering the data
   with a Gaussian mixture model.
-- `idio_mlr` - Identify response variable outliers while fitting a
+- `ombc_mlr` - Identify response variable outliers while fitting a
   multiple linear regression model to the data.
 - `simulate_noisy_gmm` - Simulate data from a Gaussian mixture model
   with multivariate outliers.
@@ -19,28 +19,34 @@ library(ggplot2)
 devtools::load_all()
 ```
 
-    ## ℹ Loading idioClust
+    ## ℹ Loading outlierMBC
 
 ### `simulate_noisy_gmm`
 
 ``` r
 n_vec <- c(2000, 1000, 1000)
 mu_list <- list(c(-1, 0), c(+1, -1), c(+1, +1))
-sigma_list <- list(diag(c(0.2, 4 * 0.2)),
-                  diag(c(0.2, 0.2)),
-                  diag(c(0.2, 0.2)))
+sigma_list <- list(
+  diag(c(0.2, 4 * 0.2)),
+  diag(c(0.2, 0.2)),
+  diag(c(0.2, 0.2))
+)
 
 noisy_gmm_p2g3 <- simulate_noisy_gmm(
- n_vec, mu_list, sigma_list,
- outlier_num = 40, seed = 123, crit_val = 0.9999,
- unif_range_multiplier = 1.5
+  n_vec, mu_list, sigma_list,
+  outlier_num = 40, seed = 123, crit_val = 0.9999,
+  unif_range_multiplier = 1.5
 )
 ```
 
 ``` r
-ggplot(as.data.frame(noisy_gmm_p2g3),
-       aes(x = V1, y = V2,
-           colour = as.factor(labels), shape = as.factor(labels))) +
+ggplot(
+  as.data.frame(noisy_gmm_p2g3),
+  aes(
+    x = V1, y = V2,
+    colour = as.factor(labels), shape = as.factor(labels)
+  )
+) +
   geom_point() +
   labs(colour = "truth", shape = "truth") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
@@ -48,31 +54,41 @@ ggplot(as.data.frame(noisy_gmm_p2g3),
 
 ![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
-### `idio_gmm`
+### `ombc_gmm`
 
 ``` r
-idio_gmm_p2g3 <- idio_gmm(noisy_gmm_p2g3[, 1:2], comp_num = 3, max_out = 80,
-                         print_interval = Inf)
+ombc_gmm_p2g3 <- ombc_gmm(noisy_gmm_p2g3[, 1:2],
+  comp_num = 3, max_out = 80,
+  print_interval = Inf
+)
 ```
 
 ``` r
-ggplot(data.frame(outliers_removed = 0:80, 
-                  distrib_diffs = idio_gmm_p2g3$distrib_diffs),
-       aes(x = outliers_removed, y = distrib_diffs)) +
+ggplot(
+  data.frame(
+    outliers_removed = 0:80,
+    distrib_diffs = ombc_gmm_p2g3$distrib_diffs
+  ),
+  aes(x = outliers_removed, y = distrib_diffs)
+) +
   geom_line() +
   geom_point() +
-  geom_vline(xintercept = idio_gmm_p2g3$outlier_num)
+  geom_vline(xintercept = ombc_gmm_p2g3$outlier_num)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
-ggplot(as.data.frame(noisy_gmm_p2g3),
-       aes(x = V1, y = V2,
-           colour = as.factor(idio_gmm_p2g3$gmm_labels),
-           shape = as.factor(1 + labels))) +
+ggplot(
+  as.data.frame(noisy_gmm_p2g3),
+  aes(
+    x = V1, y = V2,
+    colour = as.factor(ombc_gmm_p2g3$gmm_labels),
+    shape = as.factor(1 + labels)
+  )
+) +
   geom_point() +
-  labs(colour = "idio_gmm", shape = "truth") +
+  labs(colour = "ombc_gmm", shape = "truth") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
@@ -88,15 +104,20 @@ beta_list <- list(c(1, 1))
 error_sd_vec <- c(0.5)
 
 noisy_mlr_p1 <- simulate_noisy_mlr(n_vec, mu_list, sigma_list, beta_list,
-                                   error_sd_vec,
-                                   outlier_num = 20, seed = 123,
-                                   crit_val = 0.9999)
+  error_sd_vec,
+  outlier_num = 20, seed = 123,
+  crit_val = 0.9999
+)
 ```
 
 ``` r
-ggplot(as.data.frame(noisy_mlr_p1),
-       aes(x = V1, y = responses,
-           colour = as.factor(labels), shape = as.factor(labels))) +
+ggplot(
+  as.data.frame(noisy_mlr_p1),
+  aes(
+    x = V1, y = responses,
+    colour = as.factor(labels), shape = as.factor(labels)
+  )
+) +
   geom_point() +
   labs(colour = "truth", shape = "truth") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
@@ -104,18 +125,23 @@ ggplot(as.data.frame(noisy_mlr_p1),
 
 ![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
-### `idio_mlr`
+### `ombc_mlr`
 
 ``` r
-idio_mlr_p1 <- idio_mlr(noisy_mlr_p1$covariates, noisy_mlr_p1$responses,
-                        max_out = 40, print_interval = Inf)
+ombc_mlr_p1 <- ombc_mlr(noisy_mlr_p1$covariates, noisy_mlr_p1$responses,
+  max_out = 40, print_interval = Inf
+)
 ```
 
 ``` r
-ggplot(data.frame(outliers_removed = 0:40,
-                  distrib_diffs = idio_mlr_p1$distrib_diffs,
-                  outlier_num = idio_mlr_p1$outlier_num),
-       aes(x = outliers_removed, y = distrib_diffs)) +
+ggplot(
+  data.frame(
+    outliers_removed = 0:40,
+    distrib_diffs = ombc_mlr_p1$distrib_diffs,
+    outlier_num = ombc_mlr_p1$outlier_num
+  ),
+  aes(x = outliers_removed, y = distrib_diffs)
+) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
@@ -124,12 +150,16 @@ ggplot(data.frame(outliers_removed = 0:40,
 ![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
-ggplot(as.data.frame(noisy_mlr_p1),
-       aes(x = V1, y = responses,
-           colour = as.factor(1 + idio_mlr_p1$outlier_bool),
-           shape = as.factor(1 + labels))) +
+ggplot(
+  as.data.frame(noisy_mlr_p1),
+  aes(
+    x = V1, y = responses,
+    colour = as.factor(1 + ombc_mlr_p1$outlier_bool),
+    shape = as.factor(1 + labels)
+  )
+) +
   geom_point() +
-  labs(colour = "idio_mlr", shape = "truth") +
+  labs(colour = "ombc_mlr", shape = "truth") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
