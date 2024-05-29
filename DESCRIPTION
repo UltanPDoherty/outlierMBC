@@ -1,5 +1,5 @@
-Package: idioClust
-Title: Iterative Detection & Identification of Outliers while Clustering
+Package: outlierMBC
+Title: Iterative Detection & Identification of Outliers for Model-Based Clustering
 Version: 0.0.0.9000
 Authors@R: 
     person("Ultán", "Doherty", , "dohertyu@tcd.ie", role = c("aut", "cre"),

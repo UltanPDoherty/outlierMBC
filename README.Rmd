@@ -1,5 +1,5 @@
 ---
-title: "idioClust"
+title: "outlierMBC"
 author: "Ultán P. Doherty"
 date: "2024-04-18"
 output: github_document
