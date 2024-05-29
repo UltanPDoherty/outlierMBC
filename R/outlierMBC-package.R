@@ -16,5 +16,6 @@
 #' @importFrom mixture gpcm
 #' @importFrom mvtnorm dmvnorm
 #' @importFrom spatstat.geom ewcdf
+#' @importFrom stats dnorm
 ## usethis namespace: end
 NULL
