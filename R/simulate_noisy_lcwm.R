@@ -11,7 +11,7 @@
 #' @param outlier_num Desired number of outliers.
 #' @param seed Seed.
 #' @param crit_val Critical value for uniform sample rejection.
-#' @param unif_range_multipliers .
+#' @param range_multipliers .
 #' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return Matrix with a label column.
@@ -41,100 +41,88 @@ simulate_noisy_lcwm <- function(
     outlier_num,
     seed = 123,
     crit_val = 0.9999,
-    unif_range_multipliers = c(1.5, 1.5),
+    range_multipliers = c(1.5, 1.5),
     print_interval = Inf) {
+
   var_num <- length(mu[[1]])
   comp_num <- length(n)
 
   set.seed(seed)
-  comps <- list()
+  covariates <- list()
   responses <- list()
   errors <- list()
   range_mats <- rep(list(matrix(nrow = var_num, ncol = 2)), comp_num)
   dim_means <- matrix(nrow = comp_num, ncol = var_num)
   dim_widths <- matrix(nrow = comp_num, ncol = var_num)
+  err_width <- rep(NA, comp_num)
   for (g in seq_len(comp_num)) {
-    comps[[g]] <- mvtnorm::rmvnorm(
-      n[g],
-      mu[[g]],
-      sigma[[g]]
-    )
+    covariates[[g]] <- mvtnorm::rmvnorm(n[g], mu[[g]], sigma[[g]])
 
     errors[[g]] <- stats::rnorm(n[g], 0, sd = error_sd[g])
 
-    responses[[g]] <- errors[[g]] + beta[[g]][1] + comps[[g]] %*% beta[[g]][-1]
+    responses[[g]] <- errors[[g]] + beta[[g]][1] + covariates[[g]] %*% beta[[g]][-1]
 
-    range_mats[[g]] <- apply(comps[[g]], 2, range)
+    range_mats[[g]] <- apply(covariates[[g]], 2, range)
     dim_means[g, ] <- colMeans(range_mats[[g]])
     dim_widths[g, ] <- range_mats[[g]][2, ] - range_mats[[g]][1, ]
+
+    err_width[g] <- diff(range(errors[[g]]))
   }
 
-  samp <- Reduce(rbind, comps)
-  colnames(samp) <- paste0("V", seq_len(var_num))
-  resp <- Reduce(c, responses)
-
-  err_width <- vapply(errors, function(x) diff(range(x)), double(1L))
-
   set.seed(seed)
-  count <- rep(0, comp_num)
-  mahala_probs <- rep(NA, comp_num)
-  resp_probs <- rep(NA, comp_num)
-  checks <- rep(NA, comp_num)
-  attempts <- rep(0, comp_num)
-  unif_samp <- lapply(outlier_num, function(x) matrix(nrow = x, ncol = var_num))
-  err_unif <- lapply(outlier_num, function(x) rep(NA, x))
-  pred_unif <- lapply(outlier_num, function(x) rep(NA, x))
-  temp_pred_unif <- rep(NA, comp_num)
-  out_unif <- lapply(outlier_num, function(x) rep(NA, x))
+  prob_x <- prob_y <- checks <- temp_outliers_fitted <- rep(NA, comp_num)
+  outliers_x <- lapply(outlier_num, function(x) matrix(nrow = x, ncol = var_num))
+  outliers_err <- outliers_fitted <- outliers_y <- lapply(outlier_num, function(x) rep(NA, x))
   for (g in seq_len(comp_num)) {
-    while (count[g] < outlier_num[g]) {
+    count <- attempts <- 0
+    while (count < outlier_num[g]) {
+      count <- count + 1
+
       for (p in seq_len(var_num)) {
-        unif_samp[[g]][count[g] + 1, p] <- stats::runif(
+        outliers_x[[g]][count, p] <- stats::runif(
           1,
-          dim_means[g, p] - (unif_range_multipliers[1] / 2) * dim_widths[g, p],
-          dim_means[g, p] + (unif_range_multipliers[1] / 2) * dim_widths[g, p]
+          dim_means[g, p] - (range_multipliers[1] / 2) * dim_widths[g, p],
+          dim_means[g, p] + (range_multipliers[1] / 2) * dim_widths[g, p]
         )
       }
 
-      err_unif[[g]][count[g] + 1] <- stats::runif(
+      outliers_err[[g]][count] <- stats::runif(
         1,
-        0 - (unif_range_multipliers[2] / 2) * err_width[g],
-        0 + (unif_range_multipliers[2] / 2) * err_width[g]
+        min = 0 - (range_multipliers[2] / 2) * err_width[g],
+        max = 0 + (range_multipliers[2] / 2) * err_width[g]
       )
 
-      pred_unif[[g]][count[g] + 1] <-
-        (beta[[g]][1] + sum(unif_samp[[g]][count[g] + 1, ] * beta[[g]][-1]))
+      outliers_fitted[[g]][count] <-
+        (beta[[g]][1] + outliers_x[[g]][count, ] %*% beta[[g]][-1])
 
-      out_unif[[g]][count[g] + 1] <-
-        (pred_unif[[g]][count[g] + 1] + err_unif[[g]][count[g] + 1])
+      outliers_y[[g]][count] <-
+        (outliers_fitted[[g]][count] + outliers_err[[g]][count])
 
       for (h in seq_len(comp_num)) {
-        unif_mahala <- stats::mahalanobis(
-          unif_samp[[g]][count[g] + 1, ],
-          mu[[h]], sigma[[h]]
-        )
-        mahala_probs[h] <- stats::pchisq(
-          unif_mahala,
+        prob_x[h] <- stats::pchisq(
+          stats::mahalanobis(outliers_x[[g]][count, ], mu[[h]], sigma[[h]]),
           df = var_num, lower.tail = FALSE
         )
 
-        temp_pred_unif[h] <-
-          (beta[[h]][1] + sum(unif_samp[[g]][count[g] + 1, ] * beta[[h]][-1]))
+        temp_outliers_fitted[h] <-
+          (beta[[h]][1] + outliers_x[[g]][count, ] %*% beta[[h]][-1])
 
-        resp_probs[h] <- stats::pnorm(
-          abs(out_unif[[g]][count[g] + 1] - temp_pred_unif[h]),
+        prob_y[h] <- stats::pnorm(
+          abs(outliers_y[[g]][count] - temp_outliers_fitted[h]),
           mean = 0, sd = error_sd[h], lower.tail = FALSE
         )
 
-        checks[h] <- (mahala_probs[h] * resp_probs[h]) < 1 - crit_val
+        checks[h] <- (prob_x[h] * prob_y[h]) < 1 - crit_val
       }
 
-      count[g] <- count[g] + all(checks)
+      count <- count - any(!checks)
 
-      attempts[g] <- attempts[g] + 1
-      if (attempts[g] %% print_interval == 0) {
+      attempts <- attempts + 1
+      if (attempts %% print_interval == 0) {
         cat(paste0(
-          "attempts[", g, "] = ", attempts[g], ", count[", g, "] = ", count[g],
+          "component ", g, ": ",
+          "attempts = ", attempts, ", ",
+          "count = ", count,
           "\n"
         ))
       }
@@ -144,9 +132,14 @@ simulate_noisy_lcwm <- function(
   labels <- rep(seq_len(comp_num), n)
   labels <- c(labels, rep(0, sum(outlier_num)))
 
+  covariates <- rbind(Reduce(rbind, covariates), Reduce(rbind, outliers_x))
+  colnames(covariates) <- paste0("V", seq_len(var_num))
+
+  responses <- c(Reduce(c, responses), Reduce(c, outliers_y))
+
   return(list(
-    covariates = rbind(samp, Reduce(rbind, unif_samp)),
-    responses = c(resp, Reduce(c, out_unif)),
+    covariates = covariates,
+    responses = responses,
     labels = labels
   ))
 }
