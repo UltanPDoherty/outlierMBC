@@ -3,6 +3,7 @@
 export(ombc_gmm)
 export(ombc_mlr)
 export(simulate_noisy_gmm)
+export(simulate_noisy_lcwm)
 export(simulate_noisy_mlr)
 importFrom(mixture,gpcm)
 importFrom(mvtnorm,dmvnorm)
