@@ -67,9 +67,8 @@ simulate_noisy_mlr <- function(
       0 + (unif_range_multiplier / 2) * err_width
     )
 
-    out_unif[count + 1] <- (beta[1]
-    + sum(out_norm[count + 1, ] * beta[-1])
-      + err_unif[count + 1])
+    out_unif[count + 1] <-
+      beta[1] + sum(out_norm[count + 1, ] * beta[-1]) + err_unif[count + 1]
 
     check <- stats::pnorm(abs(err_unif[count + 1]), 0, error_sd) > crit_val
 
