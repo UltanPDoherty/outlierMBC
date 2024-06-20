@@ -4,7 +4,6 @@
 #' Iterative Detection & Identification of Outliers for Multiple Linear
 #' Regression
 #'
-#'
 #' @param x Covariate data.
 #' @param y Response variable.
 #' @param max_out Maximum number of outliers.
@@ -19,24 +18,31 @@
 #' @export
 #'
 #' @examples
-#' n_vec <- c(1000)
-#' mu_list <- list(+1)
-#' sigma_list <- list(as.matrix(0.1))
-#' beta_list <- list(c(1, 1))
-#' error_sd_vec <- c(0.5)
-#' noisy_mlr_p1 <- simulate_noisy_mlr(n_vec, mu_list, sigma_list, beta_list,
-#'   error_sd_vec,
+#' n <- 1000
+#' mu <- c(+1)
+#' sigma <- as.matrix(0.1)
+#' beta <- c(1, 1)
+#' error_sd <- 0.5
+#' noisy_mlr_p1 <- simulate_noisy_mlr(
+#'   n, mu, sigma, beta,
+#'   error_sd,
 #'   outlier_num = 20, seed = 123,
 #'   crit_val = 0.9999
 #' )
-#' ombc_mlr_p1 <- ombc_mlr(noisy_mlr_p1$covariates, noisy_mlr_p1$responses,
+#' ombc_mlr_p1 <- ombc_mlr(
+#'   noisy_mlr_p1$covariates,
+#'   noisy_mlr_p1$responses,
 #'   max_out = 40
 #' )
 #' # par(mfrow = c(1, 2))
 #' # plot(0:40, ombc_mlr_p1$distrib_diffs, type = "l")
 #' # abline(v = ombc_mlr_p1$outlier_num)
-#' # plot(x = noisy_mlr_p1$covariates[, 1], y = noisy_mlr_p1$responses,
-#' #      pch = 1 + noisy_mlr_p1$labels, col = 1 + ombc_mlr_p1$outlier_bool)
+#' # plot(
+#' #  x = noisy_mlr_p1$covariates[, 1],
+#' #  y = noisy_mlr_p1$responses,
+#' #  pch = 1 + noisy_mlr_p1$labels,
+#' #  col = 1 + ombc_mlr_p1$outlier_bool
+#' # )
 #' # par(mfrow = c(1, 1))
 ombc_mlr <- function(x, y, max_out, print_interval = Inf) {
   x <- as.matrix(x)
@@ -64,7 +70,8 @@ ombc_mlr <- function(x, y, max_out, print_interval = Inf) {
 
   outlier_bool <- outlier_rank <= outlier_num & outlier_rank != 0
 
-  mod <- stats::lm(y0 ~ x0,
+  mod <- stats::lm(
+    y0 ~ x0,
     data = list(x0 = x0, y0 = y0),
     subset = !outlier_bool
   )

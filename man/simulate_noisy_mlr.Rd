@@ -18,15 +18,15 @@ simulate_noisy_mlr(
 )
 }
 \arguments{
-\item{n}{Vector of component sizes.}
+\item{n}{Number of true observations.}
 
-\item{mu}{List of component mean vectors.}
+\item{mu}{Covariate mean vector.}
 
-\item{sigma}{List of component covariance matrices.}
+\item{sigma}{Covariate covariance matrix.}
 
-\item{beta}{List of component regression coefficient vectors.}
+\item{beta}{Regression coefficient vector.}
 
-\item{error_sd}{Vector of component regression error standard deivations.}
+\item{error_sd}{Regression error standard deviations.}
 
 \item{outlier_num}{Desired number of outliers.}
 
@@ -40,19 +40,25 @@ samples be than the range of the Normal samples?}
 \item{print_interval}{How frequently the iteration count is printed.}
 }
 \value{
-Matrix with a label column.
+List:
+\itemize{
+\item covariates: matrix of samples from a multivariate Normal distribution.
+\item responses: vector of regression dependent variable values.
+\item labels: vector of 1s (true observations) and 0s (outliers).
+}
 }
 \description{
 Simulate a multiple linear regression model with response variable outliers.
 }
 \examples{
-n_vec <- c(1000)
-mu_list <- list(+1)
-sigma_list <- list(as.matrix(0.1))
-beta_list <- list(c(1, 1))
-error_sd_vec <- c(0.5)
-noisy_mlr_p1 <- simulate_noisy_mlr(n_vec, mu_list, sigma_list, beta_list,
-  error_sd_vec,
+n <- 1000
+mu <- c(+1)
+sigma <- as.matrix(0.1)
+beta <- c(1, 1)
+error_sd <- 0.5
+noisy_mlr_p1 <- simulate_noisy_mlr(
+  n, mu, sigma, beta,
+  error_sd,
   outlier_num = 20, seed = 123,
   crit_val = 0.9999
 )
