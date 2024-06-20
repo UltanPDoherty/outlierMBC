@@ -114,7 +114,8 @@ simulate_noisy_lcwm <- function(
           mu[[h]], sigma[[h]]
         )
         mahala_probs[h] <- stats::pchisq(
-          unif_mahala, df = var_num, lower.tail = FALSE
+          unif_mahala,
+          df = var_num, lower.tail = FALSE
         )
 
         temp_pred_unif[h] <-
