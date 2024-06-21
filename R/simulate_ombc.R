@@ -30,14 +30,14 @@
 #'   sigma = list(as.matrix(0.1), as.matrix(0.1)),
 #'   beta = list(c(1, -1), c(1, 1)),
 #'   error_sd = c(0.5, 0.5),
-#'   outlier_num = c(10, 10),
+#'   outlier_num = c(25, 25),
 #'   outlier_type = "x_and_y",
 #'   seed = 123,
 #'   crit_val = 0.9999,
 #'   range_multipliers = c(1.5, 1.5)
 #' )
 #' plot(
-#'   x = ombc_p1$X1, y = ombc_p1$Y,
+#'   ombc_p1[, c("X1", "Y")],
 #'   col = 1 + ombc_p1$G, pch = 1 + ombc_p1$G
 #' )
 simulate_ombc <- function(
