@@ -1,4 +1,4 @@
-#' simulate_outlier_lcwm
+#' simulate_ombc
 #'
 #' @description
 #' Simulate a multiple linear regression model with response variable outliers.
@@ -15,25 +15,31 @@
 #' @param range_multipliers .
 #' @param print_interval How frequently the iteration count is printed.
 #'
-#' @return `data.frame` with p covariates, 1 response, and 1 label.
+#' @return `data.frame`:
+#' * $X1: first covariate
+#' * ...
+#' * $Y: response
+#' * $G: label
 #' @export
 #'
 #' @examples
-#' outlier_lcwm_p1 <- simulate_outlier_lcwm(
+#' ombc_p1 <- simulate_ombc(
 #'   n = c(1000, 1000),
 #'   mu = list(c(-1), c(+1)),
 #'   sigma = list(as.matrix(0.1), as.matrix(0.1)),
-#'   beta = list(c(-1, 1), c(1, 1)),
+#'   beta = list(c(1, -1), c(1, 1)),
 #'   error_sd = c(0.5, 0.5),
 #'   outlier_num = c(10, 10),
+#'   outlier_type = "x_and_y",
 #'   seed = 123,
-#'   crit_val = 0.9999
+#'   crit_val = 0.9999,
+#'   range_multipliers = c(1.5, 1.5)
 #' )
 #' plot(
-#'   x = outlier_lcwm_p1$X1, y = outlier_lcwm_p1$Y,
-#'   col = 1 + outlier_lcwm_p1$G, pch = 1 + outlier_lcwm_p1$G
+#'   x = ombc_p1$X1, y = ombc_p1$Y,
+#'   col = 1 + ombc_p1$G, pch = 1 + ombc_p1$G
 #' )
-simulate_outlier_lcwm <- function(
+simulate_ombc <- function(
     n,
     mu,
     sigma,
@@ -62,7 +68,7 @@ simulate_outlier_lcwm <- function(
 
     observations[[g]] <- cbind(covariates[[g]], responses[[g]], rep(g, n[g]))
 
-    uniform_spans[[g]] <- uniform_spans_lwcm(
+    uniform_spans[[g]] <- uniform_spans_lcwm(
       range_multipliers, covariates[[g]], errors[[g]]
     )
   }
@@ -71,24 +77,24 @@ simulate_outlier_lcwm <- function(
   outliers <- lapply(outlier_num, function(x) matrix(NA, x, var_num + 2))
   for (g in seq_len(comp_num)) {
     for (j in seq_len(outlier_num[g])) {
-      outliers[[g]][j, ] <- uniform_outlier_lcwm(
+      outliers[[g]][j, ] <- uniform_outlier_ombc(
         outlier_type, mu, sigma, beta, error_sd, g, uniform_spans, crit_val
       )
     }
   }
 
-  lwcm <- as.data.frame(rbind(
+  lcwm <- as.data.frame(rbind(
     Reduce(rbind, observations),
     Reduce(rbind, outliers)
   ))
-  colnames(lwcm) <- c(paste0("X", seq_len(var_num)), "Y", "G")
+  colnames(lcwm) <- c(paste0("X", seq_len(var_num)), "Y", "G")
 
-  return(lwcm)
+  return(lcwm)
 }
 
 # ==============================================================================
 
-test_outlier_lcwm <- function(
+test_outlier_ombc <- function(
   outlier_type,
   mu, sigma, beta, error_sd,
   x_sample, y_sample, crit_val
@@ -126,7 +132,7 @@ test_outlier_lcwm <- function(
 
 # ==============================================================================
 
-uniform_spans_lwcm <- function(range_multipliers, covariates_g, errors_g) {
+uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
 
   ranges_x <- apply(covariates_g, 2, range)
   centres_x <- colMeans(ranges_x)
@@ -182,7 +188,7 @@ uniform_sample_lcwm <- function(
 
 # ==============================================================================
 
-uniform_outlier_lcwm <- function(
+uniform_outlier_ombc <- function(
   outlier_type,
   mu, sigma, beta, error_sd, g,
   uniform_spans, crit_val
@@ -197,7 +203,7 @@ uniform_outlier_lcwm <- function(
       uniform_spans[[g]]
     )
 
-    test <- test_outlier_lcwm(
+    test <- test_outlier_ombc(
       outlier_type,
       mu, sigma, beta, error_sd,
       uniform_sample$x, uniform_sample$y, crit_val
