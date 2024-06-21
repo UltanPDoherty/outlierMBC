@@ -20,6 +20,7 @@
 #' * ...
 #' * $Y: response
 #' * $G: label
+#'
 #' @export
 #'
 #' @examples
@@ -94,6 +95,15 @@ simulate_ombc <- function(
 
 # ==============================================================================
 
+#' Check whether a new sample is an outlier for each component.
+#'
+#' @inheritParams simulate_ombc
+#' @param x_sample New covariate sample.
+#' @param y_sample New response sample.
+#'
+#' @return Logical: TRUE if the new sample is an outlier for each component.
+#'
+#' @export
 test_outlier_ombc <- function(
   outlier_type,
   mu, sigma, beta, error_sd,
@@ -132,6 +142,16 @@ test_outlier_ombc <- function(
 
 # ==============================================================================
 
+#' Obtain the span of the observations for each component.
+#'
+#' @inheritParams simulate_ombc
+#' @param covariates_g Covariate values of the sampled observations.
+#' @param errors_g Response errors of the sampled observations.
+#'
+#' @return `matrix`: minimum and maximum columns, rows for each covariate and
+#'                   one for the response errors.
+#'
+#' @export
 uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
 
   ranges_x <- apply(covariates_g, 2, range)
@@ -153,6 +173,20 @@ uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
 
 # ==============================================================================
 
+#' Sample a potential outlier.
+#'
+#' @inheritParams simulate_ombc
+#' @param mu_g Covariate mean vector for one component.
+#' @param sigma_g Covariate covariance matrix for one component.
+#' @param beta_g Regression coefficient vector for one component.
+#' @param error_sd_g Regression error standard deviation for one component.
+#' @param uniform_spans_g Covariate and response error ranges for one component.
+#'
+#' @return List:
+#' * x = Covariate sample
+#' * y = Response sample
+#'
+#' @export
 uniform_sample_lcwm <- function(
   outlier_type, mu_g, sigma_g, beta_g, error_sd_g, uniform_spans_g
 ) {
@@ -188,6 +222,15 @@ uniform_sample_lcwm <- function(
 
 # ==============================================================================
 
+#' Produce a single sample that passes the outlier checks.
+#'
+#' @inheritParams simulate_ombc
+#' @param g Component index.
+#' @param uniform_spans Covariate and response error spans.
+#'
+#' @return Vector consisting of covariate values, response value, and label 0.
+#'
+#' @export
 uniform_outlier_ombc <- function(
   outlier_type,
   mu, sigma, beta, error_sd, g,
