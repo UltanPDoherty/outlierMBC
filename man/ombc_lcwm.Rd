@@ -17,7 +17,11 @@ ombc_lcwm(
 )
 }
 \arguments{
-\item{x}{Data.}
+\item{xy}{\code{data.frame} containing covariates and response.}
+
+\item{x}{Covariate data only.}
+
+\item{formulaY}{Regression formula.}
 
 \item{comp_num}{Number of components.}
 

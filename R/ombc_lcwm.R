@@ -4,7 +4,9 @@
 #' Iterative Detection & Identification of Outliers for a Gaussian lcwmture Model
 #'
 #'
-#' @param x Data.
+#' @param xy `data.frame` containing covariates and response.
+#' @param x Covariate data only.
+#' @param formulaY Regression formula.
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
 #' @param mnames Model names for flexCWM::cwm.
@@ -66,9 +68,9 @@ ombc_lcwm <- function(xy, x, formulaY, comp_num, max_out, mnames = "VVV", seed =
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
     set.seed(seed)
-    invisible(capture.output(lcwm <- flexCWM::cwm(
+    invisible(utils::capture.output(lcwm <- flexCWM::cwm(
       formulaY = formulaY,
-      familyY = gaussian(link = "identity"),
+      familyY = stats::gaussian(link = "identity"),
       data = xy,
       Xnorm = x,
       modelXnorm = mnames,
@@ -119,7 +121,7 @@ ombc_lcwm <- function(xy, x, formulaY, comp_num, max_out, mnames = "VVV", seed =
   set.seed(seed)
   lcwm <- flexCWM::cwm(
     formulaY = formulaY,
-    familyY = gaussian(link = "identity"),
+    familyY = stats::gaussian(link = "identity"),
     data = xy0[!outlier_bool, ],
     Xnorm = x0[!outlier_bool, ],
     modelXnorm = mnames,

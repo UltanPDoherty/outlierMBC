@@ -13,6 +13,7 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @importFrom flexCWM cwm
 #' @importFrom mixture gpcm
 #' @importFrom mvtnorm dmvnorm
 #' @importFrom spatstat.geom ewcdf

@@ -7,13 +7,19 @@
 distrib_diff_lcwm_g(x, z_g, mu_g, sigma_g, mod_g, y_sigma_g, alpha = 0.5)
 }
 \arguments{
-\item{x}{Data.}
+\item{x}{Covariate data only.}
 
 \item{z_g}{Component assignment probability vector.}
 
 \item{mu_g}{Component mean vector.}
 
 \item{sigma_g}{Component covariance matrix.}
+
+\item{mod_g}{Component regression model.}
+
+\item{y_sigma_g}{Component regression standard deviation.}
+
+\item{alpha}{Factor to control relative importance of covariate and response.}
 }
 \value{
 List of

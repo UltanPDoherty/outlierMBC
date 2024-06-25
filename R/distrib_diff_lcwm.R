@@ -1,10 +1,12 @@
 #' distrib_diff_lcwm
 #'
-#' @param x Data.
+#' @inheritParams ombc_lcwm
 #' @param z Component assignment probability matrix.
 #' @param prop Vector of component proportions.
 #' @param mu List of component mean vectors.
 #' @param sigma List of component covariance matrices.
+#' @param mod_list List of component regression models.
+#' @param y_sigma Vector of component regression standard deviations.
 #'
 #' @return List of
 #' * distrib_diff
@@ -46,10 +48,13 @@ distrib_diff_lcwm <- function(x, z, prop, mu, sigma, mod_list, y_sigma, alpha = 
 
 #' distrib_diff_lcwm_g
 #'
-#' @param x Data.
+#' @inheritParams distrib_diff_lcwm
 #' @param z_g Component assignment probability vector.
 #' @param mu_g Component mean vector.
 #' @param sigma_g Component covariance matrix.
+#' @param mod_g Component regression model.
+#' @param y_sigma_g Component regression standard deviation.
+#'
 #'
 #' @return List of
 #' * distrib_diff_g
