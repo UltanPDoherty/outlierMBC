@@ -27,19 +27,16 @@
 #' ombc_p1 <- simulate_ombc(
 #'   n = c(1000, 1000),
 #'   mu = list(c(-1), c(+1)),
-#'   sigma = list(as.matrix(0.1), as.matrix(0.1)),
-#'   beta = list(c(1, -1), c(1, 1)),
-#'   error_sd = c(0.5, 0.5),
+#'   sigma = list(as.matrix(0.2), as.matrix(0.2)),
+#'   beta = list(c(1, 0), c(1, 3)),
+#'   error_sd = c(1, 1),
 #'   outlier_num = c(25, 25),
 #'   outlier_type = "x_and_y",
 #'   seed = 123,
 #'   crit_val = 0.9999,
-#'   range_multipliers = c(1.5, 1.5)
+#'   range_multipliers = c(1.5, 2)
 #' )
-#' plot(
-#'   ombc_p1[, c("X1", "Y")],
-#'   col = 1 + ombc_p1$G, pch = 1 + ombc_p1$G
-#' )
+#' plot(ombc_p1[, c("X1", "Y")], col = 1 + ombc_p1$G, pch = 1 + ombc_p1$G)
 simulate_ombc <- function(
     n,
     mu,
