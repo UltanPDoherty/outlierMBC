@@ -20,7 +20,10 @@ distrib_diff_lcwm <- function(
     sigma,
     mod_list,
     y_sigma,
-    alpha = 0.5) {
+    alpha = 0.5,
+    outlier_type = c("x_and_y", "x_only", "y_only")) {
+  outlier_type <- match.arg(outlier_type)
+
   obs_num <- nrow(x)
   comp_num <- ncol(z)
 
@@ -33,7 +36,8 @@ distrib_diff_lcwm <- function(
       as.matrix(sigma[, , g]),
       mod_list[[g]],
       y_sigma[g],
-      alpha
+      alpha,
+      outlier_type
     )
     distrib_diff_vec[g] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
@@ -73,13 +77,29 @@ distrib_diff_lcwm_g <- function(
     sigma_g,
     mod_g,
     y_sigma_g,
-    alpha = 0.5) {
+    alpha = 0.5,
+    outlier_type = c("x_and_y", "x_only", "y_only")) {
+  outlier_type <- match.arg(outlier_type)
 
-  dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g)
-  dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
+  if (outlier_type == "x_and_y") {
+    dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g)
+    dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
 
-  diff_g <- sqrt(alpha * dd_g_x$diff^2 + (1 - alpha) * dd_g_y$diff^2)
-  dens_g <- dd_g_x$dens * dd_g_y$dens
+    diff_g <- sqrt(alpha * dd_g_x$diff^2 + (1 - alpha) * dd_g_y$diff^2)
+    dens_g <- dd_g_x$dens * dd_g_y$dens
+  } else if (outlier_type == "x_only") {
+    dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g)
+
+    diff_g <- dd_g_x$diff
+    dens_g <- dd_g_x$dens
+  } else if (outlier_type == "y_only") {
+    dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
+
+    diff_g <- dd_g_y$diff
+    dens_g <- dd_g_y$dens
+  } else {
+    stop("Invalid outlier_type.")
+  }
 
   return(list(
     diff = diff_g,

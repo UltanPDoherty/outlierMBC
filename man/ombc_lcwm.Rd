@@ -13,7 +13,8 @@ ombc_lcwm(
   mnames = "VVV",
   seed = 123,
   print_interval = Inf,
-  alpha = 0.5
+  alpha = 0.5,
+  outlier_type = c("x_and_y", "x_only", "y_only")
 )
 }
 \arguments{
@@ -34,6 +35,7 @@ ombc_lcwm(
 \item{print_interval}{How frequently the iteration count is printed.}
 
 \item{alpha}{Factor to control relative importance of covariate and response.}
+
 }
 \value{
 List of

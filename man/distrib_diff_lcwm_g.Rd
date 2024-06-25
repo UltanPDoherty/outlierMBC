@@ -4,7 +4,16 @@
 \alias{distrib_diff_lcwm_g}
 \title{distrib_diff_lcwm_g}
 \usage{
-distrib_diff_lcwm_g(x, z_g, mu_g, sigma_g, mod_g, y_sigma_g, alpha = 0.5)
+distrib_diff_lcwm_g(
+  x,
+  z_g,
+  mu_g,
+  sigma_g,
+  mod_g,
+  y_sigma_g,
+  alpha = 0.5,
+  outlier_type = c("x_and_y", "x_only", "y_only")
+)
 }
 \arguments{
 \item{x}{Covariate data only.}
@@ -20,6 +29,8 @@ distrib_diff_lcwm_g(x, z_g, mu_g, sigma_g, mod_g, y_sigma_g, alpha = 0.5)
 \item{y_sigma_g}{Component regression standard deviation.}
 
 \item{alpha}{Factor to control relative importance of covariate and response.}
+
+\item{outlier_type}{Combined, covariate, or response outliers.}
 }
 \value{
 List of

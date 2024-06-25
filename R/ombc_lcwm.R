@@ -14,6 +14,7 @@
 #' @param seed Seed.
 #' @param print_interval How frequently the iteration count is printed.
 #' @param alpha Factor to control relative importance of covariate and response.
+#' @param outlier_type Combined, covariate, or response outliers.
 #'
 #' @return List of
 #' * distrib_diffs
@@ -65,6 +66,8 @@ ombc_lcwm <- function(
     print_interval = Inf,
     alpha = 0.5,
     outlier_type = c("x_and_y", "x_only", "y_only")) {
+  outlier_type <- match.arg(outlier_type)
+
   xy0 <- xy
   x <- as.matrix(x)
   x0 <- x
@@ -114,7 +117,8 @@ ombc_lcwm <- function(
       lcwm$models[[1]]$concomitant$normal.Sigma,
       mod_list,
       y_sigma,
-      alpha
+      alpha,
+      outlier_type
     )
 
     distrib_diffs[i] <- out$distrib_diff
