@@ -44,11 +44,9 @@
 #'   x = ombc_p1$X1,
 #'   y_formula = Y ~ X1,
 #'   comp_num = 2,
-#'   max_out = 200,
+#'   max_out = 100,
 #'   mnames = "V",
-#'   seed = 123,
-#'   print_interval = 100,
-#'   alpha = 0.5
+#'   seed = 123
 #' )
 #'
 #' plot(

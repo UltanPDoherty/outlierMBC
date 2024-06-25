@@ -18,14 +18,12 @@
 #' @export
 #'
 #' @examples
-#' n <- 1000
-#' mu <- c(+1)
-#' sigma <- as.matrix(0.1)
-#' beta <- c(1, 1)
-#' error_sd <- 0.5
 #' noisy_mlr_p1 <- simulate_noisy_mlr(
-#'   n, mu, sigma, beta,
-#'   error_sd,
+#'   n = 1000,
+#'   mu = +1,
+#'   sigma = as.matrix(0.1),
+#'   beta = c(1, 1),
+#'   error_sd = 0.5,
 #'   outlier_num = 20, seed = 123,
 #'   crit_val = 0.9999
 #' )
