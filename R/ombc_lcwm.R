@@ -95,9 +95,10 @@ ombc_lcwm <- function(
       seed = seed
     )))
 
-    prop <- colSums(lcwm$models[[1]]$posterior)
+    size <- colSums(lcwm$models[[1]]$posterior)
+    prop <- size / nrow(x)
 
-    if (any(prop < (var_num + 1))) {
+    if (any(size < (var_num + 1))) {
       warning(paste0(
         "One of the components became too small after removing ",
         i - 1, " outliers."
