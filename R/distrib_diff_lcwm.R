@@ -54,6 +54,8 @@ distrib_diff_lcwm <- function(
   ))
 }
 
+# ==============================================================================
+
 #' distrib_diff_lcwm_g
 #'
 #' @inheritParams distrib_diff_lcwm
@@ -67,7 +69,7 @@ distrib_diff_lcwm <- function(
 #' @return List of
 #' * distrib_diff_g
 #' * scaled_mahalas_g
-#' * dens_x_g
+#' * dens_g_x
 distrib_diff_lcwm_g <- function(
     x,
     z_g,
@@ -76,6 +78,87 @@ distrib_diff_lcwm_g <- function(
     mod_g,
     y_sigma_g,
     alpha = 0.5) {
+  dd_g_y <- distrib_diff_lcwm_g_y(x, z_g, mod_g, y_sigma_g)
+
+  dd_g_x <- distrib_diff_lcwm_g_x(x, z_g, mu_g, sigma_g)
+
+  distrib_diff_g <- sqrt(
+    alpha * dd_g_x$distrib_diff_g_x^2 + (1 - alpha) * dd_g_y$distrib_diff_g_y^2
+  )
+
+  dens_g <- dd_g_x$dens_g_x * dd_g_y$dens_g_y
+
+  return(list(
+    distrib_diff_g = distrib_diff_g,
+    scaled_mahalas_g = dd_g_x$scaled_mahalas_g,
+    dens_g = dens_g
+  ))
+}
+
+# ==============================================================================
+
+#' distrib_diff_lcwm_g_x
+#'
+#' @inheritParams distrib_diff_lcwm
+#' @param z_g Component assignment probability vector.
+#' @param mu_g Component mean vector.
+#' @param sigma_g Component covariance matrix.
+#'
+#' @return List of
+#' * distrib_diff_g
+#' * scaled_mahalas_g
+#' * dens_g_x
+distrib_diff_lcwm_g_x <- function(
+    x,
+    z_g,
+    mu_g,
+    sigma_g) {
+  var_num <- ncol(x)
+  n_g <- sum(z_g)
+
+  eps <- 0.001
+  check_seq <- seq(eps, 1 - eps, eps)
+
+  checkpoints_x <- stats::qbeta(check_seq, var_num / 2, (n_g - var_num - 1) / 2)
+
+  mahalas_g <- stats::mahalanobis(x, mu_g, (n_g / (n_g - 1)) * sigma_g)
+  scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
+  mahala_ewcdf_g_func <- spatstat.geom::ewcdf(scaled_mahalas_g, z_g / n_g)
+
+  mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
+  beta_cdf_g_x <- stats::pbeta(
+    checkpoints_x, var_num / 2, (n_g - var_num - 1) / 2
+  )
+  distrib_diff_g_x <- mean(abs(mahala_ewcdf_g - beta_cdf_g_x))
+
+  dens_g_x <-
+    (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
+
+  return(list(
+    distrib_diff_g_x = distrib_diff_g_x,
+    scaled_mahalas_g = scaled_mahalas_g,
+    dens_g_x = dens_g_x
+  ))
+}
+
+# ==============================================================================
+
+#' distrib_diff_lcwm_g_y
+#'
+#' @inheritParams distrib_diff_lcwm
+#' @param z_g Component assignment probability vector.
+#' @param mod_g Component regression model.
+#' @param y_sigma_g Component regression standard deviation.
+#'
+#' @return List of
+#' * distrib_diff_g_y
+#' * scsqst_res_g
+#' * dens_g_y
+distrib_diff_lcwm_g_y <- function(
+    x,
+    z_g,
+    mod_g,
+    y_sigma_g) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
 
@@ -84,7 +167,7 @@ distrib_diff_lcwm_g <- function(
 
   # --------
 
-  df_g <- round(n_g) - 2
+  df_g <- round(n_g) - (var_num + 1)
 
   hat_g <- stats::hatvalues(mod_g)
 
@@ -96,39 +179,16 @@ distrib_diff_lcwm_g <- function(
   scsqst_res_ecdf_g_func <- spatstat.geom::ewcdf(scsqst_res_g, z_g / n_g)
 
   scsqst_res_ecdf_g <- scsqst_res_ecdf_g_func(checkpoints_y)
-  beta_cdf_y_g <- stats::pbeta(checkpoints_y, 1 / 2, (df_g - 1) / 2)
-  distrib_diff_y_g <- mean(abs(scsqst_res_ecdf_g - beta_cdf_y_g))
+  beta_cdf_g_y <- stats::pbeta(checkpoints_y, 1 / 2, (df_g - 1) / 2)
+  distrib_diff_g_y <- mean(abs(scsqst_res_ecdf_g - beta_cdf_g_y))
 
-  dens_y_g <- stats::dnorm(mod_g$residuals, mean = 0, sd = y_sigma_g)
-
-  # ----------
-
-  checkpoints_x <- stats::qbeta(check_seq, var_num / 2, (n_g - var_num - 1) / 2)
-
-  mahalas_g <- stats::mahalanobis(x, mu_g, (n_g / (n_g - 1)) * sigma_g)
-  scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
-  mahala_ewcdf_g_func <- spatstat.geom::ewcdf(scaled_mahalas_g, z_g / n_g)
-
-  mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
-  beta_cdf_x_g <- stats::pbeta(
-    checkpoints_x, var_num / 2, (n_g - var_num - 1) / 2
-  )
-  distrib_diff_x_g <- mean(abs(mahala_ewcdf_g - beta_cdf_x_g))
-
-  dens_x_g <-
-    (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
-
-  # ------------
-
-  distrib_diff_g <- sqrt(
-    alpha * distrib_diff_x_g^2 + (1 - alpha) * distrib_diff_y_g^2
-  )
-
-  dens_g <- dens_x_g * dens_y_g
+  dens_g_y <- stats::dnorm(mod_g$residuals, mean = 0, sd = y_sigma_g)
 
   return(list(
-    distrib_diff_g = distrib_diff_g,
-    scaled_mahalas_g = scaled_mahalas_g,
-    dens_g = dens_g
+    distrib_diff_g_y = distrib_diff_g_y,
+    scsqst_res_g = scsqst_res_g,
+    dens_g_y = dens_g_y
   ))
 }
+
+

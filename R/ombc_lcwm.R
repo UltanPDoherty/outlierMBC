@@ -7,7 +7,7 @@
 #'
 #' @param xy `data.frame` containing covariates and response.
 #' @param x Covariate data only.
-#' @param formula Regression formula.
+#' @param y_formula Regression formula.
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
 #' @param mnames Model names for flexCWM::cwm.
@@ -40,7 +40,7 @@
 #' ombc_p1_lcwm <- ombc_lcwm(
 #'   xy = ombc_p1[, -3],
 #'   x = ombc_p1$X1,
-#'   formulaY = Y ~ X1,
+#'   y_formula = Y ~ X1,
 #'   comp_num = 2,
 #'   max_out = 200,
 #'   mnames = "V",
