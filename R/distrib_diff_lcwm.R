@@ -25,10 +25,9 @@ distrib_diff_lcwm <- function(
   comp_num <- ncol(z)
 
   distrib_diff_vec <- c()
-  scaled_mahalas <- matrix(nrow = obs_num, ncol = comp_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
   for (g in seq_len(comp_num)) {
-    out_g <- distrib_diff_lcwm_g(
+    dd_g <- distrib_diff_lcwm_g(
       x, z[, g],
       mu[, g, drop = FALSE],
       as.matrix(sigma[, , g]),
@@ -36,9 +35,8 @@ distrib_diff_lcwm <- function(
       y_sigma[g],
       alpha
     )
-    distrib_diff_vec[g] <- out_g$distrib_diff_g
-    scaled_mahalas[, g] <- out_g$scaled_mahalas_g
-    dens_mat[, g] <- out_g$dens_g
+    distrib_diff_vec[g] <- dd_g$diff
+    dens_mat[, g] <- dd_g$dens
   }
 
   mix_dens <- dens_mat %*% prop
@@ -65,11 +63,9 @@ distrib_diff_lcwm <- function(
 #' @param mod_g Component regression model.
 #' @param y_sigma_g Component regression standard deviation.
 #'
-#'
 #' @return List of
-#' * distrib_diff_g
-#' * scaled_mahalas_g
-#' * dens_g_x
+#' * diff
+#' * dens
 distrib_diff_lcwm_g <- function(
     x,
     z_g,
@@ -83,15 +79,14 @@ distrib_diff_lcwm_g <- function(
   dd_g_x <- distrib_diff_lcwm_g_x(x, z_g, mu_g, sigma_g)
 
   distrib_diff_g <- sqrt(
-    alpha * dd_g_x$distrib_diff_g_x^2 + (1 - alpha) * dd_g_y$distrib_diff_g_y^2
+    alpha * dd_g_x$diff^2 + (1 - alpha) * dd_g_y$diff^2
   )
 
-  dens_g <- dd_g_x$dens_g_x * dd_g_y$dens_g_y
+  dens_g <- dd_g_x$dens * dd_g_y$dens
 
   return(list(
-    distrib_diff_g = distrib_diff_g,
-    scaled_mahalas_g = dd_g_x$scaled_mahalas_g,
-    dens_g = dens_g
+    diff = distrib_diff_g,
+    dens = dens_g
   ))
 }
 
@@ -105,9 +100,8 @@ distrib_diff_lcwm_g <- function(
 #' @param sigma_g Component covariance matrix.
 #'
 #' @return List of
-#' * distrib_diff_g
-#' * scaled_mahalas_g
-#' * dens_g_x
+#' * diff
+#' * dens
 distrib_diff_lcwm_g_x <- function(
     x,
     z_g,
@@ -135,9 +129,8 @@ distrib_diff_lcwm_g_x <- function(
     (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
 
   return(list(
-    distrib_diff_g_x = distrib_diff_g_x,
-    scaled_mahalas_g = scaled_mahalas_g,
-    dens_g_x = dens_g_x
+    diff = distrib_diff_g_x,
+    dens = dens_g_x
   ))
 }
 
@@ -151,9 +144,8 @@ distrib_diff_lcwm_g_x <- function(
 #' @param y_sigma_g Component regression standard deviation.
 #'
 #' @return List of
-#' * distrib_diff_g_y
-#' * scsqst_res_g
-#' * dens_g_y
+#' * diff
+#' * dens
 distrib_diff_lcwm_g_y <- function(
     x,
     z_g,
@@ -185,9 +177,8 @@ distrib_diff_lcwm_g_y <- function(
   dens_g_y <- stats::dnorm(mod_g$residuals, mean = 0, sd = y_sigma_g)
 
   return(list(
-    distrib_diff_g_y = distrib_diff_g_y,
-    scsqst_res_g = scsqst_res_g,
-    dens_g_y = dens_g_y
+    diff = distrib_diff_g_y,
+    dens = dens_g_y
   ))
 }
 

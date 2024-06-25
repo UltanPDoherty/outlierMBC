@@ -18,9 +18,8 @@ distrib_diff_lcwm_g_y(x, z_g, mod_g, y_sigma_g)
 \value{
 List of
 \itemize{
-\item distrib_diff_g_y
-\item scsqst_res_g
-\item dens_g_y
+\item diff
+\item dens
 }
 }
 \description{

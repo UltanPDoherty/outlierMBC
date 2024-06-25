@@ -18,9 +18,8 @@ distrib_diff_lcwm_g_x(x, z_g, mu_g, sigma_g)
 \value{
 List of
 \itemize{
-\item distrib_diff_g
-\item scaled_mahalas_g
-\item dens_g_x
+\item diff
+\item dens
 }
 }
 \description{
