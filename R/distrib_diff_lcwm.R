@@ -74,32 +74,29 @@ distrib_diff_lcwm_g <- function(
     mod_g,
     y_sigma_g,
     alpha = 0.5) {
-  dd_g_y <- distrib_diff_lcwm_g_y(x, z_g, mod_g, y_sigma_g)
 
-  dd_g_x <- distrib_diff_lcwm_g_x(x, z_g, mu_g, sigma_g)
+  dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g)
+  dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
 
-  distrib_diff_g <- sqrt(
-    alpha * dd_g_x$diff^2 + (1 - alpha) * dd_g_y$diff^2
-  )
-
+  diff_g <- sqrt(alpha * dd_g_x$diff^2 + (1 - alpha) * dd_g_y$diff^2)
   dens_g <- dd_g_x$dens * dd_g_y$dens
 
   return(list(
-    diff = distrib_diff_g,
+    diff = diff_g,
     dens = dens_g
   ))
 }
 
 # ==============================================================================
 
-#' distrib_diff_lcwm_g_x
+#' distrib_diff_mahalanobis
 #'
 #' @inheritParams distrib_diff_lcwm_g
 #'
 #' @return List of
 #' * diff
 #' * dens
-distrib_diff_lcwm_g_x <- function(
+distrib_diff_mahalanobis <- function(
     x,
     z_g,
     mu_g,
@@ -133,14 +130,14 @@ distrib_diff_lcwm_g_x <- function(
 
 # ==============================================================================
 
-#' distrib_diff_lcwm_g_y
+#' distrib_diff_residual
 #'
 #' @inheritParams distrib_diff_lcwm_g
 #'
 #' @return List of
 #' * diff
 #' * dens
-distrib_diff_lcwm_g_y <- function(
+distrib_diff_residual <- function(
     x,
     z_g,
     mod_g,
