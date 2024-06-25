@@ -94,10 +94,7 @@ distrib_diff_lcwm_g <- function(
 
 #' distrib_diff_lcwm_g_x
 #'
-#' @inheritParams distrib_diff_lcwm
-#' @param z_g Component assignment probability vector.
-#' @param mu_g Component mean vector.
-#' @param sigma_g Component covariance matrix.
+#' @inheritParams distrib_diff_lcwm_g
 #'
 #' @return List of
 #' * diff
@@ -138,10 +135,7 @@ distrib_diff_lcwm_g_x <- function(
 
 #' distrib_diff_lcwm_g_y
 #'
-#' @inheritParams distrib_diff_lcwm
-#' @param z_g Component assignment probability vector.
-#' @param mod_g Component regression model.
-#' @param y_sigma_g Component regression standard deviation.
+#' @inheritParams distrib_diff_lcwm_g
 #'
 #' @return List of
 #' * diff
@@ -156,8 +150,6 @@ distrib_diff_lcwm_g_y <- function(
 
   eps <- 0.001
   check_seq <- seq(eps, 1 - eps, eps)
-
-  # --------
 
   df_g <- round(n_g) - (var_num + 1)
 
