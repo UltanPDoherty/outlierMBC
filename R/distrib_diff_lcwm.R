@@ -12,7 +12,16 @@
 #' * distrib_diff
 #' * distrib_diff_vec
 #' * choice_id
-distrib_diff_lcwm <- function(x, z, prop, mu, sigma, mod_list, y_sigma, alpha = 0.5) {
+distrib_diff_lcwm <- function(
+  x,
+  z,
+  prop,
+  mu,
+  sigma,
+  mod_list,
+  y_sigma,
+  alpha = 0.5
+) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
 
@@ -60,7 +69,15 @@ distrib_diff_lcwm <- function(x, z, prop, mu, sigma, mod_list, y_sigma, alpha = 
 #' * distrib_diff_g
 #' * scaled_mahalas_g
 #' * dens_x_g
-distrib_diff_lcwm_g <- function(x, z_g, mu_g, sigma_g, mod_g, y_sigma_g, alpha = 0.5) {
+distrib_diff_lcwm_g <- function(
+  x,
+  z_g,
+  mu_g,
+  sigma_g,
+  mod_g,
+  y_sigma_g,
+  alpha = 0.5
+) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
 
@@ -69,14 +86,11 @@ distrib_diff_lcwm_g <- function(x, z_g, mu_g, sigma_g, mod_g, y_sigma_g, alpha =
 
   # --------
 
-  # df_g <- mod_g$df.residual
   df_g <- round(n_g) - 2
 
   hat_g <- stats::hatvalues(mod_g)
 
-  # student_resids_g2 <- stats::rstandard(mod_g)
   student_resids_g <- mod_g$residuals / (y_sigma_g * sqrt(1 - hat_g))
-# browser()
   scsqst_res_g <- student_resids_g^2 / df_g
 
   checkpoints_y <- stats::qbeta(check_seq, 1 / 2, (df_g - 1) / 2)
@@ -98,21 +112,21 @@ distrib_diff_lcwm_g <- function(x, z_g, mu_g, sigma_g, mod_g, y_sigma_g, alpha =
   mahala_ewcdf_g_func <- spatstat.geom::ewcdf(scaled_mahalas_g, z_g / n_g)
 
   mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
-  beta_cdf_x_g <- stats::pbeta(checkpoints_x, var_num / 2, (n_g - var_num - 1) / 2)
+  beta_cdf_x_g <- stats::pbeta(
+    checkpoints_x, var_num / 2, (n_g - var_num - 1) / 2
+  )
   distrib_diff_x_g <- mean(abs(mahala_ewcdf_g - beta_cdf_x_g))
 
-  dens_x_g <- (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
+  dens_x_g <-
+    (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
 
   # ------------
 
-  distrib_diff_g <- sqrt(alpha * distrib_diff_x_g^2 + (1 - alpha) * distrib_diff_y_g^2)
-  # distrib_diff_g <- alpha * distrib_diff_x_g + (1 - alpha) * distrib_diff_y_g
+  distrib_diff_g <- sqrt(
+    alpha * distrib_diff_x_g^2 + (1 - alpha) * distrib_diff_y_g^2
+  )
 
   dens_g <- dens_x_g * dens_y_g
-  # dens_g <- dens_x_g
-  # dens_g <- dens_y_g
-
-  # cat(paste0("x: ", distrib_diff_x_g, ", y:", distrib_diff_y_g, "\n"))
 
   return(list(
     distrib_diff_g = distrib_diff_g,

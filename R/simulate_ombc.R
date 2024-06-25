@@ -38,17 +38,17 @@
 #' )
 #' plot(ombc_p1[, c("X1", "Y")], col = 1 + ombc_p1$G, pch = 1 + ombc_p1$G)
 simulate_ombc <- function(
-    n,
-    mu,
-    sigma,
-    beta,
-    error_sd,
-    outlier_num,
-    outlier_type = c("x_and_y", "x_only", "y_only"),
-    seed = 123,
-    crit_val = 0.9999,
-    range_multipliers = c(1.5, 1.5),
-    print_interval = Inf
+  n,
+  mu,
+  sigma,
+  beta,
+  error_sd,
+  outlier_num,
+  outlier_type = c("x_and_y", "x_only", "y_only"),
+  seed = 123,
+  crit_val = 0.9999,
+  range_multipliers = c(1.5, 1.5),
+  print_interval = Inf
 ) {
   outlier_type <- match.arg(outlier_type)
 
@@ -62,7 +62,8 @@ simulate_ombc <- function(
 
     errors[[g]] <- stats::rnorm(n[g], 0, sd = error_sd[g])
 
-    responses[[g]] <- errors[[g]] + beta[[g]][1] + covariates[[g]] %*% beta[[g]][-1]
+    responses[[g]] <-
+      errors[[g]] + beta[[g]][1] + covariates[[g]] %*% beta[[g]][-1]
 
     observations[[g]] <- cbind(covariates[[g]], responses[[g]], rep(g, n[g]))
 
@@ -131,7 +132,6 @@ test_outlier_ombc <- function(
       x_only = prob_x[h] < 1 - crit_val,
       y_only = prob_y[h] < 1 - crit_val
     )
-    # checks[h] <- (prob_x[h] * prob_y[h]) < 1 - crit_val
   }
 
   return(all(checks))

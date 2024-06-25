@@ -1,12 +1,13 @@
 #' ombc_lcwm
 #'
 #' @description
-#' Iterative Detection & Identification of Outliers for a Gaussian lcwmture Model
+#' Iterative Detection & Identification of Outliers for a Linear
+#' Cluster-Weighted Model
 #'
 #'
 #' @param xy `data.frame` containing covariates and response.
 #' @param x Covariate data only.
-#' @param formulaY Regression formula.
+#' @param formula Regression formula.
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
 #' @param mnames Model names for flexCWM::cwm.
@@ -51,8 +52,17 @@
 #' plot(
 #' ombc_p1[, c("X1", "Y")], pch = ombc_p1$G + 1, col = ombc_p1_lcwm$gmm_labels
 #' )
-ombc_lcwm <- function(xy, x, formulaY, comp_num, max_out, mnames = "VVV", seed = 123,
-                     print_interval = Inf, alpha = 0.5) {
+ombc_lcwm <- function(
+  xy,
+  x,
+  y_formula,
+  comp_num,
+  max_out,
+  mnames = "VVV",
+  seed = 123,
+  print_interval = Inf,
+  alpha = 0.5
+) {
   xy0 <- xy
   x <- as.matrix(x)
   x0 <- x
@@ -69,7 +79,7 @@ ombc_lcwm <- function(xy, x, formulaY, comp_num, max_out, mnames = "VVV", seed =
 
     set.seed(seed)
     invisible(utils::capture.output(lcwm <- flexCWM::cwm(
-      formulaY = formulaY,
+      formulaY = y_formula,
       familyY = stats::gaussian(link = "identity"),
       data = xy,
       Xnorm = x,
@@ -120,7 +130,7 @@ ombc_lcwm <- function(xy, x, formulaY, comp_num, max_out, mnames = "VVV", seed =
 
   set.seed(seed)
   lcwm <- flexCWM::cwm(
-    formulaY = formulaY,
+    formulaY = y_formula,
     familyY = stats::gaussian(link = "identity"),
     data = xy0[!outlier_bool, ],
     Xnorm = x0[!outlier_bool, ],
