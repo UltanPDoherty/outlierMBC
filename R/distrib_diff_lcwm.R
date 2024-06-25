@@ -13,15 +13,14 @@
 #' * distrib_diff_vec
 #' * choice_id
 distrib_diff_lcwm <- function(
-  x,
-  z,
-  prop,
-  mu,
-  sigma,
-  mod_list,
-  y_sigma,
-  alpha = 0.5
-) {
+    x,
+    z,
+    prop,
+    mu,
+    sigma,
+    mod_list,
+    y_sigma,
+    alpha = 0.5) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
 
@@ -70,14 +69,13 @@ distrib_diff_lcwm <- function(
 #' * scaled_mahalas_g
 #' * dens_x_g
 distrib_diff_lcwm_g <- function(
-  x,
-  z_g,
-  mu_g,
-  sigma_g,
-  mod_g,
-  y_sigma_g,
-  alpha = 0.5
-) {
+    x,
+    z_g,
+    mu_g,
+    sigma_g,
+    mod_g,
+    y_sigma_g,
+    alpha = 0.5) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
 

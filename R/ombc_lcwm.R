@@ -25,44 +25,44 @@
 #'
 #' @examples
 #' ombc_p1 <- simulate_ombc(
-#' n = c(1000, 1000),
-#' mu = list(c(-1), c(+1)),
-#' sigma = list(as.matrix(0.2), as.matrix(0.2)),
-#' beta = list(c(1, 0), c(1, 3)),
-#' error_sd = c(1, 1),
-#' outlier_num = c(25, 25),
-#' outlier_type = "x_and_y",
-#' seed = 123,
-#' crit_val = 0.9999,
-#' range_multipliers = c(1.5, 2)
+#'   n = c(1000, 1000),
+#'   mu = list(c(-1), c(+1)),
+#'   sigma = list(as.matrix(0.2), as.matrix(0.2)),
+#'   beta = list(c(1, 0), c(1, 3)),
+#'   error_sd = c(1, 1),
+#'   outlier_num = c(25, 25),
+#'   outlier_type = "x_and_y",
+#'   seed = 123,
+#'   crit_val = 0.9999,
+#'   range_multipliers = c(1.5, 2)
 #' )
 #'
 #' ombc_p1_lcwm <- ombc_lcwm(
-#' xy = ombc_p1[, -3],
-#' x = ombc_p1$X1,
-#' formulaY = Y ~ X1,
-#' comp_num = 2,
-#' max_out = 200,
-#' mnames = "V",
-#' seed = 123,
-#' print_interval = 100,
-#' alpha = 0.5
+#'   xy = ombc_p1[, -3],
+#'   x = ombc_p1$X1,
+#'   formulaY = Y ~ X1,
+#'   comp_num = 2,
+#'   max_out = 200,
+#'   mnames = "V",
+#'   seed = 123,
+#'   print_interval = 100,
+#'   alpha = 0.5
 #' )
 #'
 #' plot(
-#' ombc_p1[, c("X1", "Y")], pch = ombc_p1$G + 1, col = ombc_p1_lcwm$gmm_labels
+#'   ombc_p1[, c("X1", "Y")],
+#'   pch = ombc_p1$G + 1, col = ombc_p1_lcwm$gmm_labels
 #' )
 ombc_lcwm <- function(
-  xy,
-  x,
-  y_formula,
-  comp_num,
-  max_out,
-  mnames = "VVV",
-  seed = 123,
-  print_interval = Inf,
-  alpha = 0.5
-) {
+    xy,
+    x,
+    y_formula,
+    comp_num,
+    max_out,
+    mnames = "VVV",
+    seed = 123,
+    print_interval = Inf,
+    alpha = 0.5) {
   xy0 <- xy
   x <- as.matrix(x)
   x0 <- x

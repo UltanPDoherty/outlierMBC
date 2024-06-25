@@ -38,18 +38,17 @@
 #' )
 #' plot(ombc_p1[, c("X1", "Y")], col = 1 + ombc_p1$G, pch = 1 + ombc_p1$G)
 simulate_ombc <- function(
-  n,
-  mu,
-  sigma,
-  beta,
-  error_sd,
-  outlier_num,
-  outlier_type = c("x_and_y", "x_only", "y_only"),
-  seed = 123,
-  crit_val = 0.9999,
-  range_multipliers = c(1.5, 1.5),
-  print_interval = Inf
-) {
+    n,
+    mu,
+    sigma,
+    beta,
+    error_sd,
+    outlier_num,
+    outlier_type = c("x_and_y", "x_only", "y_only"),
+    seed = 123,
+    crit_val = 0.9999,
+    range_multipliers = c(1.5, 1.5),
+    print_interval = Inf) {
   outlier_type <- match.arg(outlier_type)
 
   var_num <- length(mu[[1]])
@@ -103,10 +102,9 @@ simulate_ombc <- function(
 #'
 #' @export
 test_outlier_ombc <- function(
-  outlier_type,
-  mu, sigma, beta, error_sd,
-  x_sample, y_sample, crit_val
-) {
+    outlier_type,
+    mu, sigma, beta, error_sd,
+    x_sample, y_sample, crit_val) {
   comp_num <- length(mu)
   var_num <- length(mu[[1]])
 
@@ -126,8 +124,7 @@ test_outlier_ombc <- function(
       mean = 0, sd = error_sd[h], lower.tail = FALSE
     )
 
-    checks[h] <- switch(
-      outlier_type,
+    checks[h] <- switch(outlier_type,
       x_and_y = (prob_x[h] * prob_y[h]) < 1 - crit_val,
       x_only = prob_x[h] < 1 - crit_val,
       y_only = prob_y[h] < 1 - crit_val
@@ -150,7 +147,6 @@ test_outlier_ombc <- function(
 #'
 #' @export
 uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
-
   ranges_x <- apply(covariates_g, 2, range)
   centres_x <- colMeans(ranges_x)
   widths_x <- apply(ranges_x, 2, diff)
@@ -185,8 +181,7 @@ uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
 #'
 #' @export
 uniform_sample_lcwm <- function(
-  outlier_type, mu_g, sigma_g, beta_g, error_sd_g, uniform_spans_g
-) {
+    outlier_type, mu_g, sigma_g, beta_g, error_sd_g, uniform_spans_g) {
   var_num <- length(beta_g) - 1
 
   outlier_x_g <- rep(NA, var_num)
@@ -229,10 +224,9 @@ uniform_sample_lcwm <- function(
 #'
 #' @export
 uniform_outlier_ombc <- function(
-  outlier_type,
-  mu, sigma, beta, error_sd, g,
-  uniform_spans, crit_val
-) {
+    outlier_type,
+    mu, sigma, beta, error_sd, g,
+    uniform_spans, crit_val) {
   test <- FALSE
 
   while (!test) {
