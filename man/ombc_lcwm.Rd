@@ -42,7 +42,8 @@ List of
 \item outlier_bool
 \item outlier_num
 \item outlier_rank
-\item gmm_labels
+\item labels
+\item final_cwm
 }
 }
 \description{
@@ -77,6 +78,6 @@ ombc_p1_lcwm <- ombc_lcwm(
 
 plot(
   ombc_p1[, c("X1", "Y")],
-  pch = ombc_p1$G + 1, col = ombc_p1_lcwm$gmm_labels
+  pch = ombc_p1$G + 1, col = ombc_p1_lcwm$labels
 )
 }

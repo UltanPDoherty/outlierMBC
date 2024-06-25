@@ -20,7 +20,8 @@
 #' * outlier_bool
 #' * outlier_num
 #' * outlier_rank
-#' * gmm_labels
+#' * labels
+#' * final_cwm
 #' @export
 #'
 #' @examples
@@ -51,7 +52,7 @@
 #'
 #' plot(
 #'   ombc_p1[, c("X1", "Y")],
-#'   pch = ombc_p1$G + 1, col = ombc_p1_lcwm$gmm_labels
+#'   pch = ombc_p1$G + 1, col = ombc_p1_lcwm$labels
 #' )
 ombc_lcwm <- function(
     xy,
@@ -62,7 +63,8 @@ ombc_lcwm <- function(
     mnames = "VVV",
     seed = 123,
     print_interval = Inf,
-    alpha = 0.5) {
+    alpha = 0.5,
+    outlier_type = c("x_and_y", "x_only", "y_only")) {
   xy0 <- xy
   x <- as.matrix(x)
   x0 <- x
@@ -140,14 +142,15 @@ ombc_lcwm <- function(
     seed = seed
   )
 
-  gmm_labels <- rep(1, nrow(x0))
-  gmm_labels[!outlier_bool] <- 1 + lcwm$models[[1]]$cluster
+  labels <- rep(1, nrow(x0))
+  labels[!outlier_bool] <- 1 + lcwm$models[[1]]$cluster
 
   return(list(
     distrib_diffs = distrib_diffs,
     outlier_bool = outlier_bool,
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
-    gmm_labels = gmm_labels
+    labels = labels,
+    final_cwm = lcwm
   ))
 }
