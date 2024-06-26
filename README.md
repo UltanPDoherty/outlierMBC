@@ -14,11 +14,6 @@ Ultán P. Doherty
 - `simulate_lcwm` - Simulate data from a linear cluster-weighted model
   with covariate and/or response outliers.
 
-``` r
-library(ggplot2)
-devtools::load_all()
-```
-
 ## Mixture Models
 
 ``` r

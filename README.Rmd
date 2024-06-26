@@ -13,7 +13,7 @@ output: github_document
 * `simulate_lcwm` - Simulate data from a linear cluster-weighted model with covariate and/or response outliers.
 
 
-```{r, message=FALSE}
+```{r, include=FALSE}
 library(ggplot2)
 devtools::load_all()
 ```
@@ -101,6 +101,9 @@ data.frame(
   geom_vline(aes(xintercept = outlier_num)) +
   labs(x = "Number of Potential Outliers Removed")
 
+coeffs <- 
+  ombc_lcwm_p1g1_y_only$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
+
 lcwm_p1g1_y_only |>
   ggplot(aes(
     x = X1, y = Y,
@@ -108,6 +111,10 @@ lcwm_p1g1_y_only |>
     shape = as.factor(G)
   )) +
   geom_point() +
+  geom_abline(
+    aes(intercept = coeffs[1], slope = coeffs[2]),
+    linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 1)
+  ) +
   labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
@@ -151,6 +158,9 @@ data.frame(
   geom_vline(aes(xintercept = outlier_num)) +
   labs(x = "Number of Potential Outliers Removed")
 
+coeffs <- 
+  ombc_lcwm_p1g1_x_only$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
+
 lcwm_p1g1_x_only |>
   ggplot(aes(
     x = X1, y = Y, 
@@ -158,6 +168,10 @@ lcwm_p1g1_x_only |>
     shape = as.factor(G)
   )) +
   geom_point() +
+  geom_abline(
+    aes(intercept = coeffs[1], slope = coeffs[2]),
+    linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 1)
+  ) +
   labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
@@ -201,6 +215,9 @@ data.frame(
   geom_vline(aes(xintercept = outlier_num)) +
   labs(x = "Number of Potential Outliers Removed")
 
+coeffs <- 
+  ombc_lcwm_p1g1_x_and_y$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
+
 lcwm_p1g1_x_and_y |>
 ggplot(aes(
   x = X1, y = Y,
@@ -208,6 +225,10 @@ ggplot(aes(
   shape = as.factor(G)
   )) +
   geom_point() +
+  geom_abline(
+    aes(intercept = coeffs[1], slope = coeffs[2]),
+    linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 1)
+  ) +
   labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
@@ -252,6 +273,11 @@ data.frame(
   geom_vline(aes(xintercept = outlier_num)) +
   labs(x = "Number of Potential Outliers Removed")
 
+coeffs1 <- 
+  ombc_lcwm_p1g2_y_only$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
+coeffs2 <- 
+  ombc_lcwm_p1g2_y_only$final_cwm$models[[1]]$GLModel$comp.2$model$coefficients
+
 lcwm_p1g2_y_only |>
   ggplot(aes(
     x = X1, y = Y,
@@ -259,8 +285,16 @@ lcwm_p1g2_y_only |>
     shape = as.factor(G)
   )) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2)) +
+  geom_abline(
+    aes(intercept = coeffs1[1], slope = coeffs1[2]),
+    linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 1)
+  ) +
+  geom_abline(
+    aes(intercept = coeffs2[1], slope = coeffs2[2]),
+    linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 2)
+  ) +
+  labs(colour = "outlierMBC", shape = "Simulation")
 ```
 
 ### Two-Component, Covariate Outliers
@@ -303,6 +337,11 @@ data.frame(
   geom_vline(aes(xintercept = outlier_num)) +
   labs(x = "Number of Potential Outliers Removed")
 
+coeffs1 <- 
+  ombc_lcwm_p1g2_x_only$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
+coeffs2 <- 
+  ombc_lcwm_p1g2_x_only$final_cwm$models[[1]]$GLModel$comp.2$model$coefficients
+
 lcwm_p1g2_x_only |>
   ggplot(aes(
     x = X1, y = Y,
@@ -310,6 +349,14 @@ lcwm_p1g2_x_only |>
     shape = as.factor(G)
   )) +
   geom_point() +
+  geom_abline(
+    aes(intercept = coeffs1[1], slope = coeffs1[2]),
+    linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 1)
+  ) +
+  geom_abline(
+    aes(intercept = coeffs2[1], slope = coeffs2[2]),
+    linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 2)
+  ) +
   labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
@@ -354,6 +401,11 @@ data.frame(
   geom_vline(aes(xintercept = outlier_num)) +
   labs(x = "Number of Potential Outliers Removed")
 
+coeffs1 <- 
+  ombc_lcwm_p1g2_x_and_y$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
+coeffs2 <- 
+  ombc_lcwm_p1g2_x_and_y$final_cwm$models[[1]]$GLModel$comp.2$model$coefficients
+
 lcwm_p1g2_x_and_y |>
   ggplot(aes(
     x = X1, y = Y,
@@ -361,6 +413,14 @@ lcwm_p1g2_x_and_y |>
     shape = as.factor(G)
   )) +
   geom_point() +
+  geom_abline(
+    aes(intercept = coeffs1[1], slope = coeffs1[2]),
+    linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 1)
+  ) +
+  geom_abline(
+    aes(intercept = coeffs2[1], slope = coeffs2[2]),
+    linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 2)
+  ) +
   labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
