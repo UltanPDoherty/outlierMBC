@@ -37,28 +37,9 @@ ombc_gmm_p2g3 <- ombc_gmm(
   comp_num = 3,
   max_out = 80
 )
-
-data.frame(
-  outliers_removed = 0:80,
-  distrib_diffs = ombc_gmm_p2g3$distrib_diffs
-) |>
-  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
-  geom_line() +
-  geom_point() +
-  geom_vline(xintercept = ombc_gmm_p2g3$outlier_num)
-
-gmm_p2g3 |>
-  ggplot(aes(
-    x = X1, y = X2,
-    colour = as.factor(ombc_gmm_p2g3$labels),
-    shape = as.factor(G)
-  )) +
-  geom_point() +
-  labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-2-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-2-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-3-2.png" width="50%" />
 
 ## Linear Cluster-Weighted Models
 
@@ -87,29 +68,9 @@ ombc_lcwm_p1g1_y_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "y_only"
 )
-
-data.frame(
-  outliers_removed = 0:40,
-  distrib_diffs = ombc_lcwm_p1g1_y_only$distrib_diffs,
-  outlier_num = ombc_lcwm_p1g1_y_only$outlier_num
-) |>
-  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
-  geom_line() +
-  geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
-
-lcwm_p1g1_y_only |>
-  ggplot(aes(
-    x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g1_y_only$labels),
-    shape = as.factor(G)
-  )) +
-  geom_point() +
-  labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-3-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-5-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-5-2.png" width="50%" />
 
 ### Single Component, Covariate Outliers
 
@@ -136,29 +97,9 @@ ombc_lcwm_p1g1_x_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_only"
 )
-
-data.frame(
-  outliers_removed = 0:40,
-  distrib_diffs = ombc_lcwm_p1g1_x_only$distrib_diffs,
-  outlier_num = ombc_lcwm_p1g1_x_only$outlier_num
-) |>
-  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
-  geom_line() +
-  geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
-
-lcwm_p1g1_x_only |>
-  ggplot(aes(
-    x = X1, y = Y, 
-    colour = as.factor(ombc_lcwm_p1g1_x_only$labels),
-    shape = as.factor(G)
-  )) +
-  geom_point() +
-  labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-4-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-4-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-7-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-7-2.png" width="50%" />
 
 ### Single Component, Combined Outliers
 
@@ -185,29 +126,9 @@ ombc_lcwm_p1g1_x_and_y <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_and_y"
 )
-
-data.frame(
-  outliers_removed = 0:40,
-  distrib_diffs = ombc_lcwm_p1g1_x_and_y$distrib_diffs,
-  outlier_num = ombc_lcwm_p1g1_x_and_y$outlier_num
-) |>
-  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
-  geom_line() +
-  geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
-
-lcwm_p1g1_x_and_y |>
-ggplot(aes(
-  x = X1, y = Y,
-  colour = as.factor(ombc_lcwm_p1g1_x_and_y$labels),
-  shape = as.factor(G)
-  )) +
-  geom_point() +
-  labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-5-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-5-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-9-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-9-2.png" width="50%" />
 
 ### Two-Component, Response Outliers
 
@@ -222,7 +143,7 @@ lcwm_p1g2_y_only <- simulate_lcwm(
   outlier_type = "y_only",
   seed = 123,
   crit_val = 0.9999,
-  range_multipliers = c(1.5, 2)
+  range_multipliers = c(2, 2)
 )
 
 ombc_lcwm_p1g2_y_only <- ombc_lcwm(
@@ -235,29 +156,9 @@ ombc_lcwm_p1g2_y_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "y_only"
 )
-
-data.frame(
-  outliers_removed = 0:100,
-  distrib_diffs = ombc_lcwm_p1g2_y_only$distrib_diffs,
-  outlier_num = ombc_lcwm_p1g2_y_only$outlier_num
-) |>
-  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
-  geom_line() +
-  geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
-
-lcwm_p1g2_y_only |>
-  ggplot(aes(
-    x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g2_y_only$labels),
-    shape = as.factor(G)
-  )) +
-  geom_point() +
-  labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-6-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-6-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-11-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-11-2.png" width="50%" />
 
 ### Two-Component, Covariate Outliers
 
@@ -272,7 +173,7 @@ lcwm_p1g2_x_only <- simulate_lcwm(
   outlier_type = "x_only",
   seed = 123,
   crit_val = 0.9999,
-  range_multipliers = c(1.5, 2)
+  range_multipliers = c(2, 2)
 )
 
 ombc_lcwm_p1g2_x_only <- ombc_lcwm(
@@ -285,29 +186,9 @@ ombc_lcwm_p1g2_x_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_only"
 )
-
-data.frame(
-  outliers_removed = 0:100,
-  distrib_diffs = ombc_lcwm_p1g2_x_only$distrib_diffs,
-  outlier_num = ombc_lcwm_p1g2_x_only$outlier_num
-) |>
-  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
-  geom_line() +
-  geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
-
-lcwm_p1g2_x_only |>
-  ggplot(aes(
-    x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g2_x_only$labels),
-    shape = as.factor(G)
-  )) +
-  geom_point() +
-  labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-7-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-7-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-13-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-13-2.png" width="50%" />
 
 ### Two-Component, Combined Outliers
 
@@ -322,7 +203,7 @@ lcwm_p1g2_x_and_y <- simulate_lcwm(
   outlier_type = "x_and_y",
   seed = 123,
   crit_val = 0.9999,
-  range_multipliers = c(1.5, 2)
+  range_multipliers = c(2, 2)
 )
 
 ombc_lcwm_p1g2_x_and_y <- ombc_lcwm(
@@ -335,26 +216,6 @@ ombc_lcwm_p1g2_x_and_y <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_and_y"
 )
-
-data.frame(
-  outliers_removed = 0:100,
-  distrib_diffs = ombc_lcwm_p1g2_x_and_y$distrib_diffs,
-  outlier_num = ombc_lcwm_p1g2_x_and_y$outlier_num
-) |> 
-  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
-  geom_line() +
-  geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
-
-lcwm_p1g2_x_and_y |>
-  ggplot(aes(
-    x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g2_x_and_y$labels),
-    shape = as.factor(G)
-  )) +
-  geom_point() +
-  labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-8-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-8-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-15-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-15-2.png" width="50%" />

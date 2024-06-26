@@ -20,7 +20,7 @@ devtools::load_all()
 
 ## Mixture Models
 
-```{r, message=FALSE, fig.show="hold", out.width="50%"}
+```{r}
 gmm_p2g3 <- simulate_gmm(
   n = c(2000, 1000, 1000),
   mu = list(c(-1, 0), c(+1, -1), c(+1, +1)),
@@ -36,7 +36,9 @@ ombc_gmm_p2g3 <- ombc_gmm(
   comp_num = 3,
   max_out = 80
 )
+```
 
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:80,
   distrib_diffs = ombc_gmm_p2g3$distrib_diffs
@@ -44,7 +46,8 @@ data.frame(
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
-  geom_vline(xintercept = ombc_gmm_p2g3$outlier_num)
+  geom_vline(xintercept = ombc_gmm_p2g3$outlier_num) +
+  labs(x = "Number of Potential Outliers Removed")
 
 gmm_p2g3 |>
   ggplot(aes(
@@ -61,7 +64,7 @@ gmm_p2g3 |>
 
 ### Single Component, Response Outliers
 
-```{r, message=FALSE, fig.show="hold", out.width="50%"}
+```{r}
 lcwm_p1g1_y_only <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
@@ -84,7 +87,9 @@ ombc_lcwm_p1g1_y_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "y_only"
 )
+```
 
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:40,
   distrib_diffs = ombc_lcwm_p1g1_y_only$distrib_diffs,
@@ -93,7 +98,8 @@ data.frame(
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
+  geom_vline(aes(xintercept = outlier_num)) +
+  labs(x = "Number of Potential Outliers Removed")
 
 lcwm_p1g1_y_only |>
   ggplot(aes(
@@ -108,7 +114,7 @@ lcwm_p1g1_y_only |>
 
 ### Single Component, Covariate Outliers
 
-```{r, message=FALSE, fig.show="hold", out.width="50%"}
+```{r}
 lcwm_p1g1_x_only <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
@@ -131,7 +137,9 @@ ombc_lcwm_p1g1_x_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_only"
 )
+```
 
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:40,
   distrib_diffs = ombc_lcwm_p1g1_x_only$distrib_diffs,
@@ -140,7 +148,8 @@ data.frame(
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
+  geom_vline(aes(xintercept = outlier_num)) +
+  labs(x = "Number of Potential Outliers Removed")
 
 lcwm_p1g1_x_only |>
   ggplot(aes(
@@ -155,7 +164,7 @@ lcwm_p1g1_x_only |>
 
 ### Single Component, Combined Outliers
 
-```{r, message=FALSE, fig.show="hold", out.width="50%"}
+```{r}
 lcwm_p1g1_x_and_y <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
@@ -178,7 +187,9 @@ ombc_lcwm_p1g1_x_and_y <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_and_y"
 )
+```
 
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:40,
   distrib_diffs = ombc_lcwm_p1g1_x_and_y$distrib_diffs,
@@ -187,7 +198,8 @@ data.frame(
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
+  geom_vline(aes(xintercept = outlier_num)) +
+  labs(x = "Number of Potential Outliers Removed")
 
 lcwm_p1g1_x_and_y |>
 ggplot(aes(
@@ -202,7 +214,7 @@ ggplot(aes(
 
 ### Two-Component, Response Outliers
 
-```{r, message=FALSE, fig.show="hold", out.width="50%"}
+```{r}
 lcwm_p1g2_y_only <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
@@ -213,7 +225,7 @@ lcwm_p1g2_y_only <- simulate_lcwm(
   outlier_type = "y_only",
   seed = 123,
   crit_val = 0.9999,
-  range_multipliers = c(1.5, 2)
+  range_multipliers = c(2, 2)
 )
 
 ombc_lcwm_p1g2_y_only <- ombc_lcwm(
@@ -226,7 +238,9 @@ ombc_lcwm_p1g2_y_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "y_only"
 )
+```
 
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:100,
   distrib_diffs = ombc_lcwm_p1g2_y_only$distrib_diffs,
@@ -235,7 +249,8 @@ data.frame(
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
+  geom_vline(aes(xintercept = outlier_num)) +
+  labs(x = "Number of Potential Outliers Removed")
 
 lcwm_p1g2_y_only |>
   ggplot(aes(
@@ -250,7 +265,7 @@ lcwm_p1g2_y_only |>
 
 ### Two-Component, Covariate Outliers
 
-```{r, message=FALSE, fig.show="hold", out.width="50%"}
+```{r}
 lcwm_p1g2_x_only <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
@@ -261,7 +276,7 @@ lcwm_p1g2_x_only <- simulate_lcwm(
   outlier_type = "x_only",
   seed = 123,
   crit_val = 0.9999,
-  range_multipliers = c(1.5, 2)
+  range_multipliers = c(2, 2)
 )
 
 ombc_lcwm_p1g2_x_only <- ombc_lcwm(
@@ -274,7 +289,9 @@ ombc_lcwm_p1g2_x_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_only"
 )
+```
 
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:100,
   distrib_diffs = ombc_lcwm_p1g2_x_only$distrib_diffs,
@@ -283,7 +300,8 @@ data.frame(
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
+  geom_vline(aes(xintercept = outlier_num)) +
+  labs(x = "Number of Potential Outliers Removed")
 
 lcwm_p1g2_x_only |>
   ggplot(aes(
@@ -298,7 +316,7 @@ lcwm_p1g2_x_only |>
 
 ### Two-Component, Combined Outliers
 
-```{r, message=FALSE, fig.show="hold", out.width="50%"}
+```{r}
 lcwm_p1g2_x_and_y <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
@@ -309,7 +327,7 @@ lcwm_p1g2_x_and_y <- simulate_lcwm(
   outlier_type = "x_and_y",
   seed = 123,
   crit_val = 0.9999,
-  range_multipliers = c(1.5, 2)
+  range_multipliers = c(2, 2)
 )
 
 ombc_lcwm_p1g2_x_and_y <- ombc_lcwm(
@@ -322,7 +340,9 @@ ombc_lcwm_p1g2_x_and_y <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_and_y"
 )
+```
 
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:100,
   distrib_diffs = ombc_lcwm_p1g2_x_and_y$distrib_diffs,
@@ -331,7 +351,8 @@ data.frame(
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
-  geom_vline(aes(xintercept = outlier_num))
+  geom_vline(aes(xintercept = outlier_num)) +
+  labs(x = "Number of Potential Outliers Removed")
 
 lcwm_p1g2_x_and_y |>
   ggplot(aes(
