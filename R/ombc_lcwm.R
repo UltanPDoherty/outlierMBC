@@ -108,7 +108,7 @@ ombc_lcwm <- function(
     names(mod_list) <- paste0("comp.", seq_along(mod_list))
     y_sigma <- vapply(lcwm$models[[1]]$GLModel, function(x) x$sigma, double(1L))
 
-    invisible(utils::capture.output(out <- distrib_diff_lcwm(
+    out <- distrib_diff_lcwm(
       x,
       lcwm$models[[1]]$posterior,
       prop,
@@ -118,7 +118,7 @@ ombc_lcwm <- function(
       y_sigma,
       alpha,
       outlier_type
-    )))
+    )
 
     distrib_diffs[i] <- out$distrib_diff
 
@@ -134,7 +134,7 @@ ombc_lcwm <- function(
   outlier_bool <- outlier_rank <= outlier_num & outlier_rank != 0
 
   set.seed(seed)
-  lcwm <- flexCWM::cwm(
+  invisible(utils::capture.output(lcwm <- flexCWM::cwm(
     formulaY = y_formula,
     familyY = stats::gaussian(link = "identity"),
     data = xy0[!outlier_bool, ],
@@ -143,7 +143,7 @@ ombc_lcwm <- function(
     k = comp_num,
     initialization = "kmeans",
     seed = seed
-  )
+  )))
 
   labels <- rep(1, nrow(x0))
   labels[!outlier_bool] <- 1 + lcwm$models[[1]]$cluster
