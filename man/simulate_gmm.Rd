@@ -45,19 +45,17 @@ samples be than the range of the Normal samples?}
 Simulate a Gaussian mixture model with multivariate outliers.
 }
 \examples{
-n_vec <- c(2000, 1000, 1000)
-mu_list <- list(c(-1, 0), c(+1, -1), c(+1, +1))
-sigma_list <- list(
-  diag(c(0.2, 4 * 0.2)),
-  diag(c(0.2, 0.2)),
-  diag(c(0.2, 0.2))
-)
-gmm_p2g3 <- simulate_gmm(
-  n_vec, mu_list, sigma_list,
-  outlier_num = 40, seed = 123, crit_val = 0.9999,
+gmm <- simulate_gmm(
+  n = c(2000, 1000, 1000),
+  mu = list(c(-1, 0), c(+1, -1), c(+1, +1)),
+  sigma = list(diag(c(0.2, 4 * 0.2)), diag(c(0.2, 0.2)), diag(c(0.2, 0.2))),
+  outlier_num = 40,
+  seed = 123,
+  crit_val = 0.9999,
   range_multiplier = 1.5
 )
-plot(gmm_p2g3[, 1:2],
-  col = 1 + gmm_p2g3[, 3], pch = 1 + gmm_p2g3[, 3]
-)
+
+ombc_gmm <- ombc_gmm(gmm[, 1:2], comp_num = 3, max_out = 80)
+
+plot(gmm[, "X1", "X2"], col = gmm$G + 1, pch = gmm$G + 1)
 }
