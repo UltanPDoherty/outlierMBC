@@ -92,50 +92,6 @@ simulate_lcwm <- function(
 
 # ==============================================================================
 
-#' Check whether a new sample is an outlier for each component.
-#'
-#' @inheritParams simulate_lcwm
-#' @param x_sample New covariate sample.
-#' @param y_sample New response sample.
-#'
-#' @return Logical: TRUE if the new sample is an outlier for each component.
-#'
-#' @export
-test_outlier_ombc <- function(
-    outlier_type,
-    mu, sigma, beta, error_sd,
-    x_sample, y_sample, crit_val) {
-  comp_num <- length(mu)
-  var_num <- length(mu[[1]])
-
-  prob_x <- prob_y <- temp_outliers_fitted <- checks <- rep(NA, comp_num)
-
-  for (h in seq_len(comp_num)) {
-    prob_x[h] <- stats::pchisq(
-      stats::mahalanobis(x_sample, mu[[h]], sigma[[h]]),
-      df = var_num, lower.tail = FALSE
-    )
-
-    temp_outliers_fitted[h] <-
-      (beta[[h]][1] + x_sample %*% beta[[h]][-1])
-
-    prob_y[h] <- stats::pnorm(
-      abs(y_sample - temp_outliers_fitted[h]),
-      mean = 0, sd = error_sd[h], lower.tail = FALSE
-    )
-
-    checks[h] <- switch(outlier_type,
-      x_and_y = (prob_x[h] * prob_y[h]) < 1 - crit_val,
-      x_only = prob_x[h] < 1 - crit_val,
-      y_only = prob_y[h] < 1 - crit_val
-    )
-  }
-
-  return(all(checks))
-}
-
-# ==============================================================================
-
 #' Obtain the span of the observations for each component.
 #'
 #' @inheritParams simulate_lcwm
@@ -162,6 +118,41 @@ uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
   spans <- cbind(c(mins_x, min_err), c(maxs_x, max_err))
 
   return(spans)
+}
+
+# ==============================================================================
+
+#' Produce a single sample that passes the outlier checks.
+#'
+#' @inheritParams simulate_lcwm
+#' @param g Component index.
+#' @param uniform_spans Covariate and response error spans.
+#'
+#' @return Vector consisting of covariate values, response value, and label 0.
+#'
+#' @export
+uniform_outlier_ombc <- function(
+    outlier_type,
+    mu, sigma, beta, error_sd, g,
+    uniform_spans, crit_val) {
+  test <- FALSE
+
+  while (!test) {
+    uniform_sample <- uniform_sample_lcwm(
+      outlier_type,
+      mu[[g]], sigma[[g]],
+      beta[[g]], error_sd[g],
+      uniform_spans[[g]]
+    )
+
+    test <- test_outlier_ombc(
+      outlier_type,
+      mu, sigma, beta, error_sd,
+      uniform_sample$x, uniform_sample$y, crit_val
+    )
+  }
+
+  return(c(uniform_sample$x, uniform_sample$y, 0))
 }
 
 # ==============================================================================
@@ -212,35 +203,44 @@ uniform_sample_lcwm <- function(
 
 # ==============================================================================
 
-#' Produce a single sample that passes the outlier checks.
+#' Check whether a new sample is an outlier for each component.
 #'
 #' @inheritParams simulate_lcwm
-#' @param g Component index.
-#' @param uniform_spans Covariate and response error spans.
+#' @param x_sample New covariate sample.
+#' @param y_sample New response sample.
 #'
-#' @return Vector consisting of covariate values, response value, and label 0.
+#' @return Logical: TRUE if the new sample is an outlier for each component.
 #'
 #' @export
-uniform_outlier_ombc <- function(
+test_outlier_ombc <- function(
     outlier_type,
-    mu, sigma, beta, error_sd, g,
-    uniform_spans, crit_val) {
-  test <- FALSE
+    mu, sigma, beta, error_sd,
+    x_sample, y_sample, crit_val) {
+  comp_num <- length(mu)
+  var_num <- length(mu[[1]])
 
-  while (!test) {
-    uniform_sample <- uniform_sample_lcwm(
-      outlier_type,
-      mu[[g]], sigma[[g]],
-      beta[[g]], error_sd[g],
-      uniform_spans[[g]]
+  prob_x <- prob_y <- temp_outliers_fitted <- checks <- rep(NA, comp_num)
+
+  for (h in seq_len(comp_num)) {
+    prob_x[h] <- stats::pchisq(
+      stats::mahalanobis(x_sample, mu[[h]], sigma[[h]]),
+      df = var_num, lower.tail = FALSE
     )
 
-    test <- test_outlier_ombc(
-      outlier_type,
-      mu, sigma, beta, error_sd,
-      uniform_sample$x, uniform_sample$y, crit_val
+    temp_outliers_fitted[h] <-
+      (beta[[h]][1] + x_sample %*% beta[[h]][-1])
+
+    prob_y[h] <- stats::pnorm(
+      abs(y_sample - temp_outliers_fitted[h]),
+      mean = 0, sd = error_sd[h], lower.tail = FALSE
+    )
+
+    checks[h] <- switch(outlier_type,
+      x_and_y = (prob_x[h] * prob_y[h]) < 1 - crit_val,
+      x_only = prob_x[h] < 1 - crit_val,
+      y_only = prob_y[h] < 1 - crit_val
     )
   }
 
-  return(c(uniform_sample$x, uniform_sample$y, 0))
+  return(all(checks))
 }
