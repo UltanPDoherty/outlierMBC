@@ -50,7 +50,7 @@ data.frame(
 gmm_p2g3 |>
   ggplot(aes(
     x = X1, y = X2,
-    colour = as.factor(ombc_gmm_p2g3$gmm_labels),
+    colour = as.factor(ombc_gmm_p2g3$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
@@ -101,12 +101,12 @@ data.frame(
 lcwm_p1g1_y_only |>
   ggplot(aes(
     x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g1_y_only$outlier_bool),
+    colour = as.factor(ombc_lcwm_p1g1_y_only$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
 
 <img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-3-2.png" width="50%" />
@@ -150,12 +150,12 @@ data.frame(
 lcwm_p1g1_x_only |>
   ggplot(aes(
     x = X1, y = Y, 
-    colour = as.factor(ombc_lcwm_p1g1_x_only$outlier_bool),
+    colour = as.factor(ombc_lcwm_p1g1_x_only$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
 
 <img src="README_files/figure-gfm/unnamed-chunk-4-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-4-2.png" width="50%" />
@@ -199,12 +199,12 @@ data.frame(
 lcwm_p1g1_x_and_y |>
 ggplot(aes(
   x = X1, y = Y,
-  colour = as.factor(ombc_lcwm_p1g1_x_and_y$outlier_bool),
+  colour = as.factor(ombc_lcwm_p1g1_x_and_y$labels),
   shape = as.factor(G)
   )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
 
 <img src="README_files/figure-gfm/unnamed-chunk-5-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-5-2.png" width="50%" />
@@ -249,7 +249,7 @@ data.frame(
 lcwm_p1g2_y_only |>
   ggplot(aes(
     x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g2_y_only$outlier_bool),
+    colour = as.factor(ombc_lcwm_p1g2_y_only$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
@@ -299,7 +299,7 @@ data.frame(
 lcwm_p1g2_x_only |>
   ggplot(aes(
     x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g2_x_only$outlier_bool),
+    colour = as.factor(ombc_lcwm_p1g2_x_only$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
@@ -349,7 +349,7 @@ data.frame(
 lcwm_p1g2_x_and_y |>
   ggplot(aes(
     x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g2_x_and_y$outlier_bool),
+    colour = as.factor(ombc_lcwm_p1g2_x_and_y$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
