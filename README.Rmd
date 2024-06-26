@@ -21,7 +21,7 @@ devtools::load_all()
 ## Gaussian Mixture Models
 
 ```{r}
-gmm_p2g3 <- simulate_gmm(
+gmm <- simulate_gmm(
   n = c(2000, 1000, 1000),
   mu = list(c(-1, 0), c(+1, -1), c(+1, +1)),
   sigma = list(diag(c(0.2, 4 * 0.2)), diag(c(0.2, 0.2)), diag(c(0.2, 0.2))),
@@ -31,8 +31,8 @@ gmm_p2g3 <- simulate_gmm(
   range_multiplier = 1.5
 )
 
-ombc_gmm_p2g3 <- ombc_gmm(
-  gmm_p2g3[, 1:2],
+ombc_gmm <- ombc_gmm(
+  gmm[, 1:2],
   comp_num = 3,
   max_out = 80,
   mnames = "VVV",
@@ -43,18 +43,21 @@ ombc_gmm_p2g3 <- ombc_gmm(
 ```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:80,
-  distrib_diffs = ombc_gmm_p2g3$distrib_diffs
+  distrib_diffs = ombc_gmm$distrib_diffs
 ) |>
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
-  geom_vline(xintercept = ombc_gmm_p2g3$outlier_num) +
-  labs(x = "Number of Potential Outliers Removed")
+  geom_vline(xintercept = ombc_gmm$outlier_num) +
+  labs(
+    x = "Number of Potential Outliers Removed",
+    y = "Distribution Difference"
+  )
 
-gmm_p2g3 |>
+gmm |>
   ggplot(aes(
     x = X1, y = X2,
-    colour = as.factor(ombc_gmm_p2g3$labels),
+    colour = as.factor(ombc_gmm$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
@@ -67,7 +70,7 @@ gmm_p2g3 |>
 ### Single Component, Response Outliers
 
 ```{r}
-lcwm_p1g1_y_only <- simulate_lcwm(
+lcwm_g1_y <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
   sigma = list(as.matrix(0.1)),
@@ -80,9 +83,9 @@ lcwm_p1g1_y_only <- simulate_lcwm(
   range_multipliers = c(1.5, 1.5)
 )
 
-ombc_lcwm_p1g1_y_only <- ombc_lcwm(
-  xy = lcwm_p1g1_y_only,
-  x = lcwm_p1g1_y_only$X1,
+ombc_lcwm_g1_y <- ombc_lcwm(
+  xy = lcwm_g1_y,
+  x = lcwm_g1_y$X1,
   y_formula = Y ~ X1,
   comp_num = 1,
   max_out = 40,
@@ -95,27 +98,29 @@ ombc_lcwm_p1g1_y_only <- ombc_lcwm(
 ```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:40,
-  distrib_diffs = ombc_lcwm_p1g1_y_only$distrib_diffs,
-  outlier_num = ombc_lcwm_p1g1_y_only$outlier_num
+  distrib_diffs = ombc_lcwm_g1_y$distrib_diffs,
+  outlier_num = ombc_lcwm_g1_y$outlier_num
 ) |>
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num)) +
-  labs(x = "Number of Potential Outliers Removed")
+  labs(
+    x = "Number of Potential Outliers Removed",
+    y = "Distribution Difference"
+  )
 
-coeffs <-
-  ombc_lcwm_p1g1_y_only$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
+coef <- ombc_lcwm_g1_y$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
 
-lcwm_p1g1_y_only |>
+lcwm_g1_y |>
   ggplot(aes(
     x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g1_y_only$labels),
+    colour = as.factor(ombc_lcwm_g1_y$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
   geom_abline(
-    aes(intercept = coeffs[1], slope = coeffs[2]),
+    aes(intercept = coef[1], slope = coef[2]),
     linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 1)
   ) +
   labs(colour = "outlierMBC", shape = "Simulation") +
@@ -125,7 +130,7 @@ lcwm_p1g1_y_only |>
 ### Single Component, Covariate Outliers
 
 ```{r}
-lcwm_p1g1_x_only <- simulate_lcwm(
+lcwm_g1_x <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
   sigma = list(as.matrix(0.1)),
@@ -138,9 +143,9 @@ lcwm_p1g1_x_only <- simulate_lcwm(
   range_multipliers = c(1.5, 1.5)
 )
 
-ombc_lcwm_p1g1_x_only <- ombc_lcwm(
-  xy = lcwm_p1g1_x_only,
-  x = lcwm_p1g1_x_only$X1,
+ombc_lcwm_g1_x <- ombc_lcwm(
+  xy = lcwm_g1_x,
+  x = lcwm_g1_x$X1,
   y_formula = Y ~ X1,
   comp_num = 1,
   max_out = 40,
@@ -153,27 +158,29 @@ ombc_lcwm_p1g1_x_only <- ombc_lcwm(
 ```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:40,
-  distrib_diffs = ombc_lcwm_p1g1_x_only$distrib_diffs,
-  outlier_num = ombc_lcwm_p1g1_x_only$outlier_num
+  distrib_diffs = ombc_lcwm_g1_x$distrib_diffs,
+  outlier_num = ombc_lcwm_g1_x$outlier_num
 ) |>
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num)) +
-  labs(x = "Number of Potential Outliers Removed")
+  labs(
+    x = "Number of Potential Outliers Removed",
+    y = "Distribution Difference"
+  )
 
-coeffs <-
-  ombc_lcwm_p1g1_x_only$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
+coef <- ombc_lcwm_g1_x$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
 
-lcwm_p1g1_x_only |>
+lcwm_g1_x |>
   ggplot(aes(
     x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g1_x_only$labels),
+    colour = as.factor(ombc_lcwm_g1_x$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
   geom_abline(
-    aes(intercept = coeffs[1], slope = coeffs[2]),
+    aes(intercept = coef[1], slope = coef[2]),
     linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 1)
   ) +
   labs(colour = "outlierMBC", shape = "Simulation") +
@@ -183,7 +190,7 @@ lcwm_p1g1_x_only |>
 ### Single Component, Combined Outliers
 
 ```{r}
-lcwm_p1g1_x_and_y <- simulate_lcwm(
+lcwm_g1_xy <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
   sigma = list(as.matrix(0.1)),
@@ -196,9 +203,9 @@ lcwm_p1g1_x_and_y <- simulate_lcwm(
   range_multipliers = c(1.5, 1.5)
 )
 
-ombc_lcwm_p1g1_x_and_y <- ombc_lcwm(
-  xy = lcwm_p1g1_x_and_y,
-  x = lcwm_p1g1_x_and_y$X1,
+ombc_lcwm_g1_xy <- ombc_lcwm(
+  xy = lcwm_g1_xy,
+  x = lcwm_g1_xy$X1,
   y_formula = Y ~ X1,
   comp_num = 1,
   max_out = 40,
@@ -211,27 +218,29 @@ ombc_lcwm_p1g1_x_and_y <- ombc_lcwm(
 ```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:40,
-  distrib_diffs = ombc_lcwm_p1g1_x_and_y$distrib_diffs,
-  outlier_num = ombc_lcwm_p1g1_x_and_y$outlier_num
+  distrib_diffs = ombc_lcwm_g1_xy$distrib_diffs,
+  outlier_num = ombc_lcwm_g1_xy$outlier_num
 ) |>
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num)) +
-  labs(x = "Number of Potential Outliers Removed")
+  labs(
+    x = "Number of Potential Outliers Removed",
+    y = "Distribution Difference"
+  )
 
-coeffs <-
-  ombc_lcwm_p1g1_x_and_y$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
+coef <- ombc_lcwm_g1_xy$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
 
-lcwm_p1g1_x_and_y |>
+lcwm_g1_xy |>
   ggplot(aes(
     x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g1_x_and_y$labels),
+    colour = as.factor(ombc_lcwm_g1_xy$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
   geom_abline(
-    aes(intercept = coeffs[1], slope = coeffs[2]),
+    aes(intercept = coef[1], slope = coef[2]),
     linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 1)
   ) +
   labs(colour = "outlierMBC", shape = "Simulation") +
@@ -241,7 +250,7 @@ lcwm_p1g1_x_and_y |>
 ### Two-Component, Response Outliers
 
 ```{r}
-lcwm_p1g2_y_only <- simulate_lcwm(
+lcwm_g2_y <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
   sigma = list(as.matrix(0.2), as.matrix(0.2)),
@@ -254,9 +263,9 @@ lcwm_p1g2_y_only <- simulate_lcwm(
   range_multipliers = c(2, 2)
 )
 
-ombc_lcwm_p1g2_y_only <- ombc_lcwm(
-  xy = lcwm_p1g2_y_only,
-  x = lcwm_p1g2_y_only$X1,
+ombc_lcwm_g2_y <- ombc_lcwm(
+  xy = lcwm_g2_y,
+  x = lcwm_g2_y$X1,
   y_formula = Y ~ X1,
   comp_num = 2,
   max_out = 100,
@@ -269,34 +278,35 @@ ombc_lcwm_p1g2_y_only <- ombc_lcwm(
 ```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:100,
-  distrib_diffs = ombc_lcwm_p1g2_y_only$distrib_diffs,
-  outlier_num = ombc_lcwm_p1g2_y_only$outlier_num
+  distrib_diffs = ombc_lcwm_g2_y$distrib_diffs,
+  outlier_num = ombc_lcwm_g2_y$outlier_num
 ) |>
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num)) +
-  labs(x = "Number of Potential Outliers Removed")
+  labs(
+    x = "Number of Potential Outliers Removed",
+    y = "Distribution Difference"
+  )
 
-coeffs1 <-
-  ombc_lcwm_p1g2_y_only$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
-coeffs2 <-
-  ombc_lcwm_p1g2_y_only$final_cwm$models[[1]]$GLModel$comp.2$model$coefficients
+coef1 <- ombc_lcwm_g2_y$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
+coef2 <- ombc_lcwm_g2_y$final_cwm$models[[1]]$GLModel$comp.2$model$coefficients
 
-lcwm_p1g2_y_only |>
+lcwm_g2_y |>
   ggplot(aes(
     x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g2_y_only$labels),
+    colour = as.factor(ombc_lcwm_g2_y$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2)) +
   geom_abline(
-    aes(intercept = coeffs1[1], slope = coeffs1[2]),
+    aes(intercept = coef1[1], slope = coef1[2]),
     linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 1)
   ) +
   geom_abline(
-    aes(intercept = coeffs2[1], slope = coeffs2[2]),
+    aes(intercept = coef2[1], slope = coef2[2]),
     linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 2)
   ) +
   labs(colour = "outlierMBC", shape = "Simulation")
@@ -305,7 +315,7 @@ lcwm_p1g2_y_only |>
 ### Two-Component, Covariate Outliers
 
 ```{r}
-lcwm_p1g2_x_only <- simulate_lcwm(
+lcwm_g2_x <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
   sigma = list(as.matrix(0.2), as.matrix(0.2)),
@@ -318,9 +328,9 @@ lcwm_p1g2_x_only <- simulate_lcwm(
   range_multipliers = c(2, 2)
 )
 
-ombc_lcwm_p1g2_x_only <- ombc_lcwm(
-  xy = lcwm_p1g2_x_only,
-  x = lcwm_p1g2_x_only$X1,
+ombc_lcwm_g2_x <- ombc_lcwm(
+  xy = lcwm_g2_x,
+  x = lcwm_g2_x$X1,
   y_formula = Y ~ X1,
   comp_num = 2,
   max_out = 100,
@@ -333,33 +343,34 @@ ombc_lcwm_p1g2_x_only <- ombc_lcwm(
 ```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:100,
-  distrib_diffs = ombc_lcwm_p1g2_x_only$distrib_diffs,
-  outlier_num = ombc_lcwm_p1g2_x_only$outlier_num
+  distrib_diffs = ombc_lcwm_g2_x$distrib_diffs,
+  outlier_num = ombc_lcwm_g2_x$outlier_num
 ) |>
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num)) +
-  labs(x = "Number of Potential Outliers Removed")
+  labs(
+    x = "Number of Potential Outliers Removed",
+    y = "Distribution Difference"
+  )
 
-coeffs1 <-
-  ombc_lcwm_p1g2_x_only$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
-coeffs2 <-
-  ombc_lcwm_p1g2_x_only$final_cwm$models[[1]]$GLModel$comp.2$model$coefficients
+coef1 <- ombc_lcwm_g2_x$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
+coef2 <- ombc_lcwm_g2_x$final_cwm$models[[1]]$GLModel$comp.2$model$coefficients
 
-lcwm_p1g2_x_only |>
+lcwm_g2_x |>
   ggplot(aes(
     x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g2_x_only$labels),
+    colour = as.factor(ombc_lcwm_g2_x$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
   geom_abline(
-    aes(intercept = coeffs1[1], slope = coeffs1[2]),
+    aes(intercept = coef1[1], slope = coef1[2]),
     linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 1)
   ) +
   geom_abline(
-    aes(intercept = coeffs2[1], slope = coeffs2[2]),
+    aes(intercept = coef2[1], slope = coef2[2]),
     linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 2)
   ) +
   labs(colour = "outlierMBC", shape = "Simulation") +
@@ -369,7 +380,7 @@ lcwm_p1g2_x_only |>
 ### Two-Component, Combined Outliers
 
 ```{r}
-lcwm_p1g2_x_and_y <- simulate_lcwm(
+lcwm_g2_xy <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
   sigma = list(as.matrix(0.2), as.matrix(0.2)),
@@ -382,9 +393,9 @@ lcwm_p1g2_x_and_y <- simulate_lcwm(
   range_multipliers = c(2, 2)
 )
 
-ombc_lcwm_p1g2_x_and_y <- ombc_lcwm(
-  xy = lcwm_p1g2_x_and_y,
-  x = lcwm_p1g2_x_and_y$X1,
+ombc_lcwm_g2_xy <- ombc_lcwm(
+  xy = lcwm_g2_xy,
+  x = lcwm_g2_xy$X1,
   y_formula = Y ~ X1,
   comp_num = 2,
   max_out = 100,
@@ -397,33 +408,34 @@ ombc_lcwm_p1g2_x_and_y <- ombc_lcwm(
 ```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 data.frame(
   outliers_removed = 0:100,
-  distrib_diffs = ombc_lcwm_p1g2_x_and_y$distrib_diffs,
-  outlier_num = ombc_lcwm_p1g2_x_and_y$outlier_num
+  distrib_diffs = ombc_lcwm_g2_xy$distrib_diffs,
+  outlier_num = ombc_lcwm_g2_xy$outlier_num
 ) |>
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num)) +
-  labs(x = "Number of Potential Outliers Removed")
+  labs(
+    x = "Number of Potential Outliers Removed",
+    y = "Distribution Difference"
+  )
 
-coeffs1 <-
-  ombc_lcwm_p1g2_x_and_y$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
-coeffs2 <-
-  ombc_lcwm_p1g2_x_and_y$final_cwm$models[[1]]$GLModel$comp.2$model$coefficients
+coef1 <- ombc_lcwm_g2_xy$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
+coef2 <- ombc_lcwm_g2_xy$final_cwm$models[[1]]$GLModel$comp.2$model$coefficients
 
-lcwm_p1g2_x_and_y |>
+lcwm_g2_xy |>
   ggplot(aes(
     x = X1, y = Y,
-    colour = as.factor(ombc_lcwm_p1g2_x_and_y$labels),
+    colour = as.factor(ombc_lcwm_g2_xy$labels),
     shape = as.factor(G)
   )) +
   geom_point() +
   geom_abline(
-    aes(intercept = coeffs1[1], slope = coeffs1[2]),
+    aes(intercept = coef1[1], slope = coef1[2]),
     linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 1)
   ) +
   geom_abline(
-    aes(intercept = coeffs2[1], slope = coeffs2[2]),
+    aes(intercept = coef2[1], slope = coef2[2]),
     linetype = "solid", colour = ggokabeito::palette_okabe_ito(order = 2)
   ) +
   labs(colour = "outlierMBC", shape = "Simulation") +

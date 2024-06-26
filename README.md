@@ -14,10 +14,10 @@ Ultán P. Doherty
 - `simulate_lcwm` - Simulate data from a linear cluster-weighted model
   with covariate and/or response outliers.
 
-## Mixture Models
+## Gaussian Mixture Models
 
 ``` r
-gmm_p2g3 <- simulate_gmm(
+gmm <- simulate_gmm(
   n = c(2000, 1000, 1000),
   mu = list(c(-1, 0), c(+1, -1), c(+1, +1)),
   sigma = list(diag(c(0.2, 4 * 0.2)), diag(c(0.2, 0.2)), diag(c(0.2, 0.2))),
@@ -27,8 +27,8 @@ gmm_p2g3 <- simulate_gmm(
   range_multiplier = 1.5
 )
 
-ombc_gmm_p2g3 <- ombc_gmm(
-  gmm_p2g3[, 1:2],
+ombc_gmm <- ombc_gmm(
+  gmm[, 1:2],
   comp_num = 3,
   max_out = 80,
   mnames = "VVV",
@@ -43,7 +43,7 @@ ombc_gmm_p2g3 <- ombc_gmm(
 ### Single Component, Response Outliers
 
 ``` r
-lcwm_p1g1_y_only <- simulate_lcwm(
+lcwm_g1_y <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
   sigma = list(as.matrix(0.1)),
@@ -56,9 +56,9 @@ lcwm_p1g1_y_only <- simulate_lcwm(
   range_multipliers = c(1.5, 1.5)
 )
 
-ombc_lcwm_p1g1_y_only <- ombc_lcwm(
-  xy = lcwm_p1g1_y_only,
-  x = lcwm_p1g1_y_only$X1,
+ombc_lcwm_g1_y <- ombc_lcwm(
+  xy = lcwm_g1_y,
+  x = lcwm_g1_y$X1,
   y_formula = Y ~ X1,
   comp_num = 1,
   max_out = 40,
@@ -73,7 +73,7 @@ ombc_lcwm_p1g1_y_only <- ombc_lcwm(
 ### Single Component, Covariate Outliers
 
 ``` r
-lcwm_p1g1_x_only <- simulate_lcwm(
+lcwm_g1_x <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
   sigma = list(as.matrix(0.1)),
@@ -86,9 +86,9 @@ lcwm_p1g1_x_only <- simulate_lcwm(
   range_multipliers = c(1.5, 1.5)
 )
 
-ombc_lcwm_p1g1_x_only <- ombc_lcwm(
-  xy = lcwm_p1g1_x_only,
-  x = lcwm_p1g1_x_only$X1,
+ombc_lcwm_g1_x <- ombc_lcwm(
+  xy = lcwm_g1_x,
+  x = lcwm_g1_x$X1,
   y_formula = Y ~ X1,
   comp_num = 1,
   max_out = 40,
@@ -103,7 +103,7 @@ ombc_lcwm_p1g1_x_only <- ombc_lcwm(
 ### Single Component, Combined Outliers
 
 ``` r
-lcwm_p1g1_x_and_y <- simulate_lcwm(
+lcwm_g1_xy <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
   sigma = list(as.matrix(0.1)),
@@ -116,9 +116,9 @@ lcwm_p1g1_x_and_y <- simulate_lcwm(
   range_multipliers = c(1.5, 1.5)
 )
 
-ombc_lcwm_p1g1_x_and_y <- ombc_lcwm(
-  xy = lcwm_p1g1_x_and_y,
-  x = lcwm_p1g1_x_and_y$X1,
+ombc_lcwm_g1_xy <- ombc_lcwm(
+  xy = lcwm_g1_xy,
+  x = lcwm_g1_xy$X1,
   y_formula = Y ~ X1,
   comp_num = 1,
   max_out = 40,
@@ -133,7 +133,7 @@ ombc_lcwm_p1g1_x_and_y <- ombc_lcwm(
 ### Two-Component, Response Outliers
 
 ``` r
-lcwm_p1g2_y_only <- simulate_lcwm(
+lcwm_g2_y <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
   sigma = list(as.matrix(0.2), as.matrix(0.2)),
@@ -146,9 +146,9 @@ lcwm_p1g2_y_only <- simulate_lcwm(
   range_multipliers = c(2, 2)
 )
 
-ombc_lcwm_p1g2_y_only <- ombc_lcwm(
-  xy = lcwm_p1g2_y_only,
-  x = lcwm_p1g2_y_only$X1,
+ombc_lcwm_g2_y <- ombc_lcwm(
+  xy = lcwm_g2_y,
+  x = lcwm_g2_y$X1,
   y_formula = Y ~ X1,
   comp_num = 2,
   max_out = 100,
@@ -163,7 +163,7 @@ ombc_lcwm_p1g2_y_only <- ombc_lcwm(
 ### Two-Component, Covariate Outliers
 
 ``` r
-lcwm_p1g2_x_only <- simulate_lcwm(
+lcwm_g2_x <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
   sigma = list(as.matrix(0.2), as.matrix(0.2)),
@@ -176,9 +176,9 @@ lcwm_p1g2_x_only <- simulate_lcwm(
   range_multipliers = c(2, 2)
 )
 
-ombc_lcwm_p1g2_x_only <- ombc_lcwm(
-  xy = lcwm_p1g2_x_only,
-  x = lcwm_p1g2_x_only$X1,
+ombc_lcwm_g2_x <- ombc_lcwm(
+  xy = lcwm_g2_x,
+  x = lcwm_g2_x$X1,
   y_formula = Y ~ X1,
   comp_num = 2,
   max_out = 100,
@@ -193,7 +193,7 @@ ombc_lcwm_p1g2_x_only <- ombc_lcwm(
 ### Two-Component, Combined Outliers
 
 ``` r
-lcwm_p1g2_x_and_y <- simulate_lcwm(
+lcwm_g2_xy <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
   sigma = list(as.matrix(0.2), as.matrix(0.2)),
@@ -206,9 +206,9 @@ lcwm_p1g2_x_and_y <- simulate_lcwm(
   range_multipliers = c(2, 2)
 )
 
-ombc_lcwm_p1g2_x_and_y <- ombc_lcwm(
-  xy = lcwm_p1g2_x_and_y,
-  x = lcwm_p1g2_x_and_y$X1,
+ombc_lcwm_g2_xy <- ombc_lcwm(
+  xy = lcwm_g2_xy,
+  x = lcwm_g2_xy$X1,
   y_formula = Y ~ X1,
   comp_num = 2,
   max_out = 100,
