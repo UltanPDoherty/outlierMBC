@@ -108,7 +108,7 @@ ombc_lcwm <- function(
     names(mod_list) <- paste0("comp.", seq_along(mod_list))
     y_sigma <- vapply(lcwm$models[[1]]$GLModel, function(x) x$sigma, double(1L))
 
-    out <- distrib_diff_lcwm(
+    invisible(utils::capture.output(out <- distrib_diff_lcwm(
       x,
       lcwm$models[[1]]$posterior,
       prop,
@@ -118,7 +118,7 @@ ombc_lcwm <- function(
       y_sigma,
       alpha,
       outlier_type
-    )
+    )))
 
     distrib_diffs[i] <- out$distrib_diff
 
