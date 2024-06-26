@@ -226,5 +226,3 @@ distrib_diff_residual <- function(
     dens = dens_g_y
   ))
 }
-
-

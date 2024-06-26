@@ -34,7 +34,9 @@ gmm_p2g3 <- simulate_gmm(
 ombc_gmm_p2g3 <- ombc_gmm(
   gmm_p2g3[, 1:2],
   comp_num = 3,
-  max_out = 80
+  max_out = 80,
+  mnames = "VVV",
+  seed = 123
 )
 ```
 
@@ -101,7 +103,7 @@ data.frame(
   geom_vline(aes(xintercept = outlier_num)) +
   labs(x = "Number of Potential Outliers Removed")
 
-coeffs <- 
+coeffs <-
   ombc_lcwm_p1g1_y_only$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
 
 lcwm_p1g1_y_only |>
@@ -158,12 +160,12 @@ data.frame(
   geom_vline(aes(xintercept = outlier_num)) +
   labs(x = "Number of Potential Outliers Removed")
 
-coeffs <- 
+coeffs <-
   ombc_lcwm_p1g1_x_only$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
 
 lcwm_p1g1_x_only |>
   ggplot(aes(
-    x = X1, y = Y, 
+    x = X1, y = Y,
     colour = as.factor(ombc_lcwm_p1g1_x_only$labels),
     shape = as.factor(G)
   )) +
@@ -215,14 +217,14 @@ data.frame(
   geom_vline(aes(xintercept = outlier_num)) +
   labs(x = "Number of Potential Outliers Removed")
 
-coeffs <- 
+coeffs <-
   ombc_lcwm_p1g1_x_and_y$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
 
 lcwm_p1g1_x_and_y |>
-ggplot(aes(
-  x = X1, y = Y,
-  colour = as.factor(ombc_lcwm_p1g1_x_and_y$labels),
-  shape = as.factor(G)
+  ggplot(aes(
+    x = X1, y = Y,
+    colour = as.factor(ombc_lcwm_p1g1_x_and_y$labels),
+    shape = as.factor(G)
   )) +
   geom_point() +
   geom_abline(
@@ -273,9 +275,9 @@ data.frame(
   geom_vline(aes(xintercept = outlier_num)) +
   labs(x = "Number of Potential Outliers Removed")
 
-coeffs1 <- 
+coeffs1 <-
   ombc_lcwm_p1g2_y_only$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
-coeffs2 <- 
+coeffs2 <-
   ombc_lcwm_p1g2_y_only$final_cwm$models[[1]]$GLModel$comp.2$model$coefficients
 
 lcwm_p1g2_y_only |>
@@ -337,9 +339,9 @@ data.frame(
   geom_vline(aes(xintercept = outlier_num)) +
   labs(x = "Number of Potential Outliers Removed")
 
-coeffs1 <- 
+coeffs1 <-
   ombc_lcwm_p1g2_x_only$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
-coeffs2 <- 
+coeffs2 <-
   ombc_lcwm_p1g2_x_only$final_cwm$models[[1]]$GLModel$comp.2$model$coefficients
 
 lcwm_p1g2_x_only |>
@@ -394,16 +396,16 @@ data.frame(
   outliers_removed = 0:100,
   distrib_diffs = ombc_lcwm_p1g2_x_and_y$distrib_diffs,
   outlier_num = ombc_lcwm_p1g2_x_and_y$outlier_num
-) |> 
+) |>
   ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num)) +
   labs(x = "Number of Potential Outliers Removed")
 
-coeffs1 <- 
+coeffs1 <-
   ombc_lcwm_p1g2_x_and_y$final_cwm$models[[1]]$GLModel$comp.1$model$coefficients
-coeffs2 <- 
+coeffs2 <-
   ombc_lcwm_p1g2_x_and_y$final_cwm$models[[1]]$GLModel$comp.2$model$coefficients
 
 lcwm_p1g2_x_and_y |>

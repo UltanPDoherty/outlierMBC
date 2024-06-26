@@ -30,7 +30,9 @@ gmm_p2g3 <- simulate_gmm(
 ombc_gmm_p2g3 <- ombc_gmm(
   gmm_p2g3[, 1:2],
   comp_num = 3,
-  max_out = 80
+  max_out = 80,
+  mnames = "VVV",
+  seed = 123
 )
 ```
 
