@@ -13,7 +13,11 @@
 #'                         samples be than the range of the Normal samples?
 #' @param print_interval How frequently the iteration count is printed.
 #'
-#' @return Matrix with a label column.
+#' @return `data.frame` with columns:
+#' * $X1: first covariate
+#' * ...
+#' * $G: label
+#'
 #' @export
 #'
 #' @examples

@@ -17,9 +17,9 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
   distrib_diff_vec <- c()
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
   for (g in seq_len(comp_num)) {
-    out_g <- distrib_diff_mahalanobis(x, z[, g], mu[[g]], sigma[[g]])
-    distrib_diff_vec[g] <- out_g$diff
-    dens_mat[, g] <- out_g$dens
+    dd_g <- distrib_diff_mahalanobis(x, z[, g], mu[[g]], sigma[[g]])
+    distrib_diff_vec[g] <- dd_g$diff
+    dens_mat[, g] <- dd_g$dens
   }
 
   mix_dens <- dens_mat %*% t(prop)
@@ -128,13 +128,11 @@ distrib_diff_lcwm_g <- function(
 
     diff_g <- dd_g_x$diff
     dens_g <- dd_g_x$dens
-  } else if (outlier_type == "y_only") {
+  } else {
     dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
 
     diff_g <- dd_g_y$diff
     dens_g <- dd_g_y$dens
-  } else {
-    stop("Invalid outlier_type.")
   }
 
   return(list(

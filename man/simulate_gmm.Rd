@@ -34,7 +34,12 @@ samples be than the range of the Normal samples?}
 \item{print_interval}{How frequently the iteration count is printed.}
 }
 \value{
-Matrix with a label column.
+\code{data.frame} with columns:
+\itemize{
+\item $X1: first covariate
+\item ...
+\item $G: label
+}
 }
 \description{
 Simulate a Gaussian mixture model with multivariate outliers.
