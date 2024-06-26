@@ -45,7 +45,7 @@ ggplot(
   )
 ) +
   geom_point() +
-  labs(colour = "truth", shape = "truth") +
+  labs(colour = "Simulation", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
@@ -79,7 +79,7 @@ ggplot(
   )
 ) +
   geom_point() +
-  labs(colour = "ombc_gmm", shape = "truth") +
+  labs(colour = "ombc_gmm", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
@@ -87,7 +87,7 @@ ggplot(
 
 ### Single Component, Response Outliers
 
-```{r}
+```{r, message=FALSE}
 lcwm_p1g1_y_only <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
@@ -99,17 +99,7 @@ lcwm_p1g1_y_only <- simulate_lcwm(
   seed = 123,
   crit_val = 0.9999
 )
-```
 
-```{r}
-lcwm_p1g1_y_only |>
-  ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
-  geom_point() +
-  labs(colour = "truth", shape = "truth") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
-```
-
-```{r, message=FALSE}
 ombc_lcwm_p1g1_y_only <- ombc_lcwm(
   xy = lcwm_p1g1_y_only,
   x = lcwm_p1g1_y_only$X1,
@@ -120,9 +110,7 @@ ombc_lcwm_p1g1_y_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "y_only"
 )
-```
 
-```{r}
 ggplot(
   data.frame(
     outliers_removed = 0:40,
@@ -134,9 +122,7 @@ ggplot(
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
-```
 
-```{r}
 lcwm_p1g1_y_only |>
 ggplot(aes(
   x = X1, y = Y,
@@ -145,7 +131,7 @@ ggplot(aes(
   )
 ) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "truth") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
@@ -169,7 +155,7 @@ lcwm_p1g1_x_only <- simulate_lcwm(
 lcwm_p1g1_x_only |>
   ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
   geom_point() +
-  labs(colour = "truth", shape = "truth") +
+  labs(colour = "Simulation", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
 
@@ -209,7 +195,7 @@ ggplot(aes(
   )
 ) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "truth") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
@@ -233,7 +219,7 @@ lcwm_p1g1_x_and_y <- simulate_lcwm(
 lcwm_p1g1_x_and_y |>
   ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
   geom_point() +
-  labs(colour = "truth", shape = "truth") +
+  labs(colour = "Simulation", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
 
@@ -273,7 +259,7 @@ ggplot(aes(
   )
 ) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "truth") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
@@ -298,7 +284,7 @@ lcwm_p1g2_y_only <- simulate_lcwm(
 lcwm_p1g2_y_only |>
   ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
   geom_point() +
-  labs(colour = "truth", shape = "truth") +
+  labs(colour = "Simulation", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
@@ -338,7 +324,7 @@ ggplot(aes(
   )
 ) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "truth") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
@@ -363,7 +349,7 @@ lcwm_p1g2_x_only <- simulate_lcwm(
 lcwm_p1g2_x_only |>
   ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
   geom_point() +
-  labs(colour = "truth", shape = "truth") +
+  labs(colour = "Simulation", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
@@ -403,7 +389,7 @@ ggplot(aes(
   )
 ) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "truth") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
@@ -428,7 +414,7 @@ lcwm_p1g2_x_and_y <- simulate_lcwm(
 lcwm_p1g2_x_and_y |>
   ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
   geom_point() +
-  labs(colour = "truth", shape = "truth") +
+  labs(colour = "Simulation", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
@@ -468,6 +454,6 @@ ggplot(aes(
   )
 ) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "truth") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
