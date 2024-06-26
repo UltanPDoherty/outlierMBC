@@ -5,14 +5,14 @@ Ultán P. Doherty
 
 # Outlier Identification for Model-Based Clustering
 
-- `ombc_gmm` - Identify multivariate outliers while clustering the data
-  with a Gaussian mixture model.
-- `ombc_mlr` - Identify response variable outliers while fitting a
-  multiple linear regression model to the data.
-- `simulate_noisy_gmm` - Simulate data from a Gaussian mixture model
-  with multivariate outliers.
-- `simulate_noisy_mlr` - Simulate data from a multiple linear regression
-  model with response variable outliers.
+- `ombc_gmm` - Identify multivariate outliers while clustering data with
+  a Gaussian mixture model.
+- `ombc_lcwm` - Identify covariate and/or response outliers while
+  fitting a linear cluster-weighted model to the data.
+- `simulate_gmm` - Simulate data from a Gaussian mixture model with
+  multivariate outliers.
+- `simulate_lcwm` - Simulate data from a linear cluster-weighted model
+  with covariate and/or response outliers.
 
 ``` r
 library(ggplot2)
@@ -30,7 +30,7 @@ sigma_list <- list(
   diag(c(0.2, 0.2))
 )
 
-noisy_gmm_p2g3 <- simulate_noisy_gmm(
+gmm_p2g3 <- simulate_gmm(
   n_vec, mu_list, sigma_list,
   outlier_num = 40, seed = 123, crit_val = 0.9999,
   unif_range_multiplier = 1.5
@@ -39,7 +39,7 @@ noisy_gmm_p2g3 <- simulate_noisy_gmm(
 
 ``` r
 ggplot(
-  as.data.frame(noisy_gmm_p2g3),
+  as.data.frame(gmm_p2g3),
   aes(
     x = V1, y = V2,
     colour = as.factor(labels), shape = as.factor(labels)
@@ -53,7 +53,7 @@ ggplot(
 ![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
-ombc_gmm_p2g3 <- ombc_gmm(noisy_gmm_p2g3[, 1:2],
+ombc_gmm_p2g3 <- ombc_gmm(gmm_p2g3[, 1:2],
   comp_num = 3, max_out = 80,
   print_interval = Inf
 )
@@ -76,7 +76,7 @@ ggplot(
 
 ``` r
 ggplot(
-  as.data.frame(noisy_gmm_p2g3),
+  as.data.frame(gmm_p2g3),
   aes(
     x = V1, y = V2,
     colour = as.factor(ombc_gmm_p2g3$gmm_labels),
@@ -95,7 +95,7 @@ ggplot(
 ### Single Component, Response Outliers
 
 ``` r
-lcwm_p1g1_y_only <- simulate_ombc(
+lcwm_p1g1_y_only <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
   sigma = list(as.matrix(0.1)),
@@ -170,7 +170,7 @@ ggplot(aes(
 ### Single Component, Covariate Outliers
 
 ``` r
-lcwm_p1g1_x_only <- simulate_ombc(
+lcwm_p1g1_x_only <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
   sigma = list(as.matrix(0.1)),
@@ -245,7 +245,7 @@ ggplot(aes(
 ### Single Component, Combined Outliers
 
 ``` r
-lcwm_p1g1_x_and_y <- simulate_ombc(
+lcwm_p1g1_x_and_y <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
   sigma = list(as.matrix(0.1)),
@@ -320,7 +320,7 @@ ggplot(aes(
 ### Two-Component, Response Outliers
 
 ``` r
-lcwm_p1g2_y_only <- simulate_ombc(
+lcwm_p1g2_y_only <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
   sigma = list(as.matrix(0.2), as.matrix(0.2)),
@@ -396,7 +396,7 @@ ggplot(aes(
 ### Two-Component, Covariate Outliers
 
 ``` r
-lcwm_p1g2_x_only <- simulate_ombc(
+lcwm_p1g2_x_only <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
   sigma = list(as.matrix(0.2), as.matrix(0.2)),
@@ -472,7 +472,7 @@ ggplot(aes(
 ### Two-Component, Combined Outliers
 
 ``` r
-lcwm_p1g2_x_and_y <- simulate_ombc(
+lcwm_p1g2_x_and_y <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
   sigma = list(as.matrix(0.2), as.matrix(0.2)),
