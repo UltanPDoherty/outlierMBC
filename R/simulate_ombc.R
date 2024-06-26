@@ -184,12 +184,10 @@ uniform_sample_lcwm <- function(
     outlier_type, mu_g, sigma_g, beta_g, error_sd_g, uniform_spans_g) {
   var_num <- length(beta_g) - 1
 
-  outlier_x_g <- rep(NA, var_num)
   if (outlier_type == "y_only") {
-    for (p in seq_len(var_num)) {
-      outlier_x_g[p] <- stats::rnorm(1, mu_g, sigma_g)
-    }
+    outlier_x_g <- mvtnorm::rmvnorm(1, mu_g, sigma_g)
   } else {
+    outlier_x_g <- rep(NA, var_num)
     for (p in seq_len(var_num)) {
       outlier_x_g[p] <- stats::runif(
         1, uniform_spans_g[p, 1], uniform_spans_g[p, 2]
