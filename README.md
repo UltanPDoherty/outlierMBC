@@ -46,7 +46,7 @@ ggplot(
   )
 ) +
   geom_point() +
-  labs(colour = "truth", shape = "truth") +
+  labs(colour = "Simulation", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
@@ -84,7 +84,7 @@ ggplot(
   )
 ) +
   geom_point() +
-  labs(colour = "ombc_gmm", shape = "truth") +
+  labs(colour = "ombc_gmm", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
@@ -106,19 +106,7 @@ lcwm_p1g1_y_only <- simulate_lcwm(
   seed = 123,
   crit_val = 0.9999
 )
-```
 
-``` r
-lcwm_p1g1_y_only |>
-  ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
-  geom_point() +
-  labs(colour = "truth", shape = "truth") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
-```
-
-![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
-
-``` r
 ombc_lcwm_p1g1_y_only <- ombc_lcwm(
   xy = lcwm_p1g1_y_only,
   x = lcwm_p1g1_y_only$X1,
@@ -150,7 +138,7 @@ ggplot(
   geom_vline(aes(xintercept = outlier_num))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 lcwm_p1g1_y_only |>
@@ -161,11 +149,11 @@ ggplot(aes(
   )
 ) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "truth") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
 
 ### Single Component, Covariate Outliers
 
@@ -187,11 +175,11 @@ lcwm_p1g1_x_only <- simulate_lcwm(
 lcwm_p1g1_x_only |>
   ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
   geom_point() +
-  labs(colour = "truth", shape = "truth") +
+  labs(colour = "Simulation", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 ombc_lcwm_p1g1_x_only <- ombc_lcwm(
@@ -225,7 +213,7 @@ ggplot(
   geom_vline(aes(xintercept = outlier_num))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 lcwm_p1g1_x_only |>
@@ -236,11 +224,11 @@ ggplot(aes(
   )
 ) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "truth") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ### Single Component, Combined Outliers
 
@@ -262,11 +250,11 @@ lcwm_p1g1_x_and_y <- simulate_lcwm(
 lcwm_p1g1_x_and_y |>
   ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
   geom_point() +
-  labs(colour = "truth", shape = "truth") +
+  labs(colour = "Simulation", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 ombc_lcwm_p1g1_x_and_y <- ombc_lcwm(
@@ -300,7 +288,7 @@ ggplot(
   geom_vline(aes(xintercept = outlier_num))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
 lcwm_p1g1_x_and_y |>
@@ -311,11 +299,11 @@ ggplot(aes(
   )
 ) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "truth") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ### Two-Component, Response Outliers
 
@@ -338,11 +326,11 @@ lcwm_p1g2_y_only <- simulate_lcwm(
 lcwm_p1g2_y_only |>
   ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
   geom_point() +
-  labs(colour = "truth", shape = "truth") +
+  labs(colour = "Simulation", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 ombc_lcwm_p1g2_y_only <- ombc_lcwm(
@@ -376,7 +364,7 @@ ggplot(
   geom_vline(aes(xintercept = outlier_num))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 ``` r
 lcwm_p1g2_y_only |>
@@ -387,11 +375,11 @@ ggplot(aes(
   )
 ) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "truth") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 ### Two-Component, Covariate Outliers
 
@@ -414,11 +402,11 @@ lcwm_p1g2_x_only <- simulate_lcwm(
 lcwm_p1g2_x_only |>
   ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
   geom_point() +
-  labs(colour = "truth", shape = "truth") +
+  labs(colour = "Simulation", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 ``` r
 ombc_lcwm_p1g2_x_only <- ombc_lcwm(
@@ -452,7 +440,7 @@ ggplot(
   geom_vline(aes(xintercept = outlier_num))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 ``` r
 lcwm_p1g2_x_only |>
@@ -463,11 +451,11 @@ ggplot(aes(
   )
 ) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "truth") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 ### Two-Component, Combined Outliers
 
@@ -490,11 +478,11 @@ lcwm_p1g2_x_and_y <- simulate_lcwm(
 lcwm_p1g2_x_and_y |>
   ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
   geom_point() +
-  labs(colour = "truth", shape = "truth") +
+  labs(colour = "Simulation", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
 ``` r
 ombc_lcwm_p1g2_x_and_y <- ombc_lcwm(
@@ -528,7 +516,7 @@ ggplot(
   geom_vline(aes(xintercept = outlier_num))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
 
 ``` r
 lcwm_p1g2_x_and_y |>
@@ -539,8 +527,8 @@ ggplot(aes(
   )
 ) +
   geom_point() +
-  labs(colour = "outlierMBC", shape = "truth") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
