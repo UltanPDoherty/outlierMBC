@@ -49,7 +49,7 @@ simulate_gmm <- function(
     )
   }
   samp <- Reduce(rbind, comps)
-  colnames(samp) <- paste0("V", seq_len(var_num))
+  colnames(samp) <- paste0("X", seq_len(var_num))
 
   range_mat <- matrix(nrow = var_num, ncol = 2)
   for (p in seq_len(var_num)) {
@@ -90,6 +90,11 @@ simulate_gmm <- function(
 
   labels <- rep(seq_len(comp_num), n)
   labels <- c(labels, rep(0, outlier_num))
+
+  df <- data.frame(
+    rbind(samp, unif_samp),
+    G = labels
+  )
 
   return(cbind(rbind(samp, unif_samp), labels))
 }
