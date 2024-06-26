@@ -41,18 +41,17 @@ List of
 Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 }
 \examples{
-gmm_p2g3 <- simulate_gmm(
+gmm <- simulate_gmm(
   n = c(2000, 1000, 1000),
   mu = list(c(-1, 0), c(+1, -1), c(+1, +1)),
   sigma = list(diag(c(0.2, 4 * 0.2)), diag(c(0.2, 0.2)), diag(c(0.2, 0.2))),
   outlier_num = 40, seed = 123, crit_val = 0.9999,
   range_multiplier = 1.5
 )
-ombc_gmm_p2g3 <- ombc_gmm(gmm_p2g3[, 1:2], comp_num = 3, max_out = 80)
+ombc_gmm <- ombc_gmm(gmm[, 1:2], comp_num = 3, max_out = 80)
 # par(mfrow = c(1, 2))
-# plot(0:80, ombc_gmm_p2g3$distrib_diffs, type = "l")
-# abline(v = ombc_gmm_p2g3$outlier_num)
-# plot(gmm_p2g3[, 1:2], col = ombc_gmm_p2g3$labels,
-#      pch = 1 + gmm_p2g3[, 3])
+# plot(0:80, ombc_gmm$distrib_diffs, type = "l")
+# abline(v = ombc_gmm$outlier_num)
+# plot(gmm[, "X1", "X2"], col = ombc_gmm$labels + 1, pch = gmm$G + 1)
 # par(mfrow = c(1, 1))
 }

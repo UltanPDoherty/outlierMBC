@@ -24,7 +24,7 @@
 #' @export
 #'
 #' @examples
-#' ombc_p1 <- simulate_lcwm(
+#' lcwm <- simulate_lcwm(
 #'   n = c(1000, 1000),
 #'   mu = list(c(-1), c(+1)),
 #'   sigma = list(as.matrix(0.2), as.matrix(0.2)),
@@ -36,7 +36,8 @@
 #'   crit_val = 0.9999,
 #'   range_multipliers = c(1.5, 2)
 #' )
-#' plot(ombc_p1[, c("X1", "Y")], col = 1 + ombc_p1$G, pch = 1 + ombc_p1$G)
+#'
+#' plot(lcwm[, c("X1", "Y")], col = lcwm$G + 1, pch = lcwm$G + 1)
 simulate_lcwm <- function(
     n,
     mu,

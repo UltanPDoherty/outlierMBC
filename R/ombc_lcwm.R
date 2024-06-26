@@ -26,7 +26,7 @@
 #' @export
 #'
 #' @examples
-#' lcwm_p1 <- simulate_lcwm(
+#' lcwm <- simulate_lcwm(
 #'   n = c(1000, 1000),
 #'   mu = list(c(-1), c(+1)),
 #'   sigma = list(as.matrix(0.2), as.matrix(0.2)),
@@ -39,9 +39,9 @@
 #'   range_multipliers = c(1.5, 2)
 #' )
 #'
-#' ombc_lcwm_p1 <- ombc_lcwm(
-#'   xy = lcwm_p1[, -3],
-#'   x = lcwm_p1$X1,
+#' ombc_lcwm <- ombc_lcwm(
+#'   xy = lcwm[, c("X1", "Y")],
+#'   x = lcwm$X1,
 #'   y_formula = Y ~ X1,
 #'   comp_num = 2,
 #'   max_out = 100,
@@ -49,11 +49,10 @@
 #'   seed = 123
 #' )
 #'
-#' plot(
-#'   lcwm_p1[, c("X1", "Y")],
-#'   pch = lcwm_p1$G + 1,
-#'   col = ombc_lcwm_p1$labels + 1
-#' )
+#' par(mfrow = c(1, 2))
+#' plot(0:100, ombc_lcwm$distrib_diffs, type = "l")
+#' plot(lcwm[, c("X1", "Y")], col = ombc_lcwm$labels + 1, pch = lcwm$G + 1)
+#' par(mfrow = c(1, 1))
 ombc_lcwm <- function(
     xy,
     x,
