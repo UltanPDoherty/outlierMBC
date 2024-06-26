@@ -26,7 +26,7 @@
 #'   mu = list(c(-1, 0), c(+1, -1), c(+1, +1)),
 #'   sigma = list(diag(c(0.2, 4 * 0.2)), diag(c(0.2, 0.2)), diag(c(0.2, 0.2))),
 #'   outlier_num = 40, seed = 123, crit_val = 0.9999,
-#'   unif_range_multiplier = 1.5
+#'   range_multiplier = 1.5
 #' )
 #' ombc_gmm_p2g3 <- ombc_gmm(gmm_p2g3[, 1:2], comp_num = 3, max_out = 80)
 #' # par(mfrow = c(1, 2))

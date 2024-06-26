@@ -24,7 +24,7 @@ gmm_p2g3 <- simulate_gmm(
   outlier_num = 40,
   seed = 123,
   crit_val = 0.9999,
-  unif_range_multiplier = 1.5
+  range_multiplier = 1.5
 )
 
 ombc_gmm_p2g3 <- ombc_gmm(
@@ -52,7 +52,8 @@ lcwm_p1g1_y_only <- simulate_lcwm(
   outlier_num = 20,
   outlier_type = "y_only",
   seed = 123,
-  crit_val = 0.9999
+  crit_val = 0.9999,
+  range_multipliers = c(1.5, 1.5)
 )
 
 ombc_lcwm_p1g1_y_only <- ombc_lcwm(
@@ -81,7 +82,8 @@ lcwm_p1g1_x_only <- simulate_lcwm(
   outlier_num = 20,
   outlier_type = "x_only",
   seed = 123,
-  crit_val = 0.9999
+  crit_val = 0.9999,
+  range_multipliers = c(1.5, 1.5)
 )
 
 ombc_lcwm_p1g1_x_only <- ombc_lcwm(
@@ -110,7 +112,8 @@ lcwm_p1g1_x_and_y <- simulate_lcwm(
   outlier_num = 20,
   outlier_type = "x_and_y",
   seed = 123,
-  crit_val = 0.9999
+  crit_val = 0.9999,
+  range_multipliers = c(1.5, 1.5)
 )
 
 ombc_lcwm_p1g1_x_and_y <- ombc_lcwm(

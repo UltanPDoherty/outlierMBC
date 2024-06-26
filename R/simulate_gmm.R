@@ -9,8 +9,8 @@
 #' @param outlier_num Desired number of outliers.
 #' @param seed Seed.
 #' @param crit_val Critical value for uniform sample rejection.
-#' @param unif_range_multiplier How much greater should the range of the Uniform
-#'                              samples be than the range of the Normal samples?
+#' @param range_multiplier How much greater should the range of the Uniform
+#'                         samples be than the range of the Normal samples?
 #' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return Matrix with a label column.
@@ -27,14 +27,14 @@
 #' gmm_p2g3 <- simulate_gmm(
 #'   n_vec, mu_list, sigma_list,
 #'   outlier_num = 40, seed = 123, crit_val = 0.9999,
-#'   unif_range_multiplier = 1.5
+#'   range_multiplier = 1.5
 #' )
 #' plot(gmm_p2g3[, 1:2],
 #'   col = 1 + gmm_p2g3[, 3], pch = 1 + gmm_p2g3[, 3]
 #' )
 simulate_gmm <- function(
     n, mu, sigma,
-    outlier_num, seed = 123, crit_val = 0.9999, unif_range_multiplier = 1.5,
+    outlier_num, seed = 123, crit_val = 0.9999, range_multiplier = 1.5,
     print_interval = Inf) {
   var_num <- length(mu[[1]])
   comp_num <- length(n)
@@ -67,8 +67,8 @@ simulate_gmm <- function(
     for (p in seq_len(var_num)) {
       unif_samp[count + 1, p] <- stats::runif(
         1,
-        dim_means[p] - (unif_range_multiplier / 2) * dim_widths[p],
-        dim_means[p] + (unif_range_multiplier / 2) * dim_widths[p]
+        dim_means[p] - (range_multiplier / 2) * dim_widths[p],
+        dim_means[p] + (range_multiplier / 2) * dim_widths[p]
       )
     }
 

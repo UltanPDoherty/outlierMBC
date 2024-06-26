@@ -11,7 +11,7 @@ simulate_gmm(
   outlier_num,
   seed = 123,
   crit_val = 0.9999,
-  unif_range_multiplier = 1.5,
+  range_multiplier = 1.5,
   print_interval = Inf
 )
 }
@@ -28,7 +28,7 @@ simulate_gmm(
 
 \item{crit_val}{Critical value for uniform sample rejection.}
 
-\item{unif_range_multiplier}{How much greater should the range of the Uniform
+\item{range_multiplier}{How much greater should the range of the Uniform
 samples be than the range of the Normal samples?}
 
 \item{print_interval}{How frequently the iteration count is printed.}
@@ -50,7 +50,7 @@ sigma_list <- list(
 gmm_p2g3 <- simulate_gmm(
   n_vec, mu_list, sigma_list,
   outlier_num = 40, seed = 123, crit_val = 0.9999,
-  unif_range_multiplier = 1.5
+  range_multiplier = 1.5
 )
 plot(gmm_p2g3[, 1:2],
   col = 1 + gmm_p2g3[, 3], pch = 1 + gmm_p2g3[, 3]
