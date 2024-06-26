@@ -21,44 +21,37 @@ devtools::load_all()
 ## Mixture Models
 
 ```{r, message=FALSE, fig.show="hold", out.width="50%"}
-n_vec <- c(2000, 1000, 1000)
-mu_list <- list(c(-1, 0), c(+1, -1), c(+1, +1))
-sigma_list <- list(
-  diag(c(0.2, 4 * 0.2)),
-  diag(c(0.2, 0.2)),
-  diag(c(0.2, 0.2))
-)
-
 gmm_p2g3 <- simulate_gmm(
-  n_vec, mu_list, sigma_list,
-  outlier_num = 40, seed = 123, crit_val = 0.9999,
+  n = c(2000, 1000, 1000),
+  mu = list(c(-1, 0), c(+1, -1), c(+1, +1)),
+  sigma = list(diag(c(0.2, 4 * 0.2)), diag(c(0.2, 0.2)), diag(c(0.2, 0.2))),
+  outlier_num = 40,
+  seed = 123,
+  crit_val = 0.9999,
   unif_range_multiplier = 1.5
 )
 
-ombc_gmm_p2g3 <- ombc_gmm(gmm_p2g3[, 1:2],
-  comp_num = 3, max_out = 80,
-  print_interval = Inf
+ombc_gmm_p2g3 <- ombc_gmm(
+  gmm_p2g3[, 1:2],
+  comp_num = 3,
+  max_out = 80
 )
 
-ggplot(
-  data.frame(
-    outliers_removed = 0:80,
-    distrib_diffs = ombc_gmm_p2g3$distrib_diffs
-  ),
-  aes(x = outliers_removed, y = distrib_diffs)
-) +
+data.frame(
+  outliers_removed = 0:80,
+  distrib_diffs = ombc_gmm_p2g3$distrib_diffs
+) |>
+  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(xintercept = ombc_gmm_p2g3$outlier_num)
 
-ggplot(
-  as.data.frame(gmm_p2g3),
-  aes(
-    x = V1, y = V2,
+gmm_p2g3 |>
+  ggplot(aes(
+    x = X1, y = X2,
     colour = as.factor(ombc_gmm_p2g3$gmm_labels),
-    shape = as.factor(1 + labels)
-  )
-) +
+    shape = as.factor(G)
+  )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
