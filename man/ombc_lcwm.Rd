@@ -77,8 +77,8 @@ ombc_lcwm <- ombc_lcwm(
   seed = 123
 )
 
-par(mfrow = c(1, 2))
 plot(0:100, ombc_lcwm$distrib_diffs, type = "l")
+abline(v = ombc_lcwm$outlier_num)
+
 plot(lcwm[, c("X1", "Y")], col = ombc_lcwm$labels + 1, pch = lcwm$G + 1)
-par(mfrow = c(1, 1))
 }

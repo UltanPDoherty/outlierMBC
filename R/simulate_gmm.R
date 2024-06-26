@@ -33,10 +33,15 @@
 #'
 #' ombc_gmm <- ombc_gmm(gmm[, 1:2], comp_num = 3, max_out = 80)
 #'
-#' plot(gmm[, "X1", "X2"], col = gmm$G + 1, pch = gmm$G + 1)
+#' plot(gmm[, c("X1", "X2")], col = gmm$G + 1, pch = gmm$G + 1)
 simulate_gmm <- function(
-    n, mu, sigma,
-    outlier_num, seed = 123, crit_val = 0.9999, range_multiplier = 1.5,
+    n,
+    mu,
+    sigma,
+    outlier_num,
+    seed = 123,
+    crit_val = 0.9999,
+    range_multiplier = 1.5,
     print_interval = Inf) {
   var_num <- length(mu[[1]])
   comp_num <- length(n)
