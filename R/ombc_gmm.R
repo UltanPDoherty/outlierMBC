@@ -16,7 +16,7 @@
 #' * outlier_bool
 #' * outlier_num
 #' * outlier_rank
-#' * gmm_labels
+#' * labels
 #' @export
 #'
 #' @examples
@@ -36,7 +36,7 @@
 #' # par(mfrow = c(1, 2))
 #' # plot(0:80, ombc_gmm_p2g3$distrib_diffs, type = "l")
 #' # abline(v = ombc_gmm_p2g3$outlier_num)
-#' # plot(gmm_p2g3[, 1:2], col = ombc_gmm_p2g3$gmm_labels,
+#' # plot(gmm_p2g3[, 1:2], col = ombc_gmm_p2g3$labels,
 #' #      pch = 1 + gmm_p2g3[, 3])
 #' # par(mfrow = c(1, 1))
 ombc_gmm <- function(x, comp_num, max_out, mnames = "VVV", seed = 123,
@@ -86,14 +86,14 @@ ombc_gmm <- function(x, comp_num, max_out, mnames = "VVV", seed = 123,
   set.seed(seed)
   mix <- mixture::gpcm(x0[!outlier_bool, ], G = comp_num, mnames = mnames)
 
-  gmm_labels <- rep(1, nrow(x0))
-  gmm_labels[!outlier_bool] <- 1 + mix$map
+  labels <- rep(0, nrow(x0))
+  labels[!outlier_bool] <- mix$map
 
   return(list(
     distrib_diffs = distrib_diffs,
     outlier_bool = outlier_bool,
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
-    gmm_labels = gmm_labels
+    labels = labels,
   ))
 }

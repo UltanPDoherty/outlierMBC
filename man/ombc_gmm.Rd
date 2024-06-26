@@ -33,7 +33,7 @@ List of
 \item outlier_bool
 \item outlier_num
 \item outlier_rank
-\item gmm_labels
+\item labels
 }
 }
 \description{
@@ -56,7 +56,7 @@ ombc_gmm_p2g3 <- ombc_gmm(gmm_p2g3[, 1:2], comp_num = 3, max_out = 80)
 # par(mfrow = c(1, 2))
 # plot(0:80, ombc_gmm_p2g3$distrib_diffs, type = "l")
 # abline(v = ombc_gmm_p2g3$outlier_num)
-# plot(gmm_p2g3[, 1:2], col = ombc_gmm_p2g3$gmm_labels,
+# plot(gmm_p2g3[, 1:2], col = ombc_gmm_p2g3$labels,
 #      pch = 1 + gmm_p2g3[, 3])
 # par(mfrow = c(1, 1))
 }

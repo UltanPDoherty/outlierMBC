@@ -145,8 +145,8 @@ ombc_lcwm <- function(
     seed = seed
   )))
 
-  labels <- rep(1, nrow(x0))
-  labels[!outlier_bool] <- 1 + lcwm$models[[1]]$cluster
+  labels <- rep(0, nrow(x0))
+  labels[!outlier_bool] <- lcwm$models[[1]]$cluster
 
   return(list(
     distrib_diffs = distrib_diffs,
