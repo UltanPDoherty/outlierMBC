@@ -1,4 +1,4 @@
-#' simulate_ombc
+#' simulate_lcwm
 #'
 #' @description
 #' Simulate a multiple linear regression model with response variable outliers.
@@ -24,7 +24,7 @@
 #' @export
 #'
 #' @examples
-#' ombc_p1 <- simulate_ombc(
+#' ombc_p1 <- simulate_lcwm(
 #'   n = c(1000, 1000),
 #'   mu = list(c(-1), c(+1)),
 #'   sigma = list(as.matrix(0.2), as.matrix(0.2)),
@@ -37,7 +37,7 @@
 #'   range_multipliers = c(1.5, 2)
 #' )
 #' plot(ombc_p1[, c("X1", "Y")], col = 1 + ombc_p1$G, pch = 1 + ombc_p1$G)
-simulate_ombc <- function(
+simulate_lcwm <- function(
     n,
     mu,
     sigma,
@@ -94,7 +94,7 @@ simulate_ombc <- function(
 
 #' Check whether a new sample is an outlier for each component.
 #'
-#' @inheritParams simulate_ombc
+#' @inheritParams simulate_lcwm
 #' @param x_sample New covariate sample.
 #' @param y_sample New response sample.
 #'
@@ -138,7 +138,7 @@ test_outlier_ombc <- function(
 
 #' Obtain the span of the observations for each component.
 #'
-#' @inheritParams simulate_ombc
+#' @inheritParams simulate_lcwm
 #' @param covariates_g Covariate values of the sampled observations.
 #' @param errors_g Response errors of the sampled observations.
 #'
@@ -168,7 +168,7 @@ uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
 
 #' Sample a potential outlier.
 #'
-#' @inheritParams simulate_ombc
+#' @inheritParams simulate_lcwm
 #' @param mu_g Covariate mean vector for one component.
 #' @param sigma_g Covariate covariance matrix for one component.
 #' @param beta_g Regression coefficient vector for one component.
@@ -214,7 +214,7 @@ uniform_sample_lcwm <- function(
 
 #' Produce a single sample that passes the outlier checks.
 #'
-#' @inheritParams simulate_ombc
+#' @inheritParams simulate_lcwm
 #' @param g Component index.
 #' @param uniform_spans Covariate and response error spans.
 #'

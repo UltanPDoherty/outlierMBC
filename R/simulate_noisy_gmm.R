@@ -1,4 +1,4 @@
-#' simulate_noisy_gmm
+#' simulate_gmm
 #'
 #' @description
 #' Simulate a Gaussian mixture model with multivariate outliers.
@@ -24,15 +24,15 @@
 #'   diag(c(0.2, 0.2)),
 #'   diag(c(0.2, 0.2))
 #' )
-#' noisy_gmm_p2g3 <- simulate_noisy_gmm(
+#' gmm_p2g3 <- simulate_gmm(
 #'   n_vec, mu_list, sigma_list,
 #'   outlier_num = 40, seed = 123, crit_val = 0.9999,
 #'   unif_range_multiplier = 1.5
 #' )
-#' plot(noisy_gmm_p2g3[, 1:2],
-#'   col = 1 + noisy_gmm_p2g3[, 3], pch = 1 + noisy_gmm_p2g3[, 3]
+#' plot(gmm_p2g3[, 1:2],
+#'   col = 1 + gmm_p2g3[, 3], pch = 1 + gmm_p2g3[, 3]
 #' )
-simulate_noisy_gmm <- function(
+simulate_gmm <- function(
     n, mu, sigma,
     outlier_num, seed = 123, crit_val = 0.9999, unif_range_multiplier = 1.5,
     print_interval = Inf) {

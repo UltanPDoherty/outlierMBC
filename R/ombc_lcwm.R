@@ -26,7 +26,7 @@
 #' @export
 #'
 #' @examples
-#' ombc_p1 <- simulate_ombc(
+#' ombc_p1 <- simulate_lcwm(
 #'   n = c(1000, 1000),
 #'   mu = list(c(-1), c(+1)),
 #'   sigma = list(as.matrix(0.2), as.matrix(0.2)),
