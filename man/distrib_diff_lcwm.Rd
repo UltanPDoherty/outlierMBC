@@ -23,9 +23,9 @@ distrib_diff_lcwm(
 
 \item{prop}{Vector of component proportions.}
 
-\item{mu}{List of component mean vectors.}
+\item{mu}{Matrix of component mean vectors (p x G).}
 
-\item{sigma}{List of component covariance matrices.}
+\item{sigma}{Array of component covariance matrices (p x p x G)}
 
 \item{mod_list}{List of component regression models.}
 

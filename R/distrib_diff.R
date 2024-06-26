@@ -41,6 +41,8 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
 #'
 #' @inheritParams ombc_lcwm
 #' @inheritParams distrib_diff_gmm
+#' @param mu Matrix of component mean vectors (p x G).
+#' @param sigma Array of component covariance matrices (p x p x G)
 #' @param mod_list List of component regression models.
 #' @param y_sigma Vector of component regression standard deviations.
 #'
