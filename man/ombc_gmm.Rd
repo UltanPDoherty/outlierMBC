@@ -41,15 +41,10 @@ List of
 Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 }
 \examples{
-n_vec <- c(2000, 1000, 1000)
-mu_list <- list(c(-1, 0), c(+1, -1), c(+1, +1))
-sigma_list <- list(
-  diag(c(0.2, 4 * 0.2)),
-  diag(c(0.2, 0.2)),
-  diag(c(0.2, 0.2))
-)
 gmm_p2g3 <- simulate_gmm(
-  n_vec, mu_list, sigma_list,
+  n = c(2000, 1000, 1000),
+  mu = list(c(-1, 0), c(+1, -1), c(+1, +1)),
+  sigma = list(diag(c(0.2, 4 * 0.2)), diag(c(0.2, 0.2)), diag(c(0.2, 0.2))),
   outlier_num = 40, seed = 123, crit_val = 0.9999,
   unif_range_multiplier = 1.5
 )
