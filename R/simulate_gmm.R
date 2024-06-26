@@ -96,5 +96,5 @@ simulate_gmm <- function(
     G = labels
   )
 
-  return(cbind(rbind(samp, unif_samp), labels))
+  return(df)
 }
