@@ -87,7 +87,7 @@ ggplot(
 
 ### Single Component, Response Outliers
 
-```{r, message=FALSE}
+```{r, message=FALSE, fig.show="hold", out.width="50%"}
 lcwm_p1g1_y_only <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
@@ -111,25 +111,22 @@ ombc_lcwm_p1g1_y_only <- ombc_lcwm(
   outlier_type = "y_only"
 )
 
-ggplot(
-  data.frame(
-    outliers_removed = 0:40,
-    distrib_diffs = ombc_lcwm_p1g1_y_only$distrib_diffs,
-    outlier_num = ombc_lcwm_p1g1_y_only$outlier_num
-  ),
-  aes(x = outliers_removed, y = distrib_diffs)
-) +
+data.frame(
+  outliers_removed = 0:40,
+  distrib_diffs = ombc_lcwm_p1g1_y_only$distrib_diffs,
+  outlier_num = ombc_lcwm_p1g1_y_only$outlier_num
+) |>
+  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
 
 lcwm_p1g1_y_only |>
-ggplot(aes(
-  x = X1, y = Y,
-  colour = as.factor(ombc_lcwm_p1g1_y_only$outlier_bool),
-  shape = as.factor(G)
-  )
-) +
+  ggplot(aes(
+    x = X1, y = Y,
+    colour = as.factor(ombc_lcwm_p1g1_y_only$outlier_bool),
+    shape = as.factor(G)
+  )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
@@ -137,7 +134,7 @@ ggplot(aes(
 
 ### Single Component, Covariate Outliers
 
-```{r}
+```{r, message=FALSE, fig.show="hold", out.width="50%"}
 lcwm_p1g1_x_only <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
@@ -149,17 +146,7 @@ lcwm_p1g1_x_only <- simulate_lcwm(
   seed = 123,
   crit_val = 0.9999
 )
-```
 
-```{r}
-lcwm_p1g1_x_only |>
-  ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
-  geom_point() +
-  labs(colour = "Simulation", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
-```
-
-```{r, message=FALSE}
 ombc_lcwm_p1g1_x_only <- ombc_lcwm(
   xy = lcwm_p1g1_x_only,
   x = lcwm_p1g1_x_only$X1,
@@ -170,9 +157,7 @@ ombc_lcwm_p1g1_x_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_only"
 )
-```
 
-```{r}
 ggplot(
   data.frame(
     outliers_removed = 0:40,
@@ -184,9 +169,7 @@ ggplot(
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
-```
 
-```{r}
 lcwm_p1g1_x_only |>
 ggplot(aes(
   x = X1, y = Y,
@@ -201,7 +184,7 @@ ggplot(aes(
 
 ### Single Component, Combined Outliers
 
-```{r}
+```{r, message=FALSE, fig.show="hold", out.width="50%"}
 lcwm_p1g1_x_and_y <- simulate_lcwm(
   n = 1000,
   mu = list(c(1)),
@@ -213,17 +196,7 @@ lcwm_p1g1_x_and_y <- simulate_lcwm(
   seed = 123,
   crit_val = 0.9999
 )
-```
 
-```{r}
-lcwm_p1g1_x_and_y |>
-  ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
-  geom_point() +
-  labs(colour = "Simulation", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1))
-```
-
-```{r, message=FALSE}
 ombc_lcwm_p1g1_x_and_y <- ombc_lcwm(
   xy = lcwm_p1g1_x_and_y,
   x = lcwm_p1g1_x_and_y$X1,
@@ -234,9 +207,7 @@ ombc_lcwm_p1g1_x_and_y <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_and_y"
 )
-```
 
-```{r}
 ggplot(
   data.frame(
     outliers_removed = 0:40,
@@ -248,9 +219,7 @@ ggplot(
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
-```
 
-```{r}
 lcwm_p1g1_x_and_y |>
 ggplot(aes(
   x = X1, y = Y,
@@ -265,7 +234,7 @@ ggplot(aes(
 
 ### Two-Component, Response Outliers
 
-```{r}
+```{r, message=FALSE, fig.show="hold", out.width="50%"}
 lcwm_p1g2_y_only <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
@@ -278,17 +247,7 @@ lcwm_p1g2_y_only <- simulate_lcwm(
   crit_val = 0.9999,
   range_multipliers = c(1.5, 2)
 )
-```
 
-```{r}
-lcwm_p1g2_y_only |>
-  ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
-  geom_point() +
-  labs(colour = "Simulation", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
-```
-
-```{r, message=FALSE}
 ombc_lcwm_p1g2_y_only <- ombc_lcwm(
   xy = lcwm_p1g2_y_only,
   x = lcwm_p1g2_y_only$X1,
@@ -299,9 +258,7 @@ ombc_lcwm_p1g2_y_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "y_only"
 )
-```
 
-```{r}
 ggplot(
   data.frame(
     outliers_removed = 0:100,
@@ -313,9 +270,7 @@ ggplot(
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
-```
 
-```{r}
 lcwm_p1g2_y_only |>
 ggplot(aes(
   x = X1, y = Y,
@@ -330,7 +285,7 @@ ggplot(aes(
 
 ### Two-Component, Covariate Outliers
 
-```{r}
+```{r, message=FALSE, fig.show="hold", out.width="50%"}
 lcwm_p1g2_x_only <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
@@ -343,17 +298,7 @@ lcwm_p1g2_x_only <- simulate_lcwm(
   crit_val = 0.9999,
   range_multipliers = c(1.5, 2)
 )
-```
 
-```{r}
-lcwm_p1g2_x_only |>
-  ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
-  geom_point() +
-  labs(colour = "Simulation", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
-```
-
-```{r, message=FALSE}
 ombc_lcwm_p1g2_x_only <- ombc_lcwm(
   xy = lcwm_p1g2_x_only,
   x = lcwm_p1g2_x_only$X1,
@@ -364,9 +309,7 @@ ombc_lcwm_p1g2_x_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_only"
 )
-```
 
-```{r}
 ggplot(
   data.frame(
     outliers_removed = 0:100,
@@ -378,9 +321,7 @@ ggplot(
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
-```
 
-```{r}
 lcwm_p1g2_x_only |>
 ggplot(aes(
   x = X1, y = Y,
@@ -395,7 +336,7 @@ ggplot(aes(
 
 ### Two-Component, Combined Outliers
 
-```{r}
+```{r, message=FALSE, fig.show="hold", out.width="50%"}
 lcwm_p1g2_x_and_y <- simulate_lcwm(
   n = c(1000, 1000),
   mu = list(c(-1), c(+1)),
@@ -408,17 +349,7 @@ lcwm_p1g2_x_and_y <- simulate_lcwm(
   crit_val = 0.9999,
   range_multipliers = c(1.5, 2)
 )
-```
 
-```{r}
-lcwm_p1g2_x_and_y |>
-  ggplot(aes(x = X1, y = Y, colour = as.factor(G), shape = as.factor(G))) +
-  geom_point() +
-  labs(colour = "Simulation", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
-```
-
-```{r, message=FALSE}
 ombc_lcwm_p1g2_x_and_y <- ombc_lcwm(
   xy = lcwm_p1g2_x_and_y,
   x = lcwm_p1g2_x_and_y$X1,
@@ -429,9 +360,7 @@ ombc_lcwm_p1g2_x_and_y <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_and_y"
 )
-```
 
-```{r}
 ggplot(
   data.frame(
     outliers_removed = 0:100,
@@ -443,9 +372,7 @@ ggplot(
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
-```
 
-```{r}
 lcwm_p1g2_x_and_y |>
 ggplot(aes(
   x = X1, y = Y,
