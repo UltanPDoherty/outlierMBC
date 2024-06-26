@@ -20,7 +20,7 @@ devtools::load_all()
 
 ## Mixture Models
 
-```{r}
+```{r, message=FALSE, fig.show="hold", out.width="50%"}
 n_vec <- c(2000, 1000, 1000)
 mu_list <- list(c(-1, 0), c(+1, -1), c(+1, +1))
 sigma_list <- list(
@@ -34,29 +34,12 @@ gmm_p2g3 <- simulate_gmm(
   outlier_num = 40, seed = 123, crit_val = 0.9999,
   unif_range_multiplier = 1.5
 )
-```
 
-```{r}
-ggplot(
-  as.data.frame(gmm_p2g3),
-  aes(
-    x = V1, y = V2,
-    colour = as.factor(labels), shape = as.factor(labels)
-  )
-) +
-  geom_point() +
-  labs(colour = "Simulation", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
-```
-
-```{r}
 ombc_gmm_p2g3 <- ombc_gmm(gmm_p2g3[, 1:2],
   comp_num = 3, max_out = 80,
   print_interval = Inf
 )
-```
 
-```{r}
 ggplot(
   data.frame(
     outliers_removed = 0:80,
@@ -67,9 +50,7 @@ ggplot(
   geom_line() +
   geom_point() +
   geom_vline(xintercept = ombc_gmm_p2g3$outlier_num)
-```
 
-```{r}
 ggplot(
   as.data.frame(gmm_p2g3),
   aes(
@@ -79,7 +60,7 @@ ggplot(
   )
 ) +
   geom_point() +
-  labs(colour = "ombc_gmm", shape = "Simulation") +
+  labs(colour = "outlierMBC", shape = "Simulation") +
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
@@ -129,7 +110,7 @@ lcwm_p1g1_y_only |>
   )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
 ### Single Component, Covariate Outliers
@@ -158,28 +139,25 @@ ombc_lcwm_p1g1_x_only <- ombc_lcwm(
   outlier_type = "x_only"
 )
 
-ggplot(
-  data.frame(
-    outliers_removed = 0:40,
-    distrib_diffs = ombc_lcwm_p1g1_x_only$distrib_diffs,
-    outlier_num = ombc_lcwm_p1g1_x_only$outlier_num
-  ),
-  aes(x = outliers_removed, y = distrib_diffs)
-) +
+data.frame(
+  outliers_removed = 0:40,
+  distrib_diffs = ombc_lcwm_p1g1_x_only$distrib_diffs,
+  outlier_num = ombc_lcwm_p1g1_x_only$outlier_num
+) |>
+  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
 
 lcwm_p1g1_x_only |>
-ggplot(aes(
-  x = X1, y = Y,
-  colour = as.factor(ombc_lcwm_p1g1_x_only$outlier_bool),
-  shape = as.factor(G)
-  )
-) +
+  ggplot(aes(
+    x = X1, y = Y, 
+    colour = as.factor(ombc_lcwm_p1g1_x_only$outlier_bool),
+    shape = as.factor(G)
+  )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
 ### Single Component, Combined Outliers
@@ -208,14 +186,12 @@ ombc_lcwm_p1g1_x_and_y <- ombc_lcwm(
   outlier_type = "x_and_y"
 )
 
-ggplot(
-  data.frame(
-    outliers_removed = 0:40,
-    distrib_diffs = ombc_lcwm_p1g1_x_and_y$distrib_diffs,
-    outlier_num = ombc_lcwm_p1g1_x_and_y$outlier_num
-  ),
-  aes(x = outliers_removed, y = distrib_diffs)
-) +
+data.frame(
+  outliers_removed = 0:40,
+  distrib_diffs = ombc_lcwm_p1g1_x_and_y$distrib_diffs,
+  outlier_num = ombc_lcwm_p1g1_x_and_y$outlier_num
+) |>
+  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
@@ -225,11 +201,10 @@ ggplot(aes(
   x = X1, y = Y,
   colour = as.factor(ombc_lcwm_p1g1_x_and_y$outlier_bool),
   shape = as.factor(G)
-  )
-) +
+  )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
 ### Two-Component, Response Outliers
@@ -259,28 +234,25 @@ ombc_lcwm_p1g2_y_only <- ombc_lcwm(
   outlier_type = "y_only"
 )
 
-ggplot(
-  data.frame(
-    outliers_removed = 0:100,
-    distrib_diffs = ombc_lcwm_p1g2_y_only$distrib_diffs,
-    outlier_num = ombc_lcwm_p1g2_y_only$outlier_num
-  ),
-  aes(x = outliers_removed, y = distrib_diffs)
-) +
+data.frame(
+  outliers_removed = 0:100,
+  distrib_diffs = ombc_lcwm_p1g2_y_only$distrib_diffs,
+  outlier_num = ombc_lcwm_p1g2_y_only$outlier_num
+) |>
+  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
 
 lcwm_p1g2_y_only |>
-ggplot(aes(
-  x = X1, y = Y,
-  colour = as.factor(ombc_lcwm_p1g2_y_only$outlier_bool),
-  shape = as.factor(G)
-  )
-) +
+  ggplot(aes(
+    x = X1, y = Y,
+    colour = as.factor(ombc_lcwm_p1g2_y_only$outlier_bool),
+    shape = as.factor(G)
+  )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
 ### Two-Component, Covariate Outliers
@@ -310,28 +282,25 @@ ombc_lcwm_p1g2_x_only <- ombc_lcwm(
   outlier_type = "x_only"
 )
 
-ggplot(
-  data.frame(
-    outliers_removed = 0:100,
-    distrib_diffs = ombc_lcwm_p1g2_x_only$distrib_diffs,
-    outlier_num = ombc_lcwm_p1g2_x_only$outlier_num
-  ),
-  aes(x = outliers_removed, y = distrib_diffs)
-) +
+data.frame(
+  outliers_removed = 0:100,
+  distrib_diffs = ombc_lcwm_p1g2_x_only$distrib_diffs,
+  outlier_num = ombc_lcwm_p1g2_x_only$outlier_num
+) |>
+  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
 
 lcwm_p1g2_x_only |>
-ggplot(aes(
-  x = X1, y = Y,
-  colour = as.factor(ombc_lcwm_p1g2_x_only$outlier_bool),
-  shape = as.factor(G)
-  )
-) +
+  ggplot(aes(
+    x = X1, y = Y,
+    colour = as.factor(ombc_lcwm_p1g2_x_only$outlier_bool),
+    shape = as.factor(G)
+  )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
 ### Two-Component, Combined Outliers
@@ -361,26 +330,23 @@ ombc_lcwm_p1g2_x_and_y <- ombc_lcwm(
   outlier_type = "x_and_y"
 )
 
-ggplot(
-  data.frame(
-    outliers_removed = 0:100,
-    distrib_diffs = ombc_lcwm_p1g2_x_and_y$distrib_diffs,
-    outlier_num = ombc_lcwm_p1g2_x_and_y$outlier_num
-  ),
-  aes(x = outliers_removed, y = distrib_diffs)
-) +
+data.frame(
+  outliers_removed = 0:100,
+  distrib_diffs = ombc_lcwm_p1g2_x_and_y$distrib_diffs,
+  outlier_num = ombc_lcwm_p1g2_x_and_y$outlier_num
+) |> 
+  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
 
 lcwm_p1g2_x_and_y |>
-ggplot(aes(
-  x = X1, y = Y,
-  colour = as.factor(ombc_lcwm_p1g2_x_and_y$outlier_bool),
-  shape = as.factor(G)
-  )
-) +
+  ggplot(aes(
+    x = X1, y = Y,
+    colour = as.factor(ombc_lcwm_p1g2_x_and_y$outlier_bool),
+    shape = as.factor(G)
+  )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```

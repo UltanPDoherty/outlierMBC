@@ -35,31 +35,12 @@ gmm_p2g3 <- simulate_gmm(
   outlier_num = 40, seed = 123, crit_val = 0.9999,
   unif_range_multiplier = 1.5
 )
-```
 
-``` r
-ggplot(
-  as.data.frame(gmm_p2g3),
-  aes(
-    x = V1, y = V2,
-    colour = as.factor(labels), shape = as.factor(labels)
-  )
-) +
-  geom_point() +
-  labs(colour = "Simulation", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
-```
-
-![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
-
-``` r
 ombc_gmm_p2g3 <- ombc_gmm(gmm_p2g3[, 1:2],
   comp_num = 3, max_out = 80,
   print_interval = Inf
 )
-```
 
-``` r
 ggplot(
   data.frame(
     outliers_removed = 0:80,
@@ -70,11 +51,7 @@ ggplot(
   geom_line() +
   geom_point() +
   geom_vline(xintercept = ombc_gmm_p2g3$outlier_num)
-```
 
-![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
-
-``` r
 ggplot(
   as.data.frame(gmm_p2g3),
   aes(
@@ -88,7 +65,7 @@ ggplot(
   ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+<img src="README_files/figure-gfm/unnamed-chunk-2-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-2-2.png" width="50%" />
 
 ## Linear Cluster-Weighted Models
 
@@ -117,14 +94,7 @@ ombc_lcwm_p1g1_y_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "y_only"
 )
-```
 
-    ## 
-    ## Estimating model with k=1, Xnorm=V, familyY=gaussian *
-    ## 
-    ## Estimated model with k = 1 group(s) and parsimonious model V and family gaussian(identity)
-
-``` r
 data.frame(
   outliers_removed = 0:40,
   distrib_diffs = ombc_lcwm_p1g1_y_only$distrib_diffs,
@@ -143,10 +113,10 @@ lcwm_p1g1_y_only |>
   )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-7-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-7-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-3-2.png" width="50%" />
 
 ### Single Component, Covariate Outliers
 
@@ -173,39 +143,29 @@ ombc_lcwm_p1g1_x_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_only"
 )
-```
 
-    ## 
-    ## Estimating model with k=1, Xnorm=V, familyY=gaussian *
-    ## 
-    ## Estimated model with k = 1 group(s) and parsimonious model V and family gaussian(identity)
-
-``` r
-ggplot(
-  data.frame(
-    outliers_removed = 0:40,
-    distrib_diffs = ombc_lcwm_p1g1_x_only$distrib_diffs,
-    outlier_num = ombc_lcwm_p1g1_x_only$outlier_num
-  ),
-  aes(x = outliers_removed, y = distrib_diffs)
-) +
+data.frame(
+  outliers_removed = 0:40,
+  distrib_diffs = ombc_lcwm_p1g1_x_only$distrib_diffs,
+  outlier_num = ombc_lcwm_p1g1_x_only$outlier_num
+) |>
+  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
 
 lcwm_p1g1_x_only |>
-ggplot(aes(
-  x = X1, y = Y,
-  colour = as.factor(ombc_lcwm_p1g1_x_only$outlier_bool),
-  shape = as.factor(G)
-  )
-) +
+  ggplot(aes(
+    x = X1, y = Y, 
+    colour = as.factor(ombc_lcwm_p1g1_x_only$outlier_bool),
+    shape = as.factor(G)
+  )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-8-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-8-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-4-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-4-2.png" width="50%" />
 
 ### Single Component, Combined Outliers
 
@@ -232,22 +192,13 @@ ombc_lcwm_p1g1_x_and_y <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_and_y"
 )
-```
 
-    ## 
-    ## Estimating model with k=1, Xnorm=V, familyY=gaussian *
-    ## 
-    ## Estimated model with k = 1 group(s) and parsimonious model V and family gaussian(identity)
-
-``` r
-ggplot(
-  data.frame(
-    outliers_removed = 0:40,
-    distrib_diffs = ombc_lcwm_p1g1_x_and_y$distrib_diffs,
-    outlier_num = ombc_lcwm_p1g1_x_and_y$outlier_num
-  ),
-  aes(x = outliers_removed, y = distrib_diffs)
-) +
+data.frame(
+  outliers_removed = 0:40,
+  distrib_diffs = ombc_lcwm_p1g1_x_and_y$distrib_diffs,
+  outlier_num = ombc_lcwm_p1g1_x_and_y$outlier_num
+) |>
+  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
@@ -257,14 +208,13 @@ ggplot(aes(
   x = X1, y = Y,
   colour = as.factor(ombc_lcwm_p1g1_x_and_y$outlier_bool),
   shape = as.factor(G)
-  )
-) +
+  )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-9-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-9-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-5-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-5-2.png" width="50%" />
 
 ### Two-Component, Response Outliers
 
@@ -292,39 +242,29 @@ ombc_lcwm_p1g2_y_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "y_only"
 )
-```
 
-    ## 
-    ## Estimating model with k=2, Xnorm=V, familyY=gaussian *****************
-    ## 
-    ## Estimated model with k = 2 group(s) and parsimonious model V and family gaussian(identity)
-
-``` r
-ggplot(
-  data.frame(
-    outliers_removed = 0:100,
-    distrib_diffs = ombc_lcwm_p1g2_y_only$distrib_diffs,
-    outlier_num = ombc_lcwm_p1g2_y_only$outlier_num
-  ),
-  aes(x = outliers_removed, y = distrib_diffs)
-) +
+data.frame(
+  outliers_removed = 0:100,
+  distrib_diffs = ombc_lcwm_p1g2_y_only$distrib_diffs,
+  outlier_num = ombc_lcwm_p1g2_y_only$outlier_num
+) |>
+  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
 
 lcwm_p1g2_y_only |>
-ggplot(aes(
-  x = X1, y = Y,
-  colour = as.factor(ombc_lcwm_p1g2_y_only$outlier_bool),
-  shape = as.factor(G)
-  )
-) +
+  ggplot(aes(
+    x = X1, y = Y,
+    colour = as.factor(ombc_lcwm_p1g2_y_only$outlier_bool),
+    shape = as.factor(G)
+  )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-10-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-6-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-6-2.png" width="50%" />
 
 ### Two-Component, Covariate Outliers
 
@@ -352,39 +292,29 @@ ombc_lcwm_p1g2_x_only <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_only"
 )
-```
 
-    ## 
-    ## Estimating model with k=2, Xnorm=V, familyY=gaussian ******************
-    ## 
-    ## Estimated model with k = 2 group(s) and parsimonious model V and family gaussian(identity)
-
-``` r
-ggplot(
-  data.frame(
-    outliers_removed = 0:100,
-    distrib_diffs = ombc_lcwm_p1g2_x_only$distrib_diffs,
-    outlier_num = ombc_lcwm_p1g2_x_only$outlier_num
-  ),
-  aes(x = outliers_removed, y = distrib_diffs)
-) +
+data.frame(
+  outliers_removed = 0:100,
+  distrib_diffs = ombc_lcwm_p1g2_x_only$distrib_diffs,
+  outlier_num = ombc_lcwm_p1g2_x_only$outlier_num
+) |>
+  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
 
 lcwm_p1g2_x_only |>
-ggplot(aes(
-  x = X1, y = Y,
-  colour = as.factor(ombc_lcwm_p1g2_x_only$outlier_bool),
-  shape = as.factor(G)
-  )
-) +
+  ggplot(aes(
+    x = X1, y = Y,
+    colour = as.factor(ombc_lcwm_p1g2_x_only$outlier_bool),
+    shape = as.factor(G)
+  )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-11-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-11-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-7-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-7-2.png" width="50%" />
 
 ### Two-Component, Combined Outliers
 
@@ -412,36 +342,26 @@ ombc_lcwm_p1g2_x_and_y <- ombc_lcwm(
   seed = 123,
   outlier_type = "x_and_y"
 )
-```
 
-    ## 
-    ## Estimating model with k=2, Xnorm=V, familyY=gaussian *****************
-    ## 
-    ## Estimated model with k = 2 group(s) and parsimonious model V and family gaussian(identity)
-
-``` r
-ggplot(
-  data.frame(
-    outliers_removed = 0:100,
-    distrib_diffs = ombc_lcwm_p1g2_x_and_y$distrib_diffs,
-    outlier_num = ombc_lcwm_p1g2_x_and_y$outlier_num
-  ),
-  aes(x = outliers_removed, y = distrib_diffs)
-) +
+data.frame(
+  outliers_removed = 0:100,
+  distrib_diffs = ombc_lcwm_p1g2_x_and_y$distrib_diffs,
+  outlier_num = ombc_lcwm_p1g2_x_and_y$outlier_num
+) |> 
+  ggplot(aes(x = outliers_removed, y = distrib_diffs)) +
   geom_line() +
   geom_point() +
   geom_vline(aes(xintercept = outlier_num))
 
 lcwm_p1g2_x_and_y |>
-ggplot(aes(
-  x = X1, y = Y,
-  colour = as.factor(ombc_lcwm_p1g2_x_and_y$outlier_bool),
-  shape = as.factor(G)
-  )
-) +
+  ggplot(aes(
+    x = X1, y = Y,
+    colour = as.factor(ombc_lcwm_p1g2_x_and_y$outlier_bool),
+    shape = as.factor(G)
+  )) +
   geom_point() +
   labs(colour = "outlierMBC", shape = "Simulation") +
-  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2, 3))
+  ggokabeito::scale_colour_okabe_ito(order = c(9, 1, 2))
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-12-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-12-2.png" width="50%" />
+<img src="README_files/figure-gfm/unnamed-chunk-8-1.png" width="50%" /><img src="README_files/figure-gfm/unnamed-chunk-8-2.png" width="50%" />
