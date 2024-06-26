@@ -17,6 +17,7 @@
 #' * outlier_num
 #' * outlier_rank
 #' * labels
+#' * final_gmm
 #' @export
 #'
 #' @examples
@@ -95,5 +96,6 @@ ombc_gmm <- function(x, comp_num, max_out, mnames = "VVV", seed = 123,
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
     labels = labels,
+    final_gmm = mix
   ))
 }

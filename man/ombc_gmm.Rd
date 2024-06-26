@@ -34,6 +34,7 @@ List of
 \item outlier_num
 \item outlier_rank
 \item labels
+\item final_gmm
 }
 }
 \description{
