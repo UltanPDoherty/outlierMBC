@@ -14,7 +14,7 @@ ombc_lcwm(
   seed = 123,
   print_interval = Inf,
   alpha = 0.5,
-  outlier_type = c("x_and_y", "x_only", "y_only")
+  outlier_type = c("x_and_y", "x_only", "y_only", "hybrid")
 )
 }
 \arguments{

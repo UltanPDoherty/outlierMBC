@@ -63,7 +63,7 @@ ombc_lcwm <- function(
     seed = 123,
     print_interval = Inf,
     alpha = 0.5,
-    outlier_type = c("x_and_y", "x_only", "y_only")) {
+    outlier_type = c("x_and_y", "x_only", "y_only", "hybrid")) {
   outlier_type <- match.arg(outlier_type)
 
   xy0 <- xy

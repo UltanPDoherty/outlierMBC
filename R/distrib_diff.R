@@ -59,7 +59,7 @@ distrib_diff_lcwm <- function(
     mod_list,
     y_sigma,
     alpha = 0.5,
-    outlier_type = c("x_and_y", "x_only", "y_only")) {
+    outlier_type = c("x_and_y", "x_only", "y_only", "hybrid")) {
   outlier_type <- match.arg(outlier_type)
 
   obs_num <- nrow(x)
@@ -116,7 +116,7 @@ distrib_diff_lcwm_g <- function(
     mod_g,
     y_sigma_g,
     alpha = 0.5,
-    outlier_type = c("x_and_y", "x_only", "y_only")) {
+    outlier_type = c("x_and_y", "x_only", "y_only", "hybrid")) {
   outlier_type <- match.arg(outlier_type)
 
   if (outlier_type == "x_and_y") {
@@ -130,11 +130,17 @@ distrib_diff_lcwm_g <- function(
 
     diff_g <- dd_g_x$diff
     dens_g <- dd_g_x$dens
-  } else {
+  } else if (outlier_type == "y_only") {
     dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
 
     diff_g <- dd_g_y$diff
     dens_g <- dd_g_y$dens
+  } else {
+    dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g)
+    dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
+
+    diff_g <- dd_g_x$diff
+    dens_g <- dd_g_x$dens * dd_g_y$dens
   }
 
   return(list(
