@@ -58,7 +58,10 @@ ombc_gmm <- function(
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
     set.seed(seed)
-    mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = z)
+    mix <- mixture::gpcm(
+      x, G = comp_num, mnames = mnames,
+      start = z, seed = 123
+    )
 
     if (any(colSums(mix$z) < var_num + 1)) {
       warning(paste0(
@@ -93,7 +96,8 @@ ombc_gmm <- function(
 
   set.seed(seed)
   mix <- mixture::gpcm(
-    x0[!outlier_bool, ], G = comp_num, mnames = mnames, start = min_diff_z
+    x0[!outlier_bool, ], G = comp_num, mnames = mnames,
+    start = min_diff_z, seed = 123
   )
 
   labels <- rep(0, nrow(x0))
