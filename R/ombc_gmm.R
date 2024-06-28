@@ -37,8 +37,13 @@
 #' abline(v = ombc_gmm$outlier_num)
 #'
 #' plot(gmm[, c("X1", "X2")], col = ombc_gmm$labels + 1, pch = gmm$G + 1)
-ombc_gmm <- function(x, comp_num, max_out, mnames = "VVV", seed = 123,
-                     print_interval = Inf) {
+ombc_gmm <- function(
+    x,
+    comp_num,
+    max_out,
+    mnames = "VVV",
+    seed = 123,
+    print_interval = Inf) {
   x <- as.matrix(x)
   x0 <- x
 
