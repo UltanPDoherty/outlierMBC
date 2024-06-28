@@ -47,17 +47,18 @@ ombc_gmm <- function(
   x <- as.matrix(x)
   x0 <- x
 
-  z0 <- 2
+  z <- 2
 
   var_num <- ncol(x)
 
+  min_diff <- Inf
   distrib_diffs <- c()
   outlier_rank <- rep(0, nrow(x))
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
     set.seed(seed)
-    mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = z0)
+    mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = z)
 
     if (any(colSums(mix$z) < var_num + 1)) {
       warning(paste0(
@@ -76,10 +77,14 @@ ombc_gmm <- function(
     )
 
     distrib_diffs[i] <- out$distrib_diff
+    if (distrib_diffs[i] < min_diff) {
+      min_diff <- distrib_diffs[i]
+      min_diff_z <- z
+    }
 
     outlier_rank[!outlier_rank][out$choice_id] <- i
     x <- x[-out$choice_id, , drop = FALSE]
-    z0 <- mix$z[-out$choice_id, , drop = FALSE]
+    z <- mix$z[-out$choice_id, , drop = FALSE]
   }
 
   outlier_num <- which.min(distrib_diffs) - 1
@@ -87,7 +92,9 @@ ombc_gmm <- function(
   outlier_bool <- outlier_rank <= outlier_num & outlier_rank != 0
 
   set.seed(seed)
-  mix <- mixture::gpcm(x0[!outlier_bool, ], G = comp_num, mnames = mnames)
+  mix <- mixture::gpcm(
+    x0[!outlier_bool, ], G = comp_num, mnames = mnames, start = min_diff_z
+  )
 
   labels <- rep(0, nrow(x0))
   labels[!outlier_bool] <- mix$map
