@@ -82,7 +82,7 @@ ombc_gmm <- function(
     distrib_diffs[i] <- out$distrib_diff
     if (distrib_diffs[i] < min_diff) {
       min_diff <- distrib_diffs[i]
-      min_diff_z <- z
+      min_diff_z <- mix$z
     }
 
     outlier_rank[!outlier_rank][out$choice_id] <- i
