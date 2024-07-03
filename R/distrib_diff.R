@@ -187,6 +187,68 @@ distrib_diff_mahalanobis <- function(
   ))
 }
 
+# ------------------------------------------------------------------------------
+
+distrib_diff_mahalanobis2 <- function(
+    x,
+    z_g,
+    mu_g,
+    sigma_g) {
+  var_num <- ncol(x)
+  n_g <- sum(z_g)
+
+  eps <- 0.001
+  check_seq <- seq(0, 1, eps)
+
+  checkpoints_x <- stats::qbeta(check_seq, var_num / 2, (n_g - var_num - 1) / 2)
+
+  mahalas_g <- stats::mahalanobis(x, mu_g, (n_g / (n_g - 1)) * sigma_g)
+  scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
+  mahala_ewcdf_g_func <- spatstat.geom::ewcdf(scaled_mahalas_g, z_g / n_g)
+
+  mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
+  distrib_diff_g_x <- mean(abs(diff(mahala_ewcdf_g) - diff(check_seq)))
+
+  dens_g_x <-
+    (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
+
+  return(list(
+    diff = distrib_diff_g_x,
+    dens = dens_g_x
+  ))
+}
+
+# ------------------------------------------------------------------------------
+
+distrib_diff_mahalanobis3 <- function(
+    x,
+    z_g,
+    mu_g,
+    sigma_g) {
+  var_num <- ncol(x)
+  n_g <- sum(z_g)
+
+  eps <- 0.001
+  check_seq <- seq(0, 1, eps)
+
+  checkpoints_x <- stats::qbeta(check_seq, var_num / 2, (n_g - var_num - 1) / 2)
+
+  mahalas_g <- stats::mahalanobis(x, mu_g, (n_g / (n_g - 1)) * sigma_g)
+  scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
+  mahala_ewcdf_g_func <- spatstat.geom::ewcdf(scaled_mahalas_g, z_g / n_g)
+
+  mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
+  distrib_diff_g_x <- sqrt(mean((diff(mahala_ewcdf_g) - diff(check_seq))^2))
+
+  dens_g_x <-
+    (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
+
+  return(list(
+    diff = distrib_diff_g_x,
+    dens = dens_g_x
+  ))
+}
+
 # ==============================================================================
 
 #' distrib_diff_residual
