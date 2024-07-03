@@ -13,6 +13,7 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @importFrom ClusterR KMeans_rcpp
 #' @importFrom flexCWM cwm
 #' @importFrom mixture gpcm
 #' @importFrom mvtnorm dmvnorm

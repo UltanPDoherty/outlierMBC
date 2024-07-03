@@ -9,10 +9,12 @@
 #' @param max_out Maximum number of outliers.
 #' @param mnames Model names for mixture::gpcm.
 #' @param seed Seed.
+#' @param reinit_interval How frequently to reinitialise.
 #' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return List of
 #' * distrib_diffs
+#' * distrib_diff_mat
 #' * outlier_bool
 #' * outlier_num
 #' * outlier_rank
@@ -43,16 +45,18 @@ ombc_gmm <- function(
     max_out,
     mnames = "VVV",
     seed = 123,
+    reinit_interval = Inf,
     print_interval = Inf) {
   x <- as.matrix(x)
   x0 <- x
 
-  z <- 2
+  z <- init_kmpp(x, comp_num, seed)
 
   var_num <- ncol(x)
 
   min_diff <- Inf
   distrib_diffs <- c()
+  distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = comp_num)
   outlier_rank <- rep(0, nrow(x))
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
@@ -71,7 +75,7 @@ ombc_gmm <- function(
       break()
     }
 
-    out <- distrib_diff_gmm(
+    dd <- distrib_diff_gmm(
       x,
       mix$z,
       mix$best_model$model_obj[[1]]$pi_gs,
@@ -79,15 +83,29 @@ ombc_gmm <- function(
       mix$best_model$model_obj[[1]]$sigs
     )
 
-    distrib_diffs[i] <- out$distrib_diff
+    if (i %% reinit_interval == 0) {
+      alt_z <- init_kmpp(x, comp_num, seed)
+      alt_mix <- mixture::gpcm(
+        x, G = comp_num, mnames = mnames,
+        start = alt_z, seed = 123
+      )
+
+      if (alt_mix$best_model$loglik > mix$best_model$loglik) {
+        cat(paste0("Iteration ", i, ": k-means++ reinitialisation accepted.\n"))
+        mix <- alt_mix
+      }
+    }
+
+    distrib_diff_mat[i, ] <- dd$distrib_diff_vec
+    distrib_diffs[i] <- dd$distrib_diff
     if (distrib_diffs[i] < min_diff) {
       min_diff <- distrib_diffs[i]
       min_diff_z <- mix$z
     }
 
-    outlier_rank[!outlier_rank][out$choice_id] <- i
-    x <- x[-out$choice_id, , drop = FALSE]
-    z <- mix$z[-out$choice_id, , drop = FALSE]
+    outlier_rank[!outlier_rank][dd$choice_id] <- i
+    x <- x[-dd$choice_id, , drop = FALSE]
+    z <- mix$z[-dd$choice_id, , drop = FALSE]
   }
 
   outlier_num <- which.min(distrib_diffs) - 1
@@ -95,9 +113,10 @@ ombc_gmm <- function(
   outlier_bool <- outlier_rank <= outlier_num & outlier_rank != 0
 
   set.seed(seed)
+  z <- init_kmpp(x0[!outlier_bool, ], comp_num, seed)
   mix <- mixture::gpcm(
     x0[!outlier_bool, ], G = comp_num, mnames = mnames,
-    start = min_diff_z, seed = 123
+    start = z, seed = 123
   )
 
   labels <- rep(0, nrow(x0))
@@ -105,6 +124,7 @@ ombc_gmm <- function(
 
   return(list(
     distrib_diffs = distrib_diffs,
+    distrib_diff_mat = distrib_diff_mat,
     outlier_bool = outlier_bool,
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
@@ -112,3 +132,15 @@ ombc_gmm <- function(
     final_gmm = mix
   ))
 }
+
+init_kmpp <- function(x, comp_num, seed) {
+  init <- ClusterR::KMeans_rcpp(x, comp_num, 100, seed = seed)$clusters
+
+  z <- matrix(nrow = nrow(x), ncol = comp_num)
+  for (k in seq_len(comp_num)) {
+    z[, k] <- as.integer(init == k)
+  }
+
+  return(z)
+}
+

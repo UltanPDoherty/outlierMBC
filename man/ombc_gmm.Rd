@@ -10,6 +10,7 @@ ombc_gmm(
   max_out,
   mnames = "VVV",
   seed = 123,
+  reinit_interval = Inf,
   print_interval = Inf
 )
 }
@@ -23,6 +24,8 @@ ombc_gmm(
 \item{mnames}{Model names for mixture::gpcm.}
 
 \item{seed}{Seed.}
+
+\item{reinit_interval}{How frequently to reinitialise.}
 
 \item{print_interval}{How frequently the iteration count is printed.}
 }
