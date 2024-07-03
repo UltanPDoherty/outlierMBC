@@ -113,11 +113,22 @@ ombc_gmm <- function(
   outlier_bool <- outlier_rank <= outlier_num & outlier_rank != 0
 
   set.seed(seed)
-  z <- init_kmpp(x0[!outlier_bool, ], comp_num, seed)
   mix <- mixture::gpcm(
-    x0[!outlier_bool, ], G = comp_num, mnames = mnames,
-    start = z, seed = 123
+    x0[!outlier_bool, ],
+    G = comp_num, mnames = mnames,
+    start = min_diff_z, seed = seed
   )
+  alt_z <- init_kmpp(x0[!outlier_bool, ], comp_num, seed)
+  alt_mix <- mixture::gpcm(
+    x0[!outlier_bool, ],
+    G = comp_num, mnames = mnames,
+    start = alt_z, seed = seed
+  )
+
+  if (alt_mix$best_model$loglik > mix$best_model$loglik) {
+    cat(paste0("Final k-means++ reinitialisation accepted.\n"))
+    mix <- alt_mix
+  }
 
   labels <- rep(0, nrow(x0))
   labels[!outlier_bool] <- mix$map
