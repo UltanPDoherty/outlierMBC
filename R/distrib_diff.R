@@ -176,10 +176,6 @@ distrib_diff_mahalanobis <- function(
   mahala_ewcdf_g_func <- spatstat.geom::ewcdf(scaled_mahalas_g, z_g / n_g)
 
   mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
-  # beta_cdf_g_x <- stats::pbeta(
-  #   checkpoints_x, var_num / 2, (n_g - var_num - 1) / 2
-  # )
-  # distrib_diff_g_x <- mean(abs(mahala_ewcdf_g - beta_cdf_g_x))
   distrib_diff_g_x <- mean(abs(mahala_ewcdf_g - check_seq))
 
   dens_g_x <-

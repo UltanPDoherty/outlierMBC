@@ -63,7 +63,8 @@ ombc_gmm <- function(
 
     set.seed(seed)
     mix <- mixture::gpcm(
-      x, G = comp_num, mnames = mnames,
+      x,
+      G = comp_num, mnames = mnames,
       start = z, seed = 123
     )
 
@@ -86,7 +87,8 @@ ombc_gmm <- function(
     if (i %% reinit_interval == 0) {
       alt_z <- init_kmpp(x, comp_num, seed)
       alt_mix <- mixture::gpcm(
-        x, G = comp_num, mnames = mnames,
+        x,
+        G = comp_num, mnames = mnames,
         start = alt_z, seed = 123
       )
 
@@ -154,4 +156,3 @@ init_kmpp <- function(x, comp_num, seed) {
 
   return(z)
 }
-
