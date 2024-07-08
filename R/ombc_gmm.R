@@ -65,7 +65,7 @@ ombc_gmm <- function(
     mix <- mixture::gpcm(
       x,
       G = comp_num, mnames = mnames,
-      start = z, seed = 123
+      start = z, seed = seed
     )
 
     if (any(colSums(mix$z) < var_num + 1)) {
@@ -89,7 +89,7 @@ ombc_gmm <- function(
       alt_mix <- mixture::gpcm(
         x,
         G = comp_num, mnames = mnames,
-        start = alt_z, seed = 123
+        start = alt_z, seed = seed
       )
 
       if (alt_mix$best_model$loglik > mix$best_model$loglik) {
@@ -145,6 +145,8 @@ ombc_gmm <- function(
     final_gmm = mix
   ))
 }
+
+# ------------------------------------------------------------------------------
 
 init_kmpp <- function(x, comp_num, seed) {
   init <- ClusterR::KMeans_rcpp(x, comp_num, 100, seed = seed)$clusters
