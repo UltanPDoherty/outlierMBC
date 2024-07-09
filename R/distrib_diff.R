@@ -10,6 +10,7 @@
 #' * distrib_diff
 #' * distrib_diff_vec
 #' * choice_id
+#' * min_dens
 distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
@@ -25,13 +26,15 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
   mix_dens <- dens_mat %*% t(prop)
 
   choice_id <- which.min(mix_dens)
+  min_dens <- mix_dens[choice_id]
 
   distrib_diff <- sum(prop * distrib_diff_vec)
 
   return(list(
     distrib_diff = distrib_diff,
     distrib_diff_vec = distrib_diff_vec,
-    choice_id = choice_id
+    choice_id = choice_id,
+    min_dens = min_dens
   ))
 }
 

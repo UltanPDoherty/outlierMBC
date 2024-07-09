@@ -20,6 +20,8 @@
 #' * outlier_rank
 #' * labels
 #' * final_gmm
+#' * loglike
+#' * min_dens
 #' @export
 #'
 #' @examples
@@ -56,6 +58,8 @@ ombc_gmm <- function(
 
   min_diff <- Inf
   distrib_diffs <- c()
+  loglike <- c()
+  min_dens <- c()
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = comp_num)
   outlier_rank <- rep(0, nrow(x))
   for (i in seq_len(max_out + 1)) {
@@ -105,6 +109,9 @@ ombc_gmm <- function(
       min_diff_z <- mix$z
     }
 
+    loglike[i] <- mix$best_model$loglik
+    min_dens[i] <- dd$min_dens
+
     outlier_rank[!outlier_rank][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
     z <- mix$z[-dd$choice_id, , drop = FALSE]
@@ -142,7 +149,9 @@ ombc_gmm <- function(
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
     labels = labels,
-    final_gmm = mix
+    final_gmm = mix,
+    loglike = loglike,
+    min_dens = min_dens
   ))
 }
 
