@@ -3,7 +3,6 @@
 #' @description
 #' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 #'
-#'
 #' @param x Data.
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.

@@ -17,7 +17,7 @@
 #' @importFrom flexCWM cwm
 #' @importFrom mixture gpcm
 #' @importFrom mvtnorm dmvnorm
-#' @importFrom spatstat.geom ewcdf
+#' @importFrom spatstat.univar ewcdf
 #' @importFrom stats dnorm
 ## usethis namespace: end
 NULL

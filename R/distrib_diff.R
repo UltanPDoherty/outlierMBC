@@ -176,7 +176,7 @@ distrib_diff_mahalanobis <- function(
 
   mahalas_g <- stats::mahalanobis(x, mu_g, (n_g / (n_g - 1)) * sigma_g)
   scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
-  mahala_ewcdf_g_func <- spatstat.geom::ewcdf(scaled_mahalas_g, z_g / n_g)
+  mahala_ewcdf_g_func <- spatstat.univar::ewcdf(scaled_mahalas_g, z_g / n_g)
 
   mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
   distrib_diff_g_x <- mean(abs(mahala_ewcdf_g - check_seq))
@@ -220,7 +220,7 @@ distrib_diff_residual <- function(
 
   checkpoints_y <- stats::qbeta(check_seq, 1 / 2, (df_g - 1) / 2)
 
-  scsqst_res_ecdf_g_func <- spatstat.geom::ewcdf(scsqst_res_g, z_g / n_g)
+  scsqst_res_ecdf_g_func <- spatstat.univar::ewcdf(scsqst_res_g, z_g / n_g)
 
   scsqst_res_ecdf_g <- scsqst_res_ecdf_g_func(checkpoints_y)
   beta_cdf_g_y <- stats::pbeta(checkpoints_y, 1 / 2, (df_g - 1) / 2)

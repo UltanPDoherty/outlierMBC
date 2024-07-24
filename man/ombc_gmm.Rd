@@ -33,11 +33,14 @@ ombc_gmm(
 List of
 \itemize{
 \item distrib_diffs
+\item distrib_diff_mat
 \item outlier_bool
 \item outlier_num
 \item outlier_rank
 \item labels
 \item final_gmm
+\item loglike
+\item min_dens
 }
 }
 \description{
