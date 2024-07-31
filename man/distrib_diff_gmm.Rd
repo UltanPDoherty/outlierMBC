@@ -4,7 +4,7 @@
 \alias{distrib_diff_gmm}
 \title{distrib_diff_gmm}
 \usage{
-distrib_diff_gmm(x, z, prop, mu, sigma)
+distrib_diff_gmm(x, z, prop, mu, sigma, logdet)
 }
 \arguments{
 \item{x}{Covariate data only.}
@@ -16,6 +16,8 @@ distrib_diff_gmm(x, z, prop, mu, sigma)
 \item{mu}{List of component mean vectors.}
 
 \item{sigma}{List of component covariance matrices.}
+
+\item{logdet}{Vector of log-determinants for covariance matrices.}
 }
 \value{
 List of

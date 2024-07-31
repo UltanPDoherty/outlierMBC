@@ -5,6 +5,7 @@
 #' @param prop Vector of component proportions.
 #' @param mu List of component mean vectors.
 #' @param sigma List of component covariance matrices.
+#' @param logdet Vector of log-determinants for covariance matrices.
 #'
 #' @return List of
 #' * distrib_diff
