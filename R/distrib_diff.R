@@ -11,7 +11,7 @@
 #' * distrib_diff_vec
 #' * choice_id
 #' * min_dens
-distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
+distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
   track_num <- 4
@@ -19,7 +19,7 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
   distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
   for (g in seq_len(comp_num)) {
-    dd_g <- distrib_diff_mahalanobis(x, z[, g], mu[[g]], sigma[[g]])
+    dd_g <- distrib_diff_mahalanobis(x, z[, g], mu[[g]], sigma[[g]], logdet[g])
     distrib_diff_mat[g, ] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
   }
@@ -53,7 +53,8 @@ distrib_diff_mahalanobis <- function(
     x,
     z_g,
     mu_g,
-    sigma_g) {
+    sigma_g,
+    logdet_g) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
 
@@ -75,8 +76,11 @@ distrib_diff_mahalanobis <- function(
     stats::quantile(abs_cdf_diffs, c(0.5, 0.75, 1))
   )
 
-  dens_g_x <-
-    (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
+  # dens_g_x <-
+  #   (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
+  dens_g_x <- exp(
+    -0.5 * (var_num * log(2 * pi) + logdet_g + mahalas_g)
+  )
 
   return(list(
     diff = distrib_diff_g_x,

@@ -102,7 +102,8 @@ ombc_gmm <- function(
       mix$z,
       mix$best_model$model_obj[[1]]$pi_gs,
       mix$best_model$model_obj[[1]]$mu,
-      mix$best_model$model_obj[[1]]$sigs
+      mix$best_model$model_obj[[1]]$sigs,
+      mix$best_model$model_obj[[1]]$log_dets
     )
 
     distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
