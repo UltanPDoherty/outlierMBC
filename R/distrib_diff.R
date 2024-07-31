@@ -14,15 +14,14 @@
 distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
+  track_num <- 4
 
-  distrib_diff_vec <- c()
+  distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
-  dd_percentile_mat <- matrix(nrow = 101, ncol = comp_num)
   for (g in seq_len(comp_num)) {
     dd_g <- distrib_diff_mahalanobis(x, z[, g], mu[[g]], sigma[[g]])
-    distrib_diff_vec[g] <- dd_g$diff
+    distrib_diff_mat[g, ] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
-    dd_percentile_mat[, g] <- dd_g$dd_percentiles
   }
 
   mix_dens <- dens_mat %*% t(prop)
@@ -30,16 +29,13 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
   choice_id <- which.min(mix_dens)
   min_dens <- mix_dens[choice_id]
 
-  distrib_diff <- sum(prop * distrib_diff_vec)
-
-  dd_percentile_vec <- apply(dd_percentile_mat, 1, function(x) sum(prop * x))
+  distrib_diff_vec <- as.numeric(prop %*% distrib_diff_mat)
 
   return(list(
-    distrib_diff = distrib_diff,
+    distrib_diff_mat = distrib_diff_mat,
     distrib_diff_vec = distrib_diff_vec,
     choice_id = choice_id,
-    min_dens = min_dens,
-    dd_percentile_vec = dd_percentile_vec
+    min_dens = min_dens
   ))
 }
 
@@ -184,20 +180,20 @@ distrib_diff_mahalanobis <- function(
   mahala_ewcdf_g_func <- spatstat.univar::ewcdf(scaled_mahalas_g, z_g / n_g)
 
   mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
-  distrib_diff_g_x <- mean(abs(mahala_ewcdf_g - check_seq))
-  # distrib_diff_g_x <- median(abs(mahala_ewcdf_g - check_seq))
-  # distrib_diff_g_x <- quantile(abs(mahala_ewcdf_g - check_seq), 0.25)
-  # distrib_diff_g_x <- max(abs(mahala_ewcdf_g - check_seq))
 
-  dd_percentiles <- quantile(abs(mahala_ewcdf_g - check_seq), seq(0, 1, 0.01))
+  abs_cdf_diffs <- abs(mahala_ewcdf_g - check_seq)
+
+  distrib_diff_g_x <- c(
+    mean(abs_cdf_diffs),
+    stats::quantile(abs_cdf_diffs, c(0.5, 0.75, 1))
+  )
 
   dens_g_x <-
     (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
 
   return(list(
     diff = distrib_diff_g_x,
-    dens = dens_g_x,
-    dd_percentiles = dd_percentiles
+    dens = dens_g_x
   ))
 }
 

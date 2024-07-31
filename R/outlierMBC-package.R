@@ -19,5 +19,6 @@
 #' @importFrom mvtnorm dmvnorm
 #' @importFrom spatstat.univar ewcdf
 #' @importFrom stats dnorm
+#' @importFrom stats quantile
 ## usethis namespace: end
 NULL
