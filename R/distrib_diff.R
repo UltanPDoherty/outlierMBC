@@ -183,8 +183,6 @@ distrib_diff_mahalanobis <- function(
   scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
   mahala_ewcdf_g_func <- spatstat.univar::ewcdf(scaled_mahalas_g, z_g / n_g)
 
-  binary_z_g <- z_g > 0.5
-
   mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
   distrib_diff_g_x <- mean(abs(mahala_ewcdf_g - check_seq))
   # distrib_diff_g_x <- median(abs(mahala_ewcdf_g - check_seq))
