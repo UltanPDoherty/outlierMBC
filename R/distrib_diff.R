@@ -17,10 +17,18 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
 
   distrib_diff_vec <- c()
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
+  ksp_vec <- c()
+  ksd_vec <- c()
+  dd_percentile_mat <- matrix(nrow = 101, ncol = comp_num)
+  beta_median_diffs <- c()
   for (g in seq_len(comp_num)) {
     dd_g <- distrib_diff_mahalanobis(x, z[, g], mu[[g]], sigma[[g]])
     distrib_diff_vec[g] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
+    ksd_vec[g] <- dd_g$ks$statistic
+    ksp_vec[g] <- dd_g$ks$p.value
+    dd_percentile_mat[, g] <- dd_g$dd_percentiles
+    beta_median_diffs[g] <- dd_g$beta_median_diff
   }
 
   mix_dens <- dens_mat %*% t(prop)
@@ -29,12 +37,22 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
   min_dens <- mix_dens[choice_id]
 
   distrib_diff <- sum(prop * distrib_diff_vec)
+  ksd <- sum(prop * ksd_vec)
+
+  dd_percentile_vec <- apply(dd_percentile_mat, 1, function(x) sum(prop * x))
+
+  beta_median_diff <- sum(prop * beta_median_diffs)
 
   return(list(
     distrib_diff = distrib_diff,
     distrib_diff_vec = distrib_diff_vec,
     choice_id = choice_id,
-    min_dens = min_dens
+    min_dens = min_dens,
+    ksd = ksd,
+    ksd_vec = ksd_vec,
+    ksp_vec = ksp_vec,
+    dd_percentile_vec = dd_percentile_vec,
+    beta_median_diff = beta_median_diff
   ))
 }
 
@@ -178,16 +196,35 @@ distrib_diff_mahalanobis <- function(
   scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
   mahala_ewcdf_g_func <- spatstat.univar::ewcdf(scaled_mahalas_g, z_g / n_g)
 
+  binary_z_g <- z_g > 0.5
+
+  ks_g <- stats::ks.test(
+    scaled_mahalas_g[binary_z_g], "pbeta", var_num / 2, (sum(binary_z_g) - var_num - 1) / 2
+  )
+
   mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
   distrib_diff_g_x <- mean(abs(mahala_ewcdf_g - check_seq))
+  # distrib_diff_g_x <- median(abs(mahala_ewcdf_g - check_seq))
+  # distrib_diff_g_x <- quantile(abs(mahala_ewcdf_g - check_seq), 0.25)
   # distrib_diff_g_x <- max(abs(mahala_ewcdf_g - check_seq))
+
+  dd_percentiles <- quantile(abs(mahala_ewcdf_g - check_seq), seq(0, 1, 0.01))
 
   dens_g_x <-
     (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
 
+  alpha_g <- var_num / 2
+  beta_g <- (sum(binary_z_g) - var_num - 1) / 2
+  beta_median_diff <- abs(
+    median(scaled_mahalas_g[binary_z_g]) - (alpha_g - 1 / 3) / (alpha_g + beta_g - 2 / 3)
+  )
+
   return(list(
     diff = distrib_diff_g_x,
-    dens = dens_g_x
+    dens = dens_g_x,
+    ks = ks_g,
+    dd_percentiles = dd_percentiles,
+    beta_median_diff = beta_median_diff
   ))
 }
 
