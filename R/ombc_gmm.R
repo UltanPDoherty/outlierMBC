@@ -172,7 +172,7 @@ ombc_gmm <- function(
 # ------------------------------------------------------------------------------
 
 init_kmpp <- function(x, comp_num, seed) {
-  init <- ClusterR::KMeans_rcpp(x, comp_num, 100, seed = seed)$clusters
+  init <- ClusterR::KMeans_rcpp(x, comp_num, 10, seed = seed)$clusters
 
   z <- matrix(nrow = nrow(x), ncol = comp_num)
   for (k in seq_len(comp_num)) {
