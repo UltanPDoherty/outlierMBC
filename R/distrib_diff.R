@@ -39,6 +39,51 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
   ))
 }
 
+
+# ==============================================================================
+
+#' distrib_diff_mahalanobis
+#'
+#' @inheritParams distrib_diff_lcwm_g
+#'
+#' @return List of
+#' * diff
+#' * dens
+distrib_diff_mahalanobis <- function(
+    x,
+    z_g,
+    mu_g,
+    sigma_g) {
+  var_num <- ncol(x)
+  n_g <- sum(z_g)
+
+  eps <- 1 / 1000
+  check_seq <- seq(eps, 1 - eps, eps)
+
+  checkpoints_x <- stats::qbeta(check_seq, var_num / 2, (n_g - var_num - 1) / 2)
+
+  mahalas_g <- stats::mahalanobis(x, mu_g, (n_g / (n_g - 1)) * sigma_g)
+  scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
+  mahala_ewcdf_g_func <- spatstat.univar::ewcdf(scaled_mahalas_g, z_g / n_g)
+
+  mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
+
+  abs_cdf_diffs <- abs(mahala_ewcdf_g - check_seq)
+
+  distrib_diff_g_x <- c(
+    mean(abs_cdf_diffs),
+    stats::quantile(abs_cdf_diffs, c(0.5, 0.75, 1))
+  )
+
+  dens_g_x <-
+    (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
+
+  return(list(
+    diff = distrib_diff_g_x,
+    dens = dens_g_x
+  ))
+}
+
 # ==============================================================================
 
 #' distrib_diff_lcwm
@@ -150,50 +195,6 @@ distrib_diff_lcwm_g <- function(
   return(list(
     diff = diff_g,
     dens = dens_g
-  ))
-}
-
-# ==============================================================================
-
-#' distrib_diff_mahalanobis
-#'
-#' @inheritParams distrib_diff_lcwm_g
-#'
-#' @return List of
-#' * diff
-#' * dens
-distrib_diff_mahalanobis <- function(
-    x,
-    z_g,
-    mu_g,
-    sigma_g) {
-  var_num <- ncol(x)
-  n_g <- sum(z_g)
-
-  eps <- 1 / 1000
-  check_seq <- seq(eps, 1 - eps, eps)
-
-  checkpoints_x <- stats::qbeta(check_seq, var_num / 2, (n_g - var_num - 1) / 2)
-
-  mahalas_g <- stats::mahalanobis(x, mu_g, (n_g / (n_g - 1)) * sigma_g)
-  scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
-  mahala_ewcdf_g_func <- spatstat.univar::ewcdf(scaled_mahalas_g, z_g / n_g)
-
-  mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
-
-  abs_cdf_diffs <- abs(mahala_ewcdf_g - check_seq)
-
-  distrib_diff_g_x <- c(
-    mean(abs_cdf_diffs),
-    stats::quantile(abs_cdf_diffs, c(0.5, 0.75, 1))
-  )
-
-  dens_g_x <-
-    (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
-
-  return(list(
-    diff = distrib_diff_g_x,
-    dens = dens_g_x
   ))
 }
 
