@@ -76,8 +76,6 @@ distrib_diff_mahalanobis <- function(
     stats::quantile(abs_cdf_diffs, c(0.5, 0.75, 1))
   )
 
-  # dens_g_x <-
-  #   (2 * pi)^(-var_num / 2) * det(sigma_g)^(-0.5) * exp(-mahalas_g / 2)
   dens_g_x <- exp(
     -0.5 * (var_num * log(2 * pi) + logdet_g + mahalas_g)
   )
