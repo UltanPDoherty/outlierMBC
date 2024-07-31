@@ -61,7 +61,6 @@ ombc_gmm <- function(
   min_dens <- c()
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = comp_num)
   dd_percentile_mat <- matrix(nrow = max_out + 1, ncol = 101)
-  beta_median_diffs <- c()
   outlier_rank <- rep(0, nrow(x))
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
@@ -115,8 +114,6 @@ ombc_gmm <- function(
 
     dd_percentile_mat[i, ] <- dd$dd_percentile_vec
 
-    beta_median_diffs[i] <- dd$beta_median_diff
-
     outlier_rank[!outlier_rank][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
     z <- mix$z[-dd$choice_id, , drop = FALSE]
@@ -157,8 +154,7 @@ ombc_gmm <- function(
     final_gmm = mix,
     loglike = loglike,
     min_dens = min_dens,
-    dd_percentile_mat = dd_percentile_mat,
-    beta_median_diffs = beta_median_diffs
+    dd_percentile_mat = dd_percentile_mat
   ))
 }
 
