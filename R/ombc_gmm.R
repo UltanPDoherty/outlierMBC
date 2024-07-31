@@ -60,10 +60,8 @@ ombc_gmm <- function(
   loglike <- c()
   min_dens <- c()
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = comp_num)
-  ksp_mat <- ksd_mat <- matrix(nrow = max_out + 1, ncol = comp_num)
   dd_percentile_mat <- matrix(nrow = max_out + 1, ncol = 101)
   beta_median_diffs <- c()
-  ksd <- c()
   outlier_rank <- rep(0, nrow(x))
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
@@ -115,10 +113,6 @@ ombc_gmm <- function(
     loglike[i] <- mix$best_model$loglik
     min_dens[i] <- dd$min_dens
 
-    ksd[i] <- dd$ksd
-    ksd_mat[i, ] <- dd$ksd_vec
-    ksp_mat[i, ] <- dd$ksp_vec
-
     dd_percentile_mat[i, ] <- dd$dd_percentile_vec
 
     beta_median_diffs[i] <- dd$beta_median_diff
@@ -163,9 +157,6 @@ ombc_gmm <- function(
     final_gmm = mix,
     loglike = loglike,
     min_dens = min_dens,
-    ksd = ksd,
-    ksd_mat = ksd_mat,
-    ksp_mat = ksp_mat,
     dd_percentile_mat = dd_percentile_mat,
     beta_median_diffs = beta_median_diffs
   ))

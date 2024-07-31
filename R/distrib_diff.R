@@ -17,16 +17,12 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
 
   distrib_diff_vec <- c()
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
-  ksp_vec <- c()
-  ksd_vec <- c()
   dd_percentile_mat <- matrix(nrow = 101, ncol = comp_num)
   beta_median_diffs <- c()
   for (g in seq_len(comp_num)) {
     dd_g <- distrib_diff_mahalanobis(x, z[, g], mu[[g]], sigma[[g]])
     distrib_diff_vec[g] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
-    ksd_vec[g] <- dd_g$ks$statistic
-    ksp_vec[g] <- dd_g$ks$p.value
     dd_percentile_mat[, g] <- dd_g$dd_percentiles
     beta_median_diffs[g] <- dd_g$beta_median_diff
   }
@@ -37,7 +33,6 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
   min_dens <- mix_dens[choice_id]
 
   distrib_diff <- sum(prop * distrib_diff_vec)
-  ksd <- sum(prop * ksd_vec)
 
   dd_percentile_vec <- apply(dd_percentile_mat, 1, function(x) sum(prop * x))
 
@@ -48,9 +43,6 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma) {
     distrib_diff_vec = distrib_diff_vec,
     choice_id = choice_id,
     min_dens = min_dens,
-    ksd = ksd,
-    ksd_vec = ksd_vec,
-    ksp_vec = ksp_vec,
     dd_percentile_vec = dd_percentile_vec,
     beta_median_diff = beta_median_diff
   ))
@@ -198,10 +190,6 @@ distrib_diff_mahalanobis <- function(
 
   binary_z_g <- z_g > 0.5
 
-  ks_g <- stats::ks.test(
-    scaled_mahalas_g[binary_z_g], "pbeta", var_num / 2, (sum(binary_z_g) - var_num - 1) / 2
-  )
-
   mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
   distrib_diff_g_x <- mean(abs(mahala_ewcdf_g - check_seq))
   # distrib_diff_g_x <- median(abs(mahala_ewcdf_g - check_seq))
@@ -222,7 +210,6 @@ distrib_diff_mahalanobis <- function(
   return(list(
     diff = distrib_diff_g_x,
     dens = dens_g_x,
-    ks = ks_g,
     dd_percentiles = dd_percentiles,
     beta_median_diff = beta_median_diff
   ))
