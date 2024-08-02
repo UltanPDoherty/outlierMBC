@@ -182,3 +182,121 @@ init_kmpp <- function(x, comp_num, seed) {
 
   return(z)
 }
+
+# ------------------------------------------------------------------------------
+
+ombc_gmm_reverse <- function(
+    ombc_gmm_out,
+    track_choice,
+    x,
+    comp_num,
+    mnames = "VVV",
+    seed = 123,
+    print_interval = Inf) {
+  outlier_bool <- ombc_gmm_out$outlier_bool[, track_choice]
+  outlier_rank <- ombc_gmm_out$outlier_rank
+  outlier_num <- ombc_gmm_out$outlier_num[track_choice]
+  mix <- ombc_gmm_out$final_gmm[[track_choice]]
+
+  x0 <- as.matrix(x)
+  x <- x0[!outlier_bool, ]
+
+  obs_num <- nrow(x0)
+  var_num <- ncol(x0)
+  track_num <- 4
+
+  min_diff <- rep(Inf, track_num)
+  min_diff_z <- list()
+  loglike <- c()
+  min_dens <- c()
+  distrib_diff_arr <- array(dim = c(comp_num, outlier_num + 1, track_num))
+  distrib_diff_mat <- matrix(nrow = outlier_num + 1, ncol = track_num)
+  for (i in seq_len(outlier_num + 1)) {
+    if (i %% print_interval == 0) cat("i = ", i, "\n")
+
+    dd <- distrib_diff_gmm(
+      x,
+      mix$z,
+      mix$best_model$model_obj[[1]]$pi_gs,
+      mix$best_model$model_obj[[1]]$mu,
+      mix$best_model$model_obj[[1]]$sigs,
+      mix$best_model$model_obj[[1]]$log_dets
+    )
+
+    distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
+    distrib_diff_mat[i, ] <- dd$distrib_diff_vec
+
+    for (j in 1:track_num) {
+      if (distrib_diff_mat[i, j] < min_diff[j]) {
+        min_diff[j] <- distrib_diff_mat[i, j]
+        min_diff_z[[j]] <- mix$z
+      }
+    }
+
+    loglike[i] <- mix$best_model$loglik
+    min_dens[i] <- dd$min_dens
+
+    x <- x0[!outlier_bool | outlier_rank > outlier_num - i, ]
+    z <- mixture::e_step(x, mix$best_model)$z
+
+    set.seed(seed)
+    mix <- mixture::gpcm(
+      x,
+      G = comp_num, mnames = mnames,
+      start = z, seed = seed
+    )
+
+    if (any(colSums(mix$z) < var_num + 1)) {
+      warning(paste0(
+        "One of the components became too small after removing ",
+        i - 1, " outliers."
+      ))
+      break()
+    }
+  }
+
+  outlier_num <- outlier_num - (apply(distrib_diff_mat, 2, which.min) - 1)
+
+  outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
+  for (j in 1:track_num) {
+    outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
+  }
+
+  mix <- list()
+  for (j in 1:track_num) {
+    mix[[j]] <- mixture::gpcm(
+      x0[!outlier_bool[, j], ],
+      G = comp_num, mnames = mnames,
+      start = min_diff_z[[j]], seed = seed
+    )
+
+    alt_z <- init_kmpp(x0[!outlier_bool[, j], ], comp_num, seed)
+    alt_mix <- mixture::gpcm(
+      x0[!outlier_bool[, j], ],
+      G = comp_num, mnames = mnames,
+      start = alt_z, seed = seed
+    )
+
+    if (alt_mix$best_model$loglik > mix[[j]]$best_model$loglik) {
+      cat(paste0("Final k-means++ reinitialisation, ", j, " accepted.\n"))
+      mix[[j]] <- alt_mix
+    }
+  }
+
+  labels <- matrix(0, nrow = obs_num, ncol = track_num)
+  for (j in 1:track_num) {
+    labels[!outlier_bool[, j], j] <- mix[[j]]$map
+  }
+
+  return(list(
+    distrib_diff_arr = distrib_diff_arr,
+    distrib_diff_mat = distrib_diff_mat,
+    outlier_bool = outlier_bool,
+    outlier_num = outlier_num,
+    outlier_rank = outlier_rank,
+    labels = labels,
+    final_gmm = mix,
+    loglike = loglike,
+    min_dens = min_dens
+  ))
+}
