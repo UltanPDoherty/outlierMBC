@@ -15,7 +15,7 @@
 distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
-  track_num <- 4
+  track_num <- 6
 
   distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
@@ -73,11 +73,13 @@ distrib_diff_mahalanobis <- function(
 
   abs_cdf_diffs <- abs(mahala_ewcdf_g - check_seq)
 
-  diff(c(0, ))
+  abs_pmf_diffs <- abs(diff(c(0, mahala_ewcdf_g)) - eps)
 
   distrib_diff_g_x <- c(
     mean(abs_cdf_diffs),
-    stats::quantile(abs_cdf_diffs, c(0.5, 0.75, 1))
+    stats::quantile(abs_cdf_diffs, c(0.5, 1)),
+    mean(abs_pmf_diffs),
+    stats::quantile(abs_pmf_diffs, c(0.5, 1))
   )
 
   dens_g_x <- exp(

@@ -52,7 +52,7 @@ ombc_gmm <- function(
   x0 <- x
 
   obs_num <- nrow(x0)
-  track_num <- 4
+  track_num <- 6
 
   z <- init_kmpp(x, comp_num, seed)
 
