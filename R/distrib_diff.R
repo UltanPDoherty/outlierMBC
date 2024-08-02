@@ -46,6 +46,7 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
 #' distrib_diff_mahalanobis
 #'
 #' @inheritParams distrib_diff_lcwm_g
+#' @param logdet_g Log-determinants for covariance matrix of component g.
 #'
 #' @return List of
 #' * diff
@@ -172,13 +173,13 @@ distrib_diff_lcwm_g <- function(
   outlier_type <- match.arg(outlier_type)
 
   if (outlier_type == "x_and_y") {
-    dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g)
+    dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
     dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
 
     diff_g <- sqrt(alpha * dd_g_x$diff^2 + (1 - alpha) * dd_g_y$diff^2)
     dens_g <- dd_g_x$dens * dd_g_y$dens
   } else if (outlier_type == "x_only") {
-    dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g)
+    dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
 
     diff_g <- dd_g_x$diff
     dens_g <- dd_g_x$dens
@@ -188,7 +189,7 @@ distrib_diff_lcwm_g <- function(
     diff_g <- dd_g_y$diff
     dens_g <- dd_g_y$dens
   } else {
-    dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g)
+    dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
     dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
 
     diff_g <- dd_g_x$diff

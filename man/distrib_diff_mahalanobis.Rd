@@ -14,6 +14,8 @@ distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g)
 \item{mu_g}{Component mean vector.}
 
 \item{sigma_g}{Component covariance matrix.}
+
+\item{logdet_g}{Log-determinants for covariance matrix of component g.}
 }
 \value{
 List of
