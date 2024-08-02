@@ -188,6 +188,7 @@ init_kmpp <- function(x, comp_num, seed) {
 ombc_gmm_reverse <- function(
     ombc_gmm_out,
     track_choice,
+    fixed = FALSE,
     x,
     comp_num,
     mnames = "VVV",
@@ -197,13 +198,14 @@ ombc_gmm_reverse <- function(
   outlier_rank <- ombc_gmm_out$outlier_rank
   outlier_num <- ombc_gmm_out$outlier_num[track_choice]
   mix <- ombc_gmm_out$final_gmm[[track_choice]]
+  z <- mix$z
 
   x0 <- as.matrix(x)
   x <- x0[!outlier_bool, ]
 
   obs_num <- nrow(x0)
   var_num <- ncol(x0)
-  track_num <- 4
+  track_num <- 6
 
   min_diff <- rep(Inf, track_num)
   min_diff_z <- list()
@@ -216,7 +218,7 @@ ombc_gmm_reverse <- function(
 
     dd <- distrib_diff_gmm(
       x,
-      mix$z,
+      z,
       mix$best_model$model_obj[[1]]$pi_gs,
       mix$best_model$model_obj[[1]]$mu,
       mix$best_model$model_obj[[1]]$sigs,
@@ -229,7 +231,7 @@ ombc_gmm_reverse <- function(
     for (j in 1:track_num) {
       if (distrib_diff_mat[i, j] < min_diff[j]) {
         min_diff[j] <- distrib_diff_mat[i, j]
-        min_diff_z[[j]] <- mix$z
+        min_diff_z[[j]] <- z
       }
     }
 
@@ -239,19 +241,23 @@ ombc_gmm_reverse <- function(
     x <- x0[!outlier_bool | outlier_rank > outlier_num - i, ]
     z <- mixture::e_step(x, mix$best_model)$z
 
-    set.seed(seed)
-    mix <- mixture::gpcm(
-      x,
-      G = comp_num, mnames = mnames,
-      start = z, seed = seed
-    )
+    if (!fixed) {
+      set.seed(seed)
+      mix <- mixture::gpcm(
+        x,
+        G = comp_num, mnames = mnames,
+        start = z, seed = seed
+      )
 
-    if (any(colSums(mix$z) < var_num + 1)) {
-      warning(paste0(
-        "One of the components became too small after removing ",
-        i - 1, " outliers."
-      ))
-      break()
+      if (any(colSums(mix$z) < var_num + 1)) {
+        warning(paste0(
+          "One of the components became too small after removing ",
+          i - 1, " outliers."
+        ))
+        break()
+      }
+
+      z <- mix$z
     }
   }
 
