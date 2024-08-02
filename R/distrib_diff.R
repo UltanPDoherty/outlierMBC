@@ -61,7 +61,7 @@ distrib_diff_mahalanobis <- function(
   n_g <- sum(z_g)
 
   eps <- 1 / 1000
-  check_seq <- seq(eps, 1 - eps, eps)
+  check_seq <- seq(eps, 1, eps)
 
   checkpoints_x <- stats::qbeta(check_seq, var_num / 2, (n_g - var_num - 1) / 2)
 
@@ -72,6 +72,8 @@ distrib_diff_mahalanobis <- function(
   mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
 
   abs_cdf_diffs <- abs(mahala_ewcdf_g - check_seq)
+
+  diff(c(0, ))
 
   distrib_diff_g_x <- c(
     mean(abs_cdf_diffs),
