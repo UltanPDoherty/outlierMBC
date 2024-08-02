@@ -30,7 +30,7 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   choice_id <- which.min(mix_dens)
   min_dens <- mix_dens[choice_id]
 
-  distrib_diff_vec <- as.numeric(prop %*% distrib_diff_mat)
+  distrib_diff_vec <- sqrt(as.numeric(prop %*% (distrib_diff_mat^2)))
 
   return(list(
     distrib_diff_mat = distrib_diff_mat,
