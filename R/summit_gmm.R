@@ -53,7 +53,7 @@ summit_gmm_forward <- function(
     }
 
     if (any(colSums(mix$z) < var_num + 1)) {
-      warning(paste0(
+      message(paste0(
         "One of the components became too small after removing ",
         i - 1, " outliers.\n"
       ))
@@ -62,10 +62,7 @@ summit_gmm_forward <- function(
       mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = alt_z)
 
       if (any(colSums(mix$z) < var_num + 1)) {
-        warning(paste0(
-          "Emergency reinitialisation unsuccessful.\n"
-        ))
-        break()
+        stop("Emergency reinitialisation unsuccessful.\n")
       } else {
         message("Emergency reinitialisation successful.\n")
       }
@@ -85,7 +82,7 @@ summit_gmm_forward <- function(
 
     rem_id <- which.min(dens_vec)
     rem_dens[i] <- dens_vec[rem_id]
-    rem_dens[i] <- mix$best_model$loglik
+    loglike[i] <- mix$best_model$loglik
 
     outlier_rank[!outlier_rank][rem_id] <- i
     x <- x[-rem_id, , drop = FALSE]
@@ -114,18 +111,19 @@ summit_gmm_backward <- function(
   comp_num <- ncol(z)
   max_out <- max(outlier_rank)
   mnames <- forward$mnames
-  x <- forward$x
+  x0 <- forward$x0
 
-  x0 <- as.matrix(x)
   x <- x0[(outlier_rank == 0), ]
 
+  loglike <- double(max_out + 1)
+
   mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = z)
+  loglike[1] <- mix$best_model$loglik
 
   obs_num <- nrow(x0)
   var_num <- ncol(x0)
 
   rem_dens <- double(max_out)
-  loglike <- double(max_out)
   for (i in seq_len(max_out)) {
     if (((max_out + 1 - i) %% print_interval) == 0) {
       cat("max_out + 1 - i = ", max_out + 1 - i, "\n")
@@ -135,8 +133,7 @@ summit_gmm_backward <- function(
     z <- mixture::e_step(x, mix$best_model)$z
 
     mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = z)
-
-    z <- mix$z
+    loglike[i + 1] <- mix$best_model$loglik
 
     dens_mat <- matrix(nrow = nrow(x), ncol = comp_num)
     for (k in 1:comp_num) {
@@ -152,7 +149,6 @@ summit_gmm_backward <- function(
 
     rem_id <- which.min(dens_vec)
     rem_dens[i] <- dens_vec[rem_id]
-    loglike[i] <- mix$best_model$loglik
   }
 
   return(list(
