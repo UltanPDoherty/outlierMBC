@@ -157,7 +157,7 @@ summit_gmm_backward <- function(
   }
 
   return(list(
-    rem_dens = rem_dens
+    rem_dens = rev(rem_dens)
   ))
 }
 
