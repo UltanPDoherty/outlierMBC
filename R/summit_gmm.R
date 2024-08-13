@@ -56,7 +56,18 @@ summit_gmm_forward <- function(
         "One of the components became too small after removing ",
         i - 1, " outliers."
       ))
-      break()
+
+      alt_z <- init_kmpp(x, comp_num, seed)
+      mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = alt_z)
+
+      if (any(colSums(mix$z) < var_num + 1)) {
+        warning(paste0(
+          "Reinitialisation did not fix the issue."
+        ))
+        break()
+      } else {
+        message("Reinitialisation fixed this issue.")
+      }
     }
 
     dens_mat <- matrix(nrow = nrow(x), ncol = comp_num)
