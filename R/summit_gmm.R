@@ -1,3 +1,4 @@
+#' @export
 summit_gmm <- function(
     x,
     comp_num,
@@ -16,6 +17,7 @@ summit_gmm <- function(
 
 # ------------------------------------------------------------------------------
 
+#' @export
 summit_gmm_forward <- function(
     x,
     comp_num,
@@ -88,6 +90,7 @@ summit_gmm_forward <- function(
 
 # ------------------------------------------------------------------------------
 
+#' @export
 summit_gmm_backward <- function(
     forward,
     print_interval = Inf) {
