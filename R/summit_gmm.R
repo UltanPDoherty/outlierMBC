@@ -54,7 +54,7 @@ summit_gmm_forward <- function(
     if (any(colSums(mix$z) < var_num + 1)) {
       warning(paste0(
         "One of the components became too small after removing ",
-        i - 1, " outliers."
+        i - 1, " outliers.\n"
       ))
 
       alt_z <- init_kmpp(x, comp_num, seed)
@@ -62,11 +62,11 @@ summit_gmm_forward <- function(
 
       if (any(colSums(mix$z) < var_num + 1)) {
         warning(paste0(
-          "Reinitialisation did not fix the issue."
+          "Reinitialisation did not fix the issue.\n"
         ))
         break()
       } else {
-        message("Reinitialisation fixed this issue.")
+        message("Reinitialisation fixed this issue.\n")
       }
     }
 
@@ -129,14 +129,6 @@ summit_gmm_backward <- function(
     z <- mixture::e_step(x, mix$best_model)$z
 
     mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = z)
-
-    if (any(colSums(mix$z) < var_num + 1)) {
-      warning(paste0(
-        "One of the components became too small after removing ",
-        i - 1, " outliers."
-      ))
-      break()
-    }
 
     z <- mix$z
 
