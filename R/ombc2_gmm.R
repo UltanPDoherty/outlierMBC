@@ -6,7 +6,8 @@ ombc2_gmm <- function(
     seed = 123,
     reinit_interval = Inf,
     print_interval = Inf) {
-  x <- as.matrix(x)
+  x0 <- as.matrix(x)
+  x <- x0
 
   obs_num <- nrow(x)
   var_num <- ncol(x)
@@ -61,7 +62,9 @@ ombc2_gmm <- function(
   return(list(
     outlier_rank = outlier_rank,
     rem_dens = rem_dens,
-    z = z
+    z = z,
+    x0 = x0,
+    mnames = mnames
   ))
 }
 
@@ -80,16 +83,16 @@ init_kmpp <- function(x, comp_num, seed) {
 
 # ------------------------------------------------------------------------------
 
-ombc2_gmm_reverse <- function(
+ombc2_gmm_backward <- function(
     ombc2_gmm_out,
-    x,
-    comp_num,
-    max_out,
-    mnames = "VVV",
-    seed = 123,
     print_interval = Inf) {
   outlier_rank <- ombc2_gmm_out$outlier_rank
   z <- ombc2_gmm_out$z
+
+  comp_num <- ncol(z)
+  max_out <- max(outlier_rank)
+  mnames <- ombc2_gmm_out$mnames
+  x <- ombc2_gmm_out$x
 
   x0 <- as.matrix(x)
   x <- x0[(outlier_rank == 0), ]
