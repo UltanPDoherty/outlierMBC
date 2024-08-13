@@ -112,7 +112,7 @@ summit_gmm_backward <- function(
 
   rem_dens <- double(max_out)
   for (i in seq_len(max_out)) {
-    if (i %% print_interval == 0) cat("max_out + 1 - i = ", max_out + 1 - i, "\n")
+    if (max_out+ 1 - i %% print_interval == 0) cat("max_out + 1 - i = ", max_out + 1 - i, "\n")
 
     x <- x0[(outlier_rank == 0) | outlier_rank > max_out - i, ]
     z <- mixture::e_step(x, mix$best_model)$z
