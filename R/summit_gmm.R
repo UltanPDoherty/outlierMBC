@@ -35,6 +35,7 @@ summit_gmm_forward <- function(
   z <- init_kmpp(x, comp_num, seed)
 
   rem_dens <- double(max_out)
+  loglike <- double(max_out)
   outlier_rank <- rep(0, obs_num)
   for (i in seq_len(max_out)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
@@ -84,6 +85,7 @@ summit_gmm_forward <- function(
 
     rem_id <- which.min(dens_vec)
     rem_dens[i] <- dens_vec[rem_id]
+    rem_dens[i] <- mix$best_model$loglik
 
     outlier_rank[!outlier_rank][rem_id] <- i
     x <- x[-rem_id, , drop = FALSE]
@@ -93,6 +95,7 @@ summit_gmm_forward <- function(
   return(list(
     outlier_rank = outlier_rank,
     rem_dens = rem_dens,
+    loglike = loglike,
     z = z,
     x0 = x0,
     mnames = mnames
@@ -122,6 +125,7 @@ summit_gmm_backward <- function(
   var_num <- ncol(x0)
 
   rem_dens <- double(max_out)
+  loglike <- double(max_out)
   for (i in seq_len(max_out)) {
     if (((max_out + 1 - i) %% print_interval) == 0) {
       cat("max_out + 1 - i = ", max_out + 1 - i, "\n")
@@ -148,10 +152,12 @@ summit_gmm_backward <- function(
 
     rem_id <- which.min(dens_vec)
     rem_dens[i] <- dens_vec[rem_id]
+    loglike[i] <- mix$best_model$loglik
   }
 
   return(list(
-    rem_dens = rev(rem_dens)
+    rem_dens = rev(rem_dens),
+    loglike = rev(loglike)
   ))
 }
 
