@@ -62,11 +62,11 @@ summit_gmm_forward <- function(
 
       if (any(colSums(mix$z) < var_num + 1)) {
         warning(paste0(
-          "Reinitialisation did not fix the issue.\n"
+          "Emergency reinitialisation unsuccessful.\n"
         ))
         break()
       } else {
-        message("Reinitialisation fixed this issue.\n")
+        message("Emergency reinitialisation successful.\n")
       }
     }
 
@@ -123,7 +123,9 @@ summit_gmm_backward <- function(
 
   rem_dens <- double(max_out)
   for (i in seq_len(max_out)) {
-    if (max_out+ 1 - i %% print_interval == 0) cat("max_out + 1 - i = ", max_out + 1 - i, "\n")
+    if (((max_out + 1 - i) %% print_interval) == 0) {
+      cat("max_out + 1 - i = ", max_out + 1 - i, "\n")
+    }
 
     x <- x0[(outlier_rank == 0) | outlier_rank > max_out - i, ]
     z <- mixture::e_step(x, mix$best_model)$z
