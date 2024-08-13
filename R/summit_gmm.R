@@ -1,4 +1,22 @@
-ombc2_gmm <- function(
+summit_gmm <- function(
+    x,
+    comp_num,
+    max_out,
+    mnames = "VVV",
+    seed = 123,
+    reinit_interval = Inf,
+    print_interval = Inf) {
+  forward <- summit_gmm_forward(
+    x, comp_num, max_out, mnames, seed, reinit_interval, print_interval
+  )
+  backward <- summit_gmm_backward(forward, print_interval)
+
+  return(list(forward = forward, backward = backward))
+}
+
+# ------------------------------------------------------------------------------
+
+summit_gmm_forward <- function(
     x,
     comp_num,
     max_out,
@@ -70,29 +88,16 @@ ombc2_gmm <- function(
 
 # ------------------------------------------------------------------------------
 
-init_kmpp <- function(x, comp_num, seed) {
-  init <- ClusterR::KMeans_rcpp(x, comp_num, 10, seed = seed)$clusters
-
-  z <- matrix(nrow = nrow(x), ncol = comp_num)
-  for (k in seq_len(comp_num)) {
-    z[, k] <- as.integer(init == k)
-  }
-
-  return(z)
-}
-
-# ------------------------------------------------------------------------------
-
-ombc2_gmm_backward <- function(
-    ombc2_gmm_out,
+summit_gmm_backward <- function(
+    forward,
     print_interval = Inf) {
-  outlier_rank <- ombc2_gmm_out$outlier_rank
-  z <- ombc2_gmm_out$z
+  outlier_rank <- forward$outlier_rank
+  z <- forward$z
 
   comp_num <- ncol(z)
   max_out <- max(outlier_rank)
-  mnames <- ombc2_gmm_out$mnames
-  x <- ombc2_gmm_out$x
+  mnames <- forward$mnames
+  x <- forward$x
 
   x0 <- as.matrix(x)
   x <- x0[(outlier_rank == 0), ]
@@ -104,7 +109,7 @@ ombc2_gmm_backward <- function(
 
   rem_dens <- double(max_out)
   for (i in seq_len(max_out)) {
-    if (i %% print_interval == 0) cat("i = ", i, "\n")
+    if (i %% print_interval == 0) cat("max_out + 1 - i = ", max_out + 1 - i, "\n")
 
     x <- x0[(outlier_rank == 0) | outlier_rank > max_out - i, ]
     z <- mixture::e_step(x, mix$best_model)$z
@@ -140,4 +145,17 @@ ombc2_gmm_backward <- function(
   return(list(
     rem_dens = rem_dens
   ))
+}
+
+# ------------------------------------------------------------------------------
+
+init_kmpp <- function(x, comp_num, seed) {
+  init <- ClusterR::KMeans_rcpp(x, comp_num, 10, seed = seed)$clusters
+
+  z <- matrix(nrow = nrow(x), ncol = comp_num)
+  for (k in seq_len(comp_num)) {
+    z[, k] <- as.integer(init == k)
+  }
+
+  return(z)
 }
