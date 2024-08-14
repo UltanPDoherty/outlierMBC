@@ -102,7 +102,7 @@ summit_gmm_forward <- function(
 # ------------------------------------------------------------------------------
 
 #' @export
-summit_gmm_return <- function(
+summit_gmm_backward <- function(
     forward,
     print_interval = Inf) {
   z <- forward$z
