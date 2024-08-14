@@ -112,16 +112,37 @@ summit_gmm_backward <- function(
   max_out <- max(outlier_rank)
   mnames <- forward$mnames
   x0 <- forward$x0
-
-  x <- x0[(outlier_rank == 0), ]
+  obs_num <- nrow(x0)
+  var_num <- ncol(x0)
 
   loglike <- double(max_out + 1)
 
-  mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = z)
+  #
+
+  subset_bool <- outlier_rank == 0
+  mix <- mixture::gpcm(
+    x0[subset_bool, ],
+    G = comp_num,
+    mnames = mnames,
+    start = z
+  )
   loglike[1] <- mix$best_model$loglik
 
-  obs_num <- nrow(x0)
-  var_num <- ncol(x0)
+  dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
+  for (k in 1:comp_num) {
+    dens_mat[, k] <- dmvnorm(
+      x0,
+      mean = mix$best_model$model_obj[[1]]$mu[[k]],
+      sigma = mix$best_model$model_obj[[1]]$sigs[[k]]
+    )
+  }
+  prop_dens_mat <- sweep(
+    dens_mat, 2, mix$best_model$model_obj[[1]]$pi_gs, "*"
+  )
+  dens_vec <- rowSums(prop_dens_mat)
+  z <- prop_dens_mat / dens_vec
+
+  #
 
   rem_dens <- double(max_out)
   for (i in seq_len(max_out)) {
@@ -129,26 +150,31 @@ summit_gmm_backward <- function(
       cat("max_out + 1 - i = ", max_out + 1 - i, "\n")
     }
 
-    x <- x0[(outlier_rank == 0) | outlier_rank > max_out - i, ]
-    z <- mixture::e_step(x, mix$best_model)$z
-
-    mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = z)
+    subset_bool <- (outlier_rank == 0) | (outlier_rank > max_out - i)
+    mix <- mixture::gpcm(
+      x0[subset_bool, ],
+      G = comp_num,
+      mnames = mnames,
+      start = z[subset_bool, ]
+    )
     loglike[i + 1] <- mix$best_model$loglik
 
-    dens_mat <- matrix(nrow = nrow(x), ncol = comp_num)
+    dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
     for (k in 1:comp_num) {
       dens_mat[, k] <- dmvnorm(
-        x,
+        x0,
         mean = mix$best_model$model_obj[[1]]$mu[[k]],
         sigma = mix$best_model$model_obj[[1]]$sigs[[k]]
       )
     }
-    dens_vec <- as.numeric(
-      dens_mat %*% t(mix$best_model$model_obj[[1]]$pi_gs)
+    prop_dens_mat <- sweep(
+      dens_mat, 2, mix$best_model$model_obj[[1]]$pi_gs, "*"
     )
+    dens_vec <- rowSums(prop_dens_mat)
+    z <- prop_dens_mat / dens_vec
 
-    rem_id <- which.min(dens_vec)
-    rem_dens[i] <- dens_vec[rem_id]
+    return_bool <- (outlier_rank == (max_out - i + 1))
+    rem_dens[i] <- dens_vec[return_bool]
   }
 
   return(list(
