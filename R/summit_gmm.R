@@ -34,7 +34,7 @@ summit_gmm_forward <- function(
 
   z <- init_kmpp(x, comp_num, seed)
 
-  rem_dens <- double(max_out)
+  removal_density <- double(max_out)
   loglike <- double(max_out)
   outlier_rank <- rep(0, obs_num)
   for (i in seq_len(max_out)) {
@@ -81,7 +81,7 @@ summit_gmm_forward <- function(
     )
 
     rem_id <- which.min(dens_vec)
-    rem_dens[i] <- dens_vec[rem_id]
+    removal_density[i] <- dens_vec[rem_id]
     loglike[i] <- mix$best_model$loglik
 
     outlier_rank[!outlier_rank][rem_id] <- i
@@ -90,8 +90,8 @@ summit_gmm_forward <- function(
   }
 
   return(list(
+    removal_density = removal_density,
     outlier_rank = outlier_rank,
-    rem_dens = rem_dens,
     loglike = loglike,
     z = z,
     x0 = x0,
@@ -118,7 +118,8 @@ summit_gmm_backward <- function(
   return_bool <- rep(FALSE, obs_num)
 
   loglike <- double(max_out)
-  rem_dens <- double(max_out)
+  replace_density <- double(max_out)
+  outlier_rank <- rep(0, obs_num)
   for (i in seq_len(max_out)) {
     if (((max_out + 1 - i) %% print_interval) == 0) {
       cat("max_out + 1 - i = ", max_out + 1 - i, "\n")
@@ -146,15 +147,18 @@ summit_gmm_backward <- function(
     dens_vec <- rowSums(prop_dens_mat)
 
     return_bool <- rep(FALSE, obs_num)
-    return_bool[!subset_bool] <- seq_len(sum(!subset_bool)) == which.max(dens_vec[!subset_bool])
-    rem_dens[i] <- dens_vec[return_bool]
+    return_bool[!subset_bool] <-
+      seq_len(sum(!subset_bool)) == which.max(dens_vec[!subset_bool])
+    replace_density[i] <- dens_vec[return_bool]
+    outlier_rank[return_bool] <- max_out - i + 1
 
     subset_bool <- subset_bool | return_bool
     z <- (prop_dens_mat / dens_vec) [subset_bool, ]
   }
 
   return(list(
-    rem_dens = rev(rem_dens),
+    replace_density = rev(replace_density),
+    outlier_rank = outlier_rank,
     loglike = rev(loglike)
   ))
 }
