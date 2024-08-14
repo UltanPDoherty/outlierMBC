@@ -175,6 +175,68 @@ summit_gmm_backward <- function(
 
     return_bool <- (outlier_rank == (max_out - i + 1))
     rem_dens[i] <- dens_vec[return_bool]
+
+    if (i > 240) browser()
+  }
+
+  return(list(
+    rem_dens = rev(rem_dens),
+    loglike = rev(loglike)
+  ))
+}
+
+# ------------------------------------------------------------------------------
+
+#' @export
+summit_gmm_return <- function(
+    forward,
+    print_interval = Inf) {
+  z <- forward$z
+
+  comp_num <- ncol(z)
+  max_out <- max(forward$outlier_rank)
+  mnames <- forward$mnames
+  x0 <- forward$x0
+  obs_num <- nrow(x0)
+  var_num <- ncol(x0)
+
+  subset_bool <- forward$outlier_rank == 0
+  return_bool <- rep(FALSE, obs_num)
+
+  loglike <- double(max_out)
+  rem_dens <- double(max_out)
+  for (i in seq_len(max_out)) {
+    if (((max_out + 1 - i) %% print_interval) == 0) {
+      cat("max_out + 1 - i = ", max_out + 1 - i, "\n")
+    }
+
+    mix <- mixture::gpcm(
+      x0[subset_bool, ],
+      G = comp_num,
+      mnames = mnames,
+      start = z
+    )
+    loglike[i] <- mix$best_model$loglik
+
+    dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
+    for (k in 1:comp_num) {
+      dens_mat[, k] <- dmvnorm(
+        x0,
+        mean = mix$best_model$model_obj[[1]]$mu[[k]],
+        sigma = mix$best_model$model_obj[[1]]$sigs[[k]]
+      )
+    }
+    prop_dens_mat <- sweep(
+      dens_mat, 2, mix$best_model$model_obj[[1]]$pi_gs, "*"
+    )
+    dens_vec <- rowSums(prop_dens_mat)
+
+    return_bool <- rep(FALSE, obs_num)
+    return_bool[!subset_bool] <- seq_len(sum(!subset_bool)) == which.max(dens_vec[!subset_bool])
+    rem_dens[i] <- dens_vec[return_bool]
+
+    subset_bool <- subset_bool | return_bool
+    z <- (prop_dens_mat / dens_vec) [subset_bool, ]
   }
 
   return(list(
