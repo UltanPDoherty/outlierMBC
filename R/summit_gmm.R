@@ -185,6 +185,90 @@ summit_gmm_backward <- function(
 
 # ------------------------------------------------------------------------------
 
+#' @export
+summit_gmm_return <- function(
+    forward,
+    print_interval = Inf) {
+  outlier_rank <- forward$outlier_rank
+  z <- forward$z
+
+  comp_num <- ncol(z)
+  max_out <- max(outlier_rank)
+  mnames <- forward$mnames
+  x0 <- forward$x0
+  obs_num <- nrow(x0)
+  var_num <- ncol(x0)
+
+  loglike <- double(max_out + 1)
+
+  #
+
+  subset_bool <- outlier_rank == 0
+  mix <- mixture::gpcm(
+    x0[subset_bool, ],
+    G = comp_num,
+    mnames = mnames,
+    start = z
+  )
+  loglike[1] <- mix$best_model$loglik
+
+  dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
+  for (k in 1:comp_num) {
+    dens_mat[, k] <- dmvnorm(
+      x0,
+      mean = mix$best_model$model_obj[[1]]$mu[[k]],
+      sigma = mix$best_model$model_obj[[1]]$sigs[[k]]
+    )
+  }
+  prop_dens_mat <- sweep(
+    dens_mat, 2, mix$best_model$model_obj[[1]]$pi_gs, "*"
+  )
+  dens_vec <- rowSums(prop_dens_mat)
+  z <- prop_dens_mat / dens_vec
+
+  #
+
+  rem_dens <- double(max_out)
+  for (i in seq_len(max_out)) {
+    if (((max_out + 1 - i) %% print_interval) == 0) {
+      cat("max_out + 1 - i = ", max_out + 1 - i, "\n")
+    }
+
+    subset_bool <- (outlier_rank == 0) | (outlier_rank > max_out - i)
+    mix <- mixture::gpcm(
+      x0[subset_bool, ],
+      G = comp_num,
+      mnames = mnames,
+      start = z[subset_bool, ]
+    )
+    loglike[i + 1] <- mix$best_model$loglik
+
+    dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
+    for (k in 1:comp_num) {
+      dens_mat[, k] <- dmvnorm(
+        x0,
+        mean = mix$best_model$model_obj[[1]]$mu[[k]],
+        sigma = mix$best_model$model_obj[[1]]$sigs[[k]]
+      )
+    }
+    prop_dens_mat <- sweep(
+      dens_mat, 2, mix$best_model$model_obj[[1]]$pi_gs, "*"
+    )
+    dens_vec <- rowSums(prop_dens_mat)
+    z <- prop_dens_mat / dens_vec
+
+    return_bool <- (outlier_rank == (max_out - i + 1))
+    rem_dens[i] <- dens_vec[return_bool]
+  }
+
+  return(list(
+    rem_dens = rev(rem_dens),
+    loglike = rev(loglike)
+  ))
+}
+
+# ------------------------------------------------------------------------------
+
 init_kmpp <- function(x, comp_num, seed) {
   init <- ClusterR::KMeans_rcpp(x, comp_num, 10, seed = seed)$clusters
 
