@@ -188,7 +188,7 @@ use_cpop <- function(y, search_centre) {
 
   search_radius <- min(c(
     floor((y_len - search_centre - 1) / 3),
-    floor((search_centre - 1) / 3)
+    floor((search_centre - 2) / 3)
   ))
 
   upper <- search_centre + search_radius
