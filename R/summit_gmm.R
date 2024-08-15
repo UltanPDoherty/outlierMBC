@@ -1,5 +1,5 @@
 #' @export
-outcast_gmm_forward <- function(
+outcast_gmm <- function(
     x,
     comp_num,
     max_out,
@@ -71,40 +71,43 @@ outcast_gmm_forward <- function(
   }
 
   return(list(
-    removal_density = removal_density,
+    densities = removal_density,
     outlier_rank = outlier_rank,
-    loglike = loglike,
-    z = z,
-    x0 = x0,
-    mnames = mnames
+    loglike = loglike
   ))
 }
 
 # ------------------------------------------------------------------------------
 
 #' @export
-outcast_gmm_backward <- function(
-    forward,
+outback_gmm <- function(
+    x,
+    outlier_rank,
+    comp_num,
+    turning_point = NULL,
+    mnames = "VVV",
+    seed = 123,
     print_interval = Inf
 ) {
-  z <- forward$z
-
-  comp_num <- ncol(z)
-  max_out <- max(forward$outlier_rank)
-  mnames <- forward$mnames
-  x0 <- forward$x0
+  x0 <- as.matrix(x)
   obs_num <- nrow(x0)
   var_num <- ncol(x0)
 
-  subset_bool <- forward$outlier_rank == 0
+  if (is.null(turning_point)) {
+    turning_point <- max(outlier_rank)
+  }
+
+  subset_bool <- outlier_rank == 0 | outlier_rank > turning_point
   return_bool <- rep(FALSE, obs_num)
 
-  loglike <- double(max_out)
-  replace_density <- double(max_out)
+  z <- init_kmpp(x0[subset_bool, ], comp_num, seed)
+
+  loglike <- double(turning_point)
+  replace_density <- double(turning_point)
   outlier_rank <- rep(0, obs_num)
-  for (i in seq_len(max_out)) {
-    if (((max_out + 1 - i) %% print_interval) == 0) {
-      cat("max_out + 1 - i = ", max_out + 1 - i, "\n")
+  for (i in seq_len(turning_point)) {
+    if (((turning_point + 1 - i) %% print_interval) == 0) {
+      cat("turning_point + 1 - i = ", turning_point + 1 - i, "\n")
     }
 
     mix <- mixture::gpcm(
@@ -132,14 +135,14 @@ outcast_gmm_backward <- function(
     return_bool[!subset_bool] <-
       seq_len(sum(!subset_bool)) == which.max(dens_vec[!subset_bool])
     replace_density[i] <- dens_vec[return_bool]
-    outlier_rank[return_bool] <- max_out - i + 1
+    outlier_rank[return_bool] <- turning_point - i + 1
 
     subset_bool <- subset_bool | return_bool
     z <- (prop_dens_mat / dens_vec) [subset_bool, ]
   }
 
   return(list(
-    replace_density = rev(replace_density),
+    densities = rev(replace_density),
     outlier_rank = outlier_rank,
     loglike = rev(loglike)
   ))
