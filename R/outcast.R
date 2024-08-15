@@ -164,26 +164,7 @@ init_kmpp <- function(x, comp_num, seed) {
 # ------------------------------------------------------------------------------
 
 #' @export
-choose_outlier_number <- function(densities, changepoint, sd_factor = 1) {
-
-  mod <- lm(densities[1:changepoint] ~ seq_len(changepoint))
-  fitted <- mod$coefficients[1] + seq_along(densities) * mod$coefficients[2]
-  res_sd <- sd(mod$residual)
-  upper_bound <- fitted + sd_factor * res_sd
-
-  outlier_num <- max(which(densities < upper_bound))
-
-  return(list(
-    outlier_num = outlier_num,
-    upper_bound = upper_bound,
-    fitted = fitted
-  ))
-}
-
-# ------------------------------------------------------------------------------
-
-#' @export
-use_cpop <- function(y, search_centre) {
+find_density_change <- function(y, search_centre) {
   y_len <- length(y)
   outliers_removed <- seq_len(y_len)
 

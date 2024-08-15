@@ -15,13 +15,9 @@
 ## usethis namespace: start
 #' @importFrom ClusterR KMeans_rcpp
 #' @importFrom cpop cpop
-#' @importFrom flexCWM cwm
 #' @importFrom mixture gpcm
 #' @importFrom mvtnorm dmvnorm
-#' @importFrom spatstat.univar ewcdf
-#' @importFrom stats dnorm
 #' @importFrom stats lm
-#' @importFrom stats quantile
 #' @importFrom stats sd
 ## usethis namespace: end
 NULL

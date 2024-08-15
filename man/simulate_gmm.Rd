@@ -55,7 +55,5 @@ gmm <- simulate_gmm(
   range_multiplier = 1.5
 )
 
-ombc_gmm <- ombc_gmm(gmm[, 1:2], comp_num = 3, max_out = 80)
-
 plot(gmm[, c("X1", "X2")], col = gmm$G + 1, pch = gmm$G + 1)
 }

@@ -1,6 +1,6 @@
-Package: outlierMBC
-Title: Iterative Detection & Identification of Outliers for Model-Based Clustering
-Version: 0.0.0.0002
+Package: outcast
+Title: OUTlier Classification And Sequential Trimming
+Version: 0.0.0.0001
 Authors@R: 
     person("Ultán", "Doherty", , "dohertyu@tcd.ie", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-1791-395X"))
@@ -12,9 +12,7 @@ RoxygenNote: 7.3.2
 Imports: 
     ClusterR,
     cpop,
-    flexCWM,
     ggplot2,
     mixture,
     mvtnorm,
-    spatstat.univar,
     stats
