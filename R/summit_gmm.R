@@ -195,13 +195,13 @@ use_cpop <- function(y, search_centre) {
   lower <- search_centre - search_radius
   search_interval <- c(lower, upper)
 
-  width <- floor(y_len / 20)
-  left <- right <- integer(60L)
+  width <- floor(y_len / 10)
+  left <- right <- integer(y_len)
   sd_vec <- double(y_len)
   for (i in seq_len(y_len)) {
     left[i] <- min(max(c(i - width, 1)), y_len - 2 * width)
     right[i] <- max(min(c(i + width, y_len)), 1 + 2 * width)
-    sd_vec[i] <- sqrt(mean(diff(diff(y[left[i]:right[i]]))^2)/6)
+    sd_vec[i] <- sqrt(mean(diff(diff(y[left[i]:right[i]]))^2) / 6)
   }
 
   cpop_out <- suppressMessages(cpop::cpop(
