@@ -191,6 +191,12 @@ use_cpop <- function(y, search_centre) {
     floor((search_centre - 2) / 3)
   ))
 
+  if (search_radius == 0 & search_centre < 5) {
+    warning("search_radius == 0. Try search_centre > 4.\n")
+  } else if (search_radius == 0 & search_centre > (y_len - 4)) {
+    warning(paste0("search_radius == 0. Try search_centre < ", y_len - 3, ".\n"))
+  }
+
   upper <- search_centre + search_radius
   lower <- search_centre - search_radius
   search_interval <- c(lower, upper)
