@@ -1,24 +1,5 @@
 #' @export
-summit_gmm <- function(
-    x,
-    comp_num,
-    max_out,
-    mnames = "VVV",
-    seed = 123,
-    reinit_interval = Inf,
-    print_interval = Inf) {
-  forward <- summit_gmm_forward(
-    x, comp_num, max_out, mnames, seed, reinit_interval, print_interval
-  )
-  backward <- summit_gmm_backward(forward, print_interval)
-
-  return(list(forward = forward, backward = backward))
-}
-
-# ------------------------------------------------------------------------------
-
-#' @export
-summit_gmm_forward <- function(
+outcast_gmm_forward <- function(
     x,
     comp_num,
     max_out,
@@ -102,9 +83,10 @@ summit_gmm_forward <- function(
 # ------------------------------------------------------------------------------
 
 #' @export
-summit_gmm_backward <- function(
+outcast_gmm_backward <- function(
     forward,
-    print_interval = Inf) {
+    print_interval = Inf
+) {
   z <- forward$z
 
   comp_num <- ncol(z)
