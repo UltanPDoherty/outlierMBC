@@ -218,14 +218,29 @@ use_cpop <- function(y, search_centre) {
 
   stopifnot(length(cpop_out@changepoints) == 3)
 
+  choice <- cpop_out@changepoints[2]
+
   cat("search centre = ", search_centre)
   cat(", search radius = ", search_radius)
   cat(", search interval = ", search_interval)
   cat(", search choice = ", cpop_out@changepoints[2], "\n")
 
+  gg <- ggplot2::ggplot(cbind(x = seq_len(y_len), y = y), ggplot2::aes(x = x, y = y)) +
+    ggplot2::geom_line() +
+    ggplot2::geom_vline(xintercept = search_interval, linetype = "dashed") +
+    ggplot2::geom_vline(xintercept = choice) +
+    ggplot2::labs(
+      title = paste0(
+        "choice = ", choice,
+        " (search_interval = [", search_interval[1],
+        ", ", search_interval[2], "])"
+      )
+    )
+
   return(list(
-    choice = cpop_out@changepoints[2],
+    choice = choice,
     search_interval = search_interval,
-    cpop_out = cpop_out
+    cpop_out = cpop_out,
+    plot = gg
   ))
 }
