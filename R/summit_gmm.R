@@ -195,13 +195,19 @@ use_cpop <- function(y, search_centre) {
   lower <- search_centre - search_radius
   search_interval <- c(lower, upper)
 
-  sd1 <- sqrt(mean(diff(diff(y[1:search_centre]))^2)/6)
-  sd2 <- sqrt(mean(diff(diff(y[(search_centre + 1):y_len]))^2)/6)
+  width <- floor(y_len / 20)
+  left <- right <- integer(60L)
+  sd_vec <- double(y_len)
+  for (i in seq_len(y_len)) {
+    left[i] <- min(max(c(i - width, 1)), y_len - 2 * width)
+    right[i] <- max(min(c(i + width, y_len)), 1 + 2 * width)
+    sd_vec[i] <- sqrt(mean(diff(diff(y[left[i]:right[i]]))^2)/6)
+  }
 
   cpop_out <- suppressMessages(cpop::cpop(
     y, seq_len(y_len),
     grid = lower:upper, minseglen = 2 * search_radius + 1,
-    sd = c(rep(sd1, search_centre), rep(sd2, y_len - search_centre))
+    sd = sd_vec
   ))
 
   stopifnot(length(cpop_out@changepoints) == 3)
