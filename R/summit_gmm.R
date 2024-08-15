@@ -215,3 +215,5 @@ use_cpop <- function(y, search_centre) {
     choice = cpop_out@changepoints[2],
     search_interval = search_interval,
     cpop_out = cpop_out
+  ))
+}
