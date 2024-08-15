@@ -160,3 +160,38 @@ init_kmpp <- function(x, comp_num, seed) {
 
   return(z)
 }
+# ------------------------------------------------------------------------------
+
+#' @export
+use_cpop <- function(y, search_centre) {
+  y_len <- length(y)
+
+  search_radius <- min(c(
+    floor((y_len - search_centre - 1) / 3),
+    floor((y_len - 1) / 3)
+  ))
+
+  upper <- search_centre + search_radius
+  lower <- search_centre - search_radius
+  search_interval <- c(lower, upper)
+
+  sd1 <- sqrt(mean(diff(diff(y[1:search_centre]))^2)/6)
+  sd2 <- sqrt(mean(diff(diff(y[(search_centre + 1):y_len]))^2)/6)
+
+  cpop_out <- suppressMessages(cpop::cpop(
+    y, seq_len(y_len),
+    grid = lower:upper, minseglen = 2 * search_radius + 1,
+    sd = c(rep(sd1, search_centre), rep(sd2, y_len - search_centre))
+  ))
+
+  stopifnot(length(cpop_out@changepoints) == 3)
+
+  cat("search centre = ", search_centre)
+  cat(", search radius = ", search_radius)
+  cat(", search interval = ", search_interval)
+  cat(", search choice = ", cpop_out@changepoints[2], "\n")
+
+  return(list(
+    choice = cpop_out@changepoints[2],
+    search_interval = search_interval,
+    cpop_out = cpop_out
