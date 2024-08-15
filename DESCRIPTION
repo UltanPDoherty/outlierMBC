@@ -13,6 +13,7 @@ Imports:
     ClusterR,
     cpop,
     flexCWM,
+    ggplot2,
     mixture,
     mvtnorm,
     spatstat.univar,
