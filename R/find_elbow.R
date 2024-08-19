@@ -1,3 +1,14 @@
+#' @title Find the elbow using a two-piece linear regression model.
+#' 
+#' @param y Numeric vector.
+#' @param search_centre Centre of changepoint search interval.
+#' @param concave Logical value.
+#' 
+#' @return List:
+#' * $choice: a numeric value indicating the elbow's location.
+#' * $search_interval: a numeric vector of length 2 indicating the minimum and
+#'                     maximum values considered for the changepoint.
+#'
 #' @export
 find_elbow <- function(y, search_centre = NULL, concave = TRUE) {
   y_len <- length(y)
