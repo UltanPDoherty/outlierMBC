@@ -1,7 +1,16 @@
 #' @export
-find_density_change <- function(y, search_centre) {
+find_density_change <- function(y, search_centre = NULL, concave = TRUE) {
   y_len <- length(y)
   outliers_removed <- seq_len(y_len)
+  
+  if (is.null(search_centre)) {
+    linmod <- stats::lm(y ~ seq_len(y_len))
+    if (concave) {
+      search_centre == which.min(linmod$residuals)
+    } else {
+      search_centre == which.max(linmod$residuals)
+    }
+  }
   
   search_radius <- min(c(
     floor((y_len - search_centre - 1) / 3),
