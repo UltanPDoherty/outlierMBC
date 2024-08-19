@@ -1,5 +1,5 @@
 #' @export
-find_density_change <- function(y, search_centre = NULL, concave = TRUE) {
+find_elbow <- function(y, search_centre = NULL, concave = TRUE) {
   y_len <- length(y)
   outliers_removed <- seq_len(y_len)
   
