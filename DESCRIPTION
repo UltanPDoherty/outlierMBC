@@ -1,6 +1,6 @@
 Package: outcast
 Title: OUTlier Classification And Sequential Trimming
-Version: 0.0.0.0001
+Version: 0.0.0.0002
 Authors@R: 
     person("Ultán", "Doherty", , "dohertyu@tcd.ie", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-1791-395X"))
