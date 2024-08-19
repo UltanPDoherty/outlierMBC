@@ -17,9 +17,9 @@ find_elbow <- function(y, search_centre = NULL, concave = TRUE) {
   if (is.null(search_centre)) {
     linmod <- stats::lm(y ~ seq_len(y_len))
     if (concave) {
-      search_centre == which.min(linmod$residuals)
+      search_centre <- which.min(linmod$residuals)
     } else {
-      search_centre == which.max(linmod$residuals)
+      search_centre <- which.max(linmod$residuals)
     }
   }
   
