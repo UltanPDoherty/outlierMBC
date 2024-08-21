@@ -27,11 +27,11 @@ fit_gmm <- function(
   labels <- rep(0, nrow(x0))
   
   if (is.null(init_z)) {
-    init_z <- init_kmpp(x0[!outlier_bool], comp_num, seed)
+    init_z <- init_kmpp(x0[!outlier_bool, ], comp_num, seed)
   }
   
   mix <- mixture::gpcm(
-    x0[!outlier_bool],
+    x0[!outlier_bool, ],
     G = comp_num,
     mnames = mnames,
     start = init_z,
