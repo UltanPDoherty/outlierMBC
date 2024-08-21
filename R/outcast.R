@@ -1,3 +1,22 @@
+#' @title Alternate between trimming the lowest density point and refitting a
+#' Gaussian mixture model.
+#' 
+#' @description
+#' Record the order and mixture density of the trimmed points.
+#' 
+#' @param x Data set.
+#' @param comp_num Number of mixture components.
+#' @param max_out Maximum number of outliers.
+#' @param mnames Gaussian mixture model covariance structure.
+#' @param seed Seed.
+#' @param reinit_interval Number of iterations between proposed reinitialisations.
+#' @param print_interval Number of iterations between print statements.
+#'
+#' @return List:
+#' * $densities
+#' * $outlier_rank
+#' * $loglike
+#' 
 #' @export
 outcast_gmm <- function(
     x,
@@ -79,6 +98,18 @@ outcast_gmm <- function(
 
 # ------------------------------------------------------------------------------
 
+#' @title Alternate between returning the highest density trimmed point and 
+#' refitting a Gaussian mixture model.
+#' 
+#' @inheritParams outcast_gmm
+#' @param outlier_rank Order in which points were trimmed / removed.
+#' @param turning_point Point at which to start returning points.
+#'
+#' @return List:
+#' * $densities
+#' * $outlier_rank
+#' * $loglike
+#' 
 #' @export
 outback_gmm <- function(
     x,
