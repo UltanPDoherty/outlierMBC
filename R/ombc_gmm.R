@@ -90,11 +90,19 @@ ombc_gmm <- function(
     }
 
     if (any(colSums(mix$z) < var_num + 1)) {
-      warning(paste0(
+      message(paste0(
         "One of the components became too small after removing ",
-        i - 1, " outliers."
+        i - 1, " outliers.\n"
       ))
-      break()
+
+      alt_z <- init_kmpp(x, comp_num, seed)
+      mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = alt_z)
+
+      if (any(colSums(mix$z) < var_num + 1)) {
+        stop("Emergency reinitialisation unsuccessful.\n")
+      } else {
+        message("Emergency reinitialisation successful.\n")
+      }
     }
 
     dd <- distrib_diff_gmm(
