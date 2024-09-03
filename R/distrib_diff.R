@@ -19,11 +19,31 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
 
   distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
+  mahala_mat <- matrix(nrow = obs_num, ncol = comp_num)
   for (g in seq_len(comp_num)) {
     dd_g <- distrib_diff_mahalanobis(x, z[, g], mu[[g]], sigma[[g]], logdet[g])
     distrib_diff_mat[g, ] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
+    mahala_mat[, g] <- dd_g$mahalas
   }
+
+  var_num <- ncol(x)
+  n_vec <- colSums(z)
+  w_mat <- sweep(z, 2, n_vec, "/")
+  mahala_ewcdf_func <- spatstat.univar::ewcdf(c(mahala_mat), c(w_mat))
+  param1 <- var_num / 2
+  param2 <- (n_vec - var_num - 1) / 2
+  eps <- 1 / 1000
+  check_seq <- seq(eps, 1, eps)
+  checkpoints <- qbeta(check_seq, param1, min(param2))
+  mahala_ewcdf_vals <- mahala_ewcdf_func(checkpoints)
+  betamix_cdf_mat <- matrix(nrow = length(checkpoints), ncol = comp_num)
+  betamix_cdf_vals <- double(length(checkpoints))
+  for (g in seq_len(comp_num)) {
+    betamix_cdf_mat[, g] <- stats::pbeta(checkpoints, param1, param2[g])
+    betamix_cdf_vals <- betamix_cdf_vals + betamix_cdf_mat[, g] * prop[g]
+  }
+  betamix_diff <- max(abs(mahala_ewcdf_vals - betamix_cdf_vals))
 
   mix_dens <- dens_mat %*% t(prop)
 
@@ -36,7 +56,8 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
     distrib_diff_mat = distrib_diff_mat,
     distrib_diff_vec = distrib_diff_vec,
     choice_id = choice_id,
-    min_dens = min_dens
+    min_dens = min_dens,
+    betamix_diff = betamix_diff
   ))
 }
 
@@ -88,7 +109,8 @@ distrib_diff_mahalanobis <- function(
 
   return(list(
     diff = distrib_diff_g_x,
-    dens = dens_g_x
+    dens = dens_g_x,
+    mahalas = scaled_mahalas_g
   ))
 }
 

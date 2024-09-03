@@ -60,6 +60,7 @@ ombc_gmm <- function(
 
   min_diff <- rep(Inf, track_num)
   min_diff_z <- list()
+  betamix_diff <- c()
   loglike <- c()
   min_dens <- c()
   distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
@@ -116,6 +117,7 @@ ombc_gmm <- function(
 
     distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
     distrib_diff_mat[i, ] <- dd$distrib_diff_vec
+    betamix_diff[i] <- dd$betamix_diff
 
     for (j in 1:track_num) {
       if (distrib_diff_mat[i, j] < min_diff[j]) {
@@ -174,7 +176,8 @@ ombc_gmm <- function(
     labels = labels,
     final_gmm = mix,
     loglike = loglike,
-    min_dens = min_dens
+    min_dens = min_dens,
+    betamix_diff = betamix_diff
   ))
 }
 
