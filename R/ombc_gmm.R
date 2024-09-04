@@ -54,7 +54,7 @@ ombc_gmm <- function(
   obs_num <- nrow(x0)
   track_num <- 4 + 1
 
-  dist_mat0 <- as.matrix(dist(x0))
+  dist_mat0 <- as.matrix(stats::dist(x0))
   dist_mat <- dist_mat0
   # z <- init_kmpp(x, comp_num, seed)
   z <- init_hc(dist_mat, comp_num)
@@ -202,7 +202,7 @@ init_kmpp <- function(x, comp_num, seed) {
 # ------------------------------------------------------------------------------
 
 init_hc <- function(dist_mat, comp_num) {
-  hc <- stats::hclust(as.dist(dist_mat), method = "ward.D2")
+  hc <- stats::hclust(stats::as.dist(dist_mat), method = "ward.D2")
   init <- stats::cutree(hc, k = comp_num)
 
   z <- matrix(nrow = nrow(dist_mat), ncol = comp_num)
