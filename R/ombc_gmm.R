@@ -56,8 +56,8 @@ ombc_gmm <- function(
 
   dist_mat0 <- as.matrix(dist(x0))
   dist_mat <- dist_mat0
-  z <- init_kmpp(x, comp_num, seed)
-  # z <- init_hc(dist_mat, comp_num)
+  # z <- init_kmpp(x, comp_num, seed)
+  z <- init_hc(dist_mat, comp_num)
 
   var_num <- ncol(x)
 
@@ -80,8 +80,8 @@ ombc_gmm <- function(
     )
 
     if (i %% reinit_interval == 0) {
-      alt_z <- init_kmpp(x, comp_num, seed)
-      # alt_z <- init_hc(dist_mat, comp_num)
+      # alt_z <- init_kmpp(x, comp_num, seed)
+      alt_z <- init_hc(dist_mat, comp_num)
       alt_mix <- mixture::gpcm(
         x,
         G = comp_num, mnames = mnames,
@@ -100,8 +100,8 @@ ombc_gmm <- function(
         i - 1, " outliers.\n"
       ))
 
-      alt_z <- init_kmpp(x, comp_num, seed)
-      # alt_z <- init_hc(dist_mat, comp_num)
+      # alt_z <- init_kmpp(x, comp_num, seed)
+      alt_z <- init_hc(dist_mat, comp_num)
       mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = alt_z)
 
       if (any(colSums(mix$z) < var_num + 1)) {
@@ -138,7 +138,7 @@ ombc_gmm <- function(
     x <- x[-dd$choice_id, , drop = FALSE]
     z <- mix$z[-dd$choice_id, , drop = FALSE]
 
-    # dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
+    dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
   }
 
   outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1
@@ -156,8 +156,8 @@ ombc_gmm <- function(
       start = min_diff_z[[j]], seed = seed
     )
 
-    alt_z <- init_kmpp(x0[!outlier_bool[, j], ], comp_num, seed)
-    # alt_z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
+    # alt_z <- init_kmpp(x0[!outlier_bool[, j], ], comp_num, seed)
+    alt_z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
     alt_mix <- mixture::gpcm(
       x0[!outlier_bool[, j], ],
       G = comp_num, mnames = mnames,
