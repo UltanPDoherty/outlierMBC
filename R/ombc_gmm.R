@@ -52,7 +52,7 @@ ombc_gmm <- function(
   x0 <- x
 
   obs_num <- nrow(x0)
-  track_num <- 6
+  track_num <- 4
 
   dist_mat0 <- as.matrix(dist(x0))
   dist_mat <- dist_mat0
