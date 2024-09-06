@@ -35,8 +35,6 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   param2 <- (n_vec - var_num - 1) / 2
   eps <- 1 / 1000
   check_seq <- seq(eps, 1, eps)
-  # checkpoints <- qbeta(check_seq, param1, min(param2))
-  # mahala_ewcdf_vals <- mahala_ewcdf_func(checkpoints)
   mahala_ewcdf_vals <- mahala_ewcdf_func(check_seq)
   betamix_cdf_mat <- matrix(nrow = length(check_seq), ncol = comp_num)
   betamix_cdf_vals <- double(length(check_seq))
@@ -44,7 +42,10 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
     betamix_cdf_mat[, g] <- stats::pbeta(check_seq, param1, param2[g])
     betamix_cdf_vals <- betamix_cdf_vals + betamix_cdf_mat[, g] * prop[g]
   }
-  betamix_diff <- max(abs(mahala_ewcdf_vals - betamix_cdf_vals))
+  betamix_diff <- c(
+    max(abs(mahala_ewcdf_vals - betamix_cdf_vals)),
+    median(abs(mahala_ewcdf_vals - betamix_cdf_vals))
+  )
 
   mix_dens <- dens_mat %*% t(prop)
 
