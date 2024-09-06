@@ -33,7 +33,7 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   mahala_ewcdf_func <- spatstat.univar::ewcdf(c(mahala_mat), c(w_mat))
   param1 <- var_num / 2
   param2 <- (n_vec - var_num - 1) / 2
-  eps <- 1 / 100
+  eps <- 1 / 1000
   check_seq <- seq(eps, 1, eps)
   # checkpoints <- qbeta(check_seq, param1, min(param2))
   # mahala_ewcdf_vals <- mahala_ewcdf_func(checkpoints)
