@@ -88,7 +88,7 @@ ombc_gmm <- function(
       )
 
       if (alt_mix$best_model$loglik > mix$best_model$loglik) {
-        cat(paste0("Iteration ", i, ": k-means++ reinitialisation accepted.\n"))
+        cat(paste0("Iteration ", i, ": reinitialisation accepted.\n"))
         mix <- alt_mix
       }
     }
@@ -163,7 +163,7 @@ ombc_gmm <- function(
     )
 
     if (alt_mix$best_model$loglik > mix[[j]]$best_model$loglik) {
-      cat(paste0("Final k-means++ reinitialisation, ", j, " accepted.\n"))
+      cat(paste0("Final reinitialisation, ", j, " accepted.\n"))
       mix[[j]] <- alt_mix
     }
   }
