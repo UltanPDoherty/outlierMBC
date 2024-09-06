@@ -44,7 +44,9 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   }
   betamix_diff <- c(
     max(abs(mahala_ewcdf_vals - betamix_cdf_vals)),
-    median(abs(mahala_ewcdf_vals - betamix_cdf_vals))
+    median(abs(mahala_ewcdf_vals - betamix_cdf_vals)),
+    max(abs(mahala_ewcdf_vals - betamix_cdf_vals)[seq(10, 1000, by = 10)]),
+    median(abs(mahala_ewcdf_vals - betamix_cdf_vals)[seq(10, 1000, by = 10)])
   )
 
   mix_dens <- dens_mat %*% t(prop)
