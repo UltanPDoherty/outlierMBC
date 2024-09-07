@@ -34,35 +34,35 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   param1 <- var_num / 2
   param2 <- (n_vec - var_num - 1) / 2
   eps <- 1 / 1000
-  check_seq <- seq(eps, 1, eps)
-  mahala_ewcdf_vals <- mahala_ewcdf_func(check_seq)
-  betamix_cdf_mat <- matrix(nrow = length(check_seq), ncol = comp_num)
-  betamix_cdf_vals <- rep(0, length(check_seq))
+  # check_seq <- seq(eps, 1, eps)
+  # mahala_ewcdf_vals <- mahala_ewcdf_func(check_seq)
+  # betamix_cdf_mat <- matrix(nrow = length(check_seq), ncol = comp_num)
+  # betamix_cdf_vals <- rep(0, length(check_seq))
   check_quants <- spatstat.univar::quantile.ewcdf(
-    mahala_ewcdf_func, probs = c(0.25, 0.5, 0.75, 1)
+    mahala_ewcdf_func, probs = seq(0, 1, 0.1)
   )
-  mahala_ewcdf_vals2 <- mahala_ewcdf_func(check_quants)
-  betamix_cdf_mat2 <- matrix(nrow = 4, ncol = comp_num)
-  betamix_cdf_vals2 <- rep(0, 4)
+  mahala_ewcdf_vals <- mahala_ewcdf_func(check_quants)
+  betamix_cdf_mat <- matrix(nrow = 11, ncol = comp_num)
+  betamix_cdf_vals <- rep(0, 11)
   for (g in seq_len(comp_num)) {
-    betamix_cdf_mat[, g] <- stats::pbeta(check_seq, param1, param2[g])
-    betamix_cdf_vals <- betamix_cdf_vals + betamix_cdf_mat[, g] * prop[g]
-    betamix_cdf_mat2[, g] <- stats::pbeta(check_quants, param1, param2[g])
-    betamix_cdf_vals2 <- betamix_cdf_vals2 + betamix_cdf_mat2[, g] * prop[g]
+    # betamix_cdf_mat[, g] <- stats::pbeta(check_seq, param1, param2[g])
+    # betamix_cdf_vals <- betamix_cdf_vals + betamix_cdf_mat[, g] * prop[g]
+    betamix_cdf_mat[, g] <- stats::pbeta(check_quants, param1, param2[g])
+    betamix_cdf_vals <- betamix_cdf_vals2 + betamix_cdf_mat2[, g] * prop[g]
   }
-  betamix_diff <- c(
-    quantile(abs(mahala_ewcdf_vals - betamix_cdf_vals), c(0.75, 1)),
-    quantile(
-      abs(mahala_ewcdf_vals - betamix_cdf_vals)[seq(10, 1000, by = 10)],
-      c(0.75, 1)
-    )
-  )
-  whichmax <- c(
-    which.max(abs(mahala_ewcdf_vals - betamix_cdf_vals)),
-    which.max(abs(mahala_ewcdf_vals - betamix_cdf_vals)[seq(10, 1000, by = 10)])
-  )
+  # betamix_diff <- c(
+  #   quantile(abs(mahala_ewcdf_vals - betamix_cdf_vals), c(0.75, 1)),
+  #   quantile(
+  #     abs(mahala_ewcdf_vals - betamix_cdf_vals)[seq(10, 1000, by = 10)],
+  #     c(0.75, 1)
+  #   )
+  # # )
+  # whichmax <- c(
+  #   which.max(abs(mahala_ewcdf_vals - betamix_cdf_vals)),
+  #   which.max(abs(mahala_ewcdf_vals - betamix_cdf_vals)[seq(10, 1000, by = 10)])
+  # )
 
-  betamix_diff <- c(betamix_diff, abs(mahala_ewcdf_vals2 - betamix_cdf_vals2))
+  betamix_diff <- abs(mahala_ewcdf_vals - betamix_cdf_vals)
 
   mix_dens <- dens_mat %*% t(prop)
 
@@ -77,7 +77,7 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
     choice_id = choice_id,
     min_dens = min_dens,
     betamix_diff = betamix_diff,
-    whichmax = whichmax
+    check_quants = check_quants
   ))
 }
 
