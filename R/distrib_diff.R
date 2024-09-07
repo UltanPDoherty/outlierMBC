@@ -48,7 +48,7 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
     # betamix_cdf_mat[, g] <- stats::pbeta(check_seq, param1, param2[g])
     # betamix_cdf_vals <- betamix_cdf_vals + betamix_cdf_mat[, g] * prop[g]
     betamix_cdf_mat[, g] <- stats::pbeta(check_quants, param1, param2[g])
-    betamix_cdf_vals <- betamix_cdf_vals2 + betamix_cdf_mat2[, g] * prop[g]
+    betamix_cdf_vals <- betamix_cdf_vals + betamix_cdf_mat[, g] * prop[g]
   }
   # betamix_diff <- c(
   #   quantile(abs(mahala_ewcdf_vals - betamix_cdf_vals), c(0.75, 1)),
