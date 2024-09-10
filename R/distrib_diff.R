@@ -33,23 +33,22 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   mahala_ewcdf_func <- spatstat.univar::ewcdf(c(mahala_mat), c(w_mat))
   param1 <- var_num / 2
   param2 <- (n_vec - var_num - 1) / 2
-  browser()
-  eps <- 1 / 1000
-  # check_seq <- seq(eps, 1, eps)
-  # mahala_ewcdf_vals <- mahala_ewcdf_func(check_seq)
-  # betamix_cdf_mat <- matrix(nrow = length(check_seq), ncol = comp_num)
-  # betamix_cdf_vals <- rep(0, length(check_seq))
-  check_quants <- spatstat.univar::quantile.ewcdf(
-    mahala_ewcdf_func, probs = seq(0, 1, 0.1)
-  )
-  mahala_ewcdf_vals <- mahala_ewcdf_func(check_quants)
-  betamix_cdf_mat <- matrix(nrow = length(check_quants), ncol = comp_num)
-  betamix_cdf_vals <- rep(0, length(check_quants))
+  eps <- 1 / 10000
+  check_seq <- seq(eps, 1, eps)
+  mahala_ewcdf_vals <- mahala_ewcdf_func(check_seq)
+  betamix_cdf_mat <- matrix(nrow = length(check_seq), ncol = comp_num)
+  betamix_cdf_vals <- rep(0, length(check_seq))
+  # check_quants <- spatstat.univar::quantile.ewcdf(
+  #   mahala_ewcdf_func, probs = seq(0, 1, 0.1)
+  # )
+  # mahala_ewcdf_vals <- mahala_ewcdf_func(check_quants)
+  # betamix_cdf_mat <- matrix(nrow = length(check_quants), ncol = comp_num)
+  # betamix_cdf_vals <- rep(0, length(check_quants))
   for (g in seq_len(comp_num)) {
-    # betamix_cdf_mat[, g] <- stats::pbeta(check_seq, param1, param2[g])
-    # betamix_cdf_vals <- betamix_cdf_vals + betamix_cdf_mat[, g] * prop[g]
-    betamix_cdf_mat[, g] <- stats::pbeta(check_quants, param1, param2[g])
+    betamix_cdf_mat[, g] <- stats::pbeta(check_seq, param1, param2[g])
     betamix_cdf_vals <- betamix_cdf_vals + betamix_cdf_mat[, g] * prop[g]
+    # betamix_cdf_mat[, g] <- stats::pbeta(check_quants, param1, param2[g])
+    # betamix_cdf_vals <- betamix_cdf_vals + betamix_cdf_mat[, g] * prop[g]
   }
   # betamix_diff <- c(
   #   quantile(abs(mahala_ewcdf_vals - betamix_cdf_vals), c(0.75, 1)),
@@ -63,8 +62,8 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   #   which.max(abs(mahala_ewcdf_vals - betamix_cdf_vals)[seq(10, 1000, by = 10)])
   # )
 
-  betamix_diff <- abs(mahala_ewcdf_vals - betamix_cdf_vals)
-
+  # betamix_diff <- abs(mahala_ewcdf_vals - betamix_cdf_vals)
+  betamix_diff <- sum(abs(mahala_ewcdf_vals - betamix_cdf_vals))
   mix_dens <- dens_mat %*% t(prop)
 
   choice_id <- which.min(mix_dens)
@@ -77,8 +76,8 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
     distrib_diff_vec = distrib_diff_vec,
     choice_id = choice_id,
     min_dens = min_dens,
-    betamix_diff = betamix_diff,
-    check_quants = check_quants
+    betamix_diff = betamix_diff#,
+    # check_quants = check_quants
   ))
 }
 
