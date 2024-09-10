@@ -73,13 +73,13 @@ ombc_gmm <- function(
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
     set.seed(seed)
-    mix <- mixture::gpcm(
-      x,
-      G = comp_num, mnames = mnames,
-      start = z, seed = seed
-    )
+    # mix <- mixture::gpcm(
+    #   x,
+    #   G = comp_num, mnames = mnames,
+    #   start = z, seed = seed
+    # )
 
-    if (i %% reinit_interval == 0) {
+    # if (i %% reinit_interval == 0) {
       # alt_z <- init_kmpp(x, comp_num, seed)
       alt_z <- init_hc(dist_mat, comp_num)
       alt_mix <- mixture::gpcm(
@@ -88,28 +88,28 @@ ombc_gmm <- function(
         start = alt_z, seed = seed
       )
 
-      if (alt_mix$best_model$loglik > mix$best_model$loglik) {
-        cat(paste0("Iteration ", i, ": reinitialisation accepted.\n"))
+      # if (alt_mix$best_model$loglik > mix$best_model$loglik) {
+        # cat(paste0("Iteration ", i, ": reinitialisation accepted.\n"))
         mix <- alt_mix
-      }
-    }
+      # }
+    # }
 
-    if (any(colSums(mix$z) < var_num + 1)) {
-      message(paste0(
-        "One of the components became too small after removing ",
-        i - 1, " outliers.\n"
-      ))
-
-      # alt_z <- init_kmpp(x, comp_num, seed)
-      alt_z <- init_hc(dist_mat, comp_num)
-      mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = alt_z)
-
-      if (any(colSums(mix$z) < var_num + 1)) {
-        stop("Emergency reinitialisation unsuccessful.\n")
-      } else {
-        message("Emergency reinitialisation successful.\n")
-      }
-    }
+    # if (any(colSums(mix$z) < var_num + 1)) {
+    #   message(paste0(
+    #     "One of the components became too small after removing ",
+    #     i - 1, " outliers.\n"
+    #   ))
+    #
+    #   # alt_z <- init_kmpp(x, comp_num, seed)
+    #   alt_z <- init_hc(dist_mat, comp_num)
+    #   mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = alt_z)
+    #
+    #   if (any(colSums(mix$z) < var_num + 1)) {
+    #     stop("Emergency reinitialisation unsuccessful.\n")
+    #   } else {
+    #     message("Emergency reinitialisation successful.\n")
+    #   }
+    # }
 
     dd <- distrib_diff_gmm(
       x,
@@ -157,18 +157,18 @@ ombc_gmm <- function(
       start = min_diff_z[[j]], seed = seed
     )
 
-    # alt_z <- init_kmpp(x0[!outlier_bool[, j], ], comp_num, seed)
-    alt_z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
-    alt_mix <- mixture::gpcm(
-      x0[!outlier_bool[, j], ],
-      G = comp_num, mnames = mnames,
-      start = alt_z, seed = seed
-    )
-
-    if (alt_mix$best_model$loglik > mix[[j]]$best_model$loglik) {
-      cat(paste0("Final reinitialisation, ", j, " accepted.\n"))
-      mix[[j]] <- alt_mix
-    }
+    # # alt_z <- init_kmpp(x0[!outlier_bool[, j], ], comp_num, seed)
+    # alt_z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
+    # alt_mix <- mixture::gpcm(
+    #   x0[!outlier_bool[, j], ],
+    #   G = comp_num, mnames = mnames,
+    #   start = alt_z, seed = seed
+    # )
+    #
+    # if (alt_mix$best_model$loglik > mix[[j]]$best_model$loglik) {
+    #   cat(paste0("Final reinitialisation, ", j, " accepted.\n"))
+    #   mix[[j]] <- alt_mix
+    # }
   }
 
   labels <- matrix(0, nrow = obs_num, ncol = track_num)
