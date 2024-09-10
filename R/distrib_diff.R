@@ -15,13 +15,17 @@
 distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
-  track_num <- 4
+  track_num <- 6
+
+  z_map <- apply(z, 1, which.max)
 
   distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
   mahala_mat <- matrix(nrow = obs_num, ncol = comp_num)
   for (g in seq_len(comp_num)) {
-    dd_g <- distrib_diff_mahalanobis(x, z[, g], mu[[g]], sigma[[g]], logdet[g])
+    dd_g <- distrib_diff_mahalanobis(
+      x, z[, g], mu[[g]], sigma[[g]], logdet[g], z_map == g
+    )
     distrib_diff_mat[g, ] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
     mahala_mat[, g] <- dd_g$mahalas
@@ -63,17 +67,20 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   # )
 
   # betamix_diff <- abs(mahala_ewcdf_vals - betamix_cdf_vals)
+
+  cdf_diffs <- betamix_cdf_vals - mahala_ewcdf_vals
+  pos_cdf_diffs <- pmax(rep(0, length(check_seq)), cdf_diffs)
+
   betamix_diff <- c(
-    sum(betamix_cdf_vals - mahala_ewcdf_vals),
-    max(betamix_cdf_vals - mahala_ewcdf_vals),
-    sum(max(0, betamix_cdf_vals - mahala_ewcdf_vals))
+    mean(pos_cdf_diffs),
+    max(cdf_diffs)
   )
   mix_dens <- dens_mat %*% t(prop)
 
   choice_id <- which.min(mix_dens)
   min_dens <- mix_dens[choice_id]
 
-  distrib_diff_vec <- sqrt(as.numeric(prop %*% (distrib_diff_mat^2)))
+  distrib_diff_vec <- as.numeric(prop %*% (distrib_diff_mat))
 
   return(list(
     distrib_diff_mat = distrib_diff_mat,
@@ -101,47 +108,52 @@ distrib_diff_mahalanobis <- function(
     z_g,
     mu_g,
     sigma_g,
-    logdet_g) {
+    logdet_g,
+    bool_g) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
 
-  eps <- 1 / 10000
-  check_seq <- seq(eps, 1, eps)
-
-  # checkpoints_x <- stats::qbeta(check_seq, var_num / 2, (n_g - var_num - 1) / 2)
-  #
-  # mahalas_g <- stats::mahalanobis(x, mu_g, (n_g / (n_g - 1)) * sigma_g)
-  # scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
-  # mahala_ewcdf_g_func <- spatstat.univar::ewcdf(scaled_mahalas_g, z_g / n_g)
-  #
-  # mahala_ewcdf_g <- mahala_ewcdf_g_func(checkpoints_x)
-  #
-  # abs_cdf_diffs <- abs(mahala_ewcdf_g - check_seq)
-  #
-  # abs_pmf_diffs <- abs(diff(c(0, mahala_ewcdf_g)) - eps)
-
+  param1 <- var_num / 2
+  param2 <- (n_g - var_num - 1) / 2
+  param2_b <- (sum(bool_g) - var_num - 1) / 2
 
   mahalas_g <- stats::mahalanobis(x, mu_g, (n_g / (n_g - 1)) * sigma_g)
   scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
   mahala_ewcdf_g_func <- spatstat.univar::ewcdf(scaled_mahalas_g, z_g / n_g)
 
+  mahala_ecdf_g_func <- stats::ecdf(scaled_mahalas_g[bool_g])
+
+  eps <- 1e-5
+  check_seq <- seq(
+    eps,
+    min(max(scaled_mahalas_g, stats::qbeta(0.9999, param1, param2)) + eps, 1),
+    eps
+  )
+  check_seq_b <- seq(
+    eps,
+    min(max(scaled_mahalas_g, stats::qbeta(0.9999, param1, param2_b)) + eps, 1),
+    eps
+  )
+
   mahala_ewcdf_g <- mahala_ewcdf_g_func(check_seq)
-  beta_cdf_g <- stats::pbeta(check_seq, var_num / 2, (n_g - var_num - 1) / 2)
+  beta_cdf_g <- stats::pbeta(check_seq, param1, param2)
 
   cdf_diffs <- beta_cdf_g - mahala_ewcdf_g
   pos_cdf_diffs <- pmax(rep(0, length(check_seq)), cdf_diffs)
 
-  # abs_pmf_diffs <- abs(diff(c(0, mahala_ewcdf_g)) - diff(c(0, beta_cdf_g)))
+  mahala_ecdf_g <- mahala_ecdf_g_func(check_seq_b)
+  beta_cdf_g_b <- stats::pbeta(check_seq_b, param1, param2_b)
+
+  cdf_diffs_b <- beta_cdf_g_b - mahala_ecdf_g
+  pos_cdf_diffs_b <- pmax(rep(0, length(check_seq_b)), cdf_diffs_b)
 
   distrib_diff_g_x <- c(
     mean(abs(cdf_diffs)),
     mean(pos_cdf_diffs),
-    max(pos_cdf_diffs),
-    sum(pos_cdf_diffs[check_seq > stats::qbeta(0.99, var_num / 2, (n_g - var_num - 1) / 2)])
-    # stats::quantile(abs_cdf_diffs, c(0.5, 1)),
-    # mean(abs_pmf_diffs),
-    # max(abs_pmf_diffs)
-    # stats::quantile(abs_pmf_diffs, c(0.5, 1))
+    max(cdf_diffs),
+    mean(abs(cdf_diffs_b)),
+    mean(pos_cdf_diffs_b),
+    max(cdf_diffs_b)
   )
 
   dens_g_x <- exp(
