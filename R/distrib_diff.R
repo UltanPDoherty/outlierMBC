@@ -63,7 +63,10 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   # )
 
   # betamix_diff <- abs(mahala_ewcdf_vals - betamix_cdf_vals)
-  betamix_diff <- sum(abs(mahala_ewcdf_vals - betamix_cdf_vals))
+  betamix_diff <- c(
+    sum(betamix_cdf_vals - mahala_ewcdf_vals),
+    max(betamix_cdf_vals - mahala_ewcdf_vals)
+  )
   mix_dens <- dens_mat %*% t(prop)
 
   choice_id <- which.min(mix_dens)
