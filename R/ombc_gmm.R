@@ -52,7 +52,7 @@ ombc_gmm <- function(
   x0 <- x
 
   obs_num <- nrow(x0)
-  track_num <- 4 + 4
+  track_num <- 4 + 3
 
   dist_mat0 <- as.matrix(stats::dist(x0))
   dist_mat <- dist_mat0
@@ -65,7 +65,7 @@ ombc_gmm <- function(
   min_diff_z <- list()
   loglike <- c()
   min_dens <- c()
-  distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num - 4))
+  distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num - 3))
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = track_num)
   outlier_rank <- rep(0, obs_num)
   # check_quants <- matrix(nrow = max_out + 1, ncol = 11)
