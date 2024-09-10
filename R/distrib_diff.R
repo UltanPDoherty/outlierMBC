@@ -105,7 +105,7 @@ distrib_diff_mahalanobis <- function(
   var_num <- ncol(x)
   n_g <- sum(z_g)
 
-  eps <- 1 / 100
+  eps <- 1 / 10000
   check_seq <- seq(eps, 1, eps)
 
   # checkpoints_x <- stats::qbeta(check_seq, var_num / 2, (n_g - var_num - 1) / 2)
@@ -128,17 +128,19 @@ distrib_diff_mahalanobis <- function(
   mahala_ewcdf_g <- mahala_ewcdf_g_func(check_seq)
   beta_cdf_g <- stats::pbeta(check_seq, var_num / 2, (n_g - var_num - 1) / 2)
 
-  abs_cdf_diffs <- abs(mahala_ewcdf_g - beta_cdf_g)
+  cdf_diffs <- beta_cdf_g - mahala_ewcdf_g
+  pos_cdf_diffs <- pmax(rep(0, length(check_seq)), cdf_diffs)
 
-  abs_pmf_diffs <- abs(diff(c(0, mahala_ewcdf_g)) - diff(c(0, beta_cdf_g)))
-
+  # abs_pmf_diffs <- abs(diff(c(0, mahala_ewcdf_g)) - diff(c(0, beta_cdf_g)))
 
   distrib_diff_g_x <- c(
-    mean(abs_cdf_diffs),
-    max(abs_cdf_diffs),
+    mean(abs(cdf_diffs)),
+    mean(pos_cdf_diffs),
+    max(pos_cdf_diffs),
+    sum(pos_cdf_diffs[check_seq > stats::qbeta(0.99, var_num / 2, (n_g - var_num - 1) / 2)])
     # stats::quantile(abs_cdf_diffs, c(0.5, 1)),
-    mean(abs_pmf_diffs),
-    max(abs_pmf_diffs)
+    # mean(abs_pmf_diffs),
+    # max(abs_pmf_diffs)
     # stats::quantile(abs_pmf_diffs, c(0.5, 1))
   )
 
