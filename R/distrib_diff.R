@@ -70,10 +70,13 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
 
   cdf_diffs <- betamix_cdf_vals - mahala_ewcdf_vals
   pos_cdf_diffs <- pmax(rep(0, length(check_seq)), cdf_diffs)
+  neg_cdf_diffs <- pmax(rep(0, length(check_seq)), - cdf_diffs)
 
   betamix_diff <- c(
     mean(pos_cdf_diffs),
-    max(cdf_diffs)
+    max(pos_cdf_diffs),
+    mean(neg_cdf_diffs),
+    max(neg_cdf_diffs)
   )
   mix_dens <- dens_mat %*% t(prop)
 
@@ -81,6 +84,16 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   min_dens <- mix_dens[choice_id]
 
   distrib_diff_vec <- as.numeric(prop %*% (distrib_diff_mat))
+
+  # plot(
+  #   x = check_seq, y = cdf_diffs, type = "l",
+  #   xlim = c(0, 0.2), ylim = c(0, 0.2),
+  #   main = paste0(
+  #     5350 - obs_num, ": ",
+  #     round(betamix_diff[1], 4), ", ",
+  #     round(betamix_diff[2], 3)
+  #   )
+  # )
 
   return(list(
     distrib_diff_mat = distrib_diff_mat,
@@ -123,17 +136,8 @@ distrib_diff_mahalanobis <- function(
 
   mahala_ecdf_g_func <- stats::ecdf(scaled_mahalas_g[bool_g])
 
-  eps <- 1e-5
-  check_seq <- seq(
-    eps,
-    min(max(scaled_mahalas_g, stats::qbeta(0.9999, param1, param2)) + eps, 1),
-    eps
-  )
-  check_seq_b <- seq(
-    eps,
-    min(max(scaled_mahalas_g, stats::qbeta(0.9999, param1, param2_b)) + eps, 1),
-    eps
-  )
+  eps <- 1e-4
+  check_seq <- seq(eps, 1, eps)
 
   mahala_ewcdf_g <- mahala_ewcdf_g_func(check_seq)
   beta_cdf_g <- stats::pbeta(check_seq, param1, param2)
@@ -141,19 +145,25 @@ distrib_diff_mahalanobis <- function(
   cdf_diffs <- beta_cdf_g - mahala_ewcdf_g
   pos_cdf_diffs <- pmax(rep(0, length(check_seq)), cdf_diffs)
 
-  mahala_ecdf_g <- mahala_ecdf_g_func(check_seq_b)
-  beta_cdf_g_b <- stats::pbeta(check_seq_b, param1, param2_b)
+  mahala_ewpmf_g <- diff(c(0, mahala_ewcdf_g))
+  beta_pmf_g <- diff(c(0, beta_cdf_g))
+
+  pmf_diffs <- beta_pmf_g - mahala_ewpmf_g
+  pos_pmf_diffs <- pmax(rep(0, length(check_seq)), pmf_diffs)
+
+  mahala_ecdf_g <- mahala_ecdf_g_func(check_seq)
+  beta_cdf_g_b <- stats::pbeta(check_seq, param1, param2_b)
 
   cdf_diffs_b <- beta_cdf_g_b - mahala_ecdf_g
-  pos_cdf_diffs_b <- pmax(rep(0, length(check_seq_b)), cdf_diffs_b)
+  pos_cdf_diffs_b <- pmax(rep(0, length(check_seq)), cdf_diffs_b)
 
   distrib_diff_g_x <- c(
-    mean(abs(cdf_diffs)),
-    mean(pos_cdf_diffs),
-    max(cdf_diffs),
-    mean(abs(cdf_diffs_b)),
-    mean(pos_cdf_diffs_b),
-    max(cdf_diffs_b)
+    "abs_cdf_mean" = mean(abs(cdf_diffs)),
+    "cdf_max" = max(cdf_diffs),
+    "cdf_max_b" = max(cdf_diffs_b),
+    "abs_pmf_mean" = mean(abs(pmf_diffs)),
+    "pos_pmf_mean" = mean(pos_pmf_diffs),
+    "KL" = entropy::KL.plugin(mahala_ewpmf_g[beta_pmf_g != 0], beta_pmf_g[beta_pmf_g != 0])
   )
 
   dens_g_x <- exp(
