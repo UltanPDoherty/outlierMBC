@@ -72,11 +72,19 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   pos_cdf_diffs <- pmax(rep(0, length(check_seq)), cdf_diffs)
   neg_cdf_diffs <- pmax(rep(0, length(check_seq)), - cdf_diffs)
 
+  mahala_ewpmf_vals <- diff(c(0, mahala_ewcdf_vals))
+  betamix_pmf_vals <- diff(c(0, betamix_cdf_vals))
+  pmf_diffs <- betamix_pmf_vals - mahala_ewpmf_vals
+
+  mean_abs_roll10mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 10)))
+
   betamix_diff <- c(
+    mean(abs(cdf_diffs)),
+    max(abs(cdf_diffs)),
     mean(pos_cdf_diffs),
     max(pos_cdf_diffs),
-    mean(neg_cdf_diffs),
-    max(neg_cdf_diffs)
+    mean(abs(pmf_diffs)),
+    mean_abs_roll10mean_pmf_diffs
   )
   mix_dens <- dens_mat %*% t(prop)
 
@@ -87,7 +95,16 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
 
   # plot(
   #   x = check_seq, y = cdf_diffs, type = "l",
-  #   xlim = c(0, 0.2), ylim = c(0, 0.2),
+  #   xlim = c(0, 0.2), ylim = c(-0.2, 0.2),
+  #   main = paste0(
+  #     5350 - obs_num, ": ",
+  #     round(betamix_diff[1], 4), ", ",
+  #     round(betamix_diff[2], 3)
+  #   )
+  # )
+  # matplot(
+  #   x = check_seq, y = pmf_diffs, type = "l",
+  #   xlim = c(0, 0.2),
   #   main = paste0(
   #     5350 - obs_num, ": ",
   #     round(betamix_diff[1], 4), ", ",
@@ -134,8 +151,6 @@ distrib_diff_mahalanobis <- function(
   scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
   mahala_ewcdf_g_func <- spatstat.univar::ewcdf(scaled_mahalas_g, z_g / n_g)
 
-  mahala_ecdf_g_func <- stats::ecdf(scaled_mahalas_g[bool_g])
-
   eps <- 1e-4
   check_seq <- seq(eps, 1, eps)
 
@@ -149,21 +164,15 @@ distrib_diff_mahalanobis <- function(
   beta_pmf_g <- diff(c(0, beta_cdf_g))
 
   pmf_diffs <- beta_pmf_g - mahala_ewpmf_g
-  pos_pmf_diffs <- pmax(rep(0, length(check_seq)), pmf_diffs)
-
-  mahala_ecdf_g <- mahala_ecdf_g_func(check_seq)
-  beta_cdf_g_b <- stats::pbeta(check_seq, param1, param2_b)
-
-  cdf_diffs_b <- beta_cdf_g_b - mahala_ecdf_g
-  pos_cdf_diffs_b <- pmax(rep(0, length(check_seq)), cdf_diffs_b)
+  mean_abs_roll10mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 10)))
 
   distrib_diff_g_x <- c(
-    "abs_cdf_mean" = mean(abs(cdf_diffs)),
-    "cdf_max" = max(cdf_diffs),
-    "cdf_max_b" = max(cdf_diffs_b),
-    "abs_pmf_mean" = mean(abs(pmf_diffs)),
-    "pos_pmf_mean" = mean(pos_pmf_diffs),
-    "KL" = entropy::KL.plugin(mahala_ewpmf_g[beta_pmf_g != 0], beta_pmf_g[beta_pmf_g != 0])
+    mean(abs(cdf_diffs)),
+    max(abs(cdf_diffs)),
+    mean(pos_cdf_diffs),
+    max(pos_cdf_diffs),
+    mean(abs(pmf_diffs)),
+    mean_abs_roll10mean_pmf_diffs
   )
 
   dens_g_x <- exp(
