@@ -11,7 +11,8 @@ ombc_gmm(
   mnames = "VVV",
   seed = 123,
   reinit_interval = Inf,
-  print_interval = Inf
+  print_interval = Inf,
+  gross_outs = NULL
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ ombc_gmm(
 \item{reinit_interval}{How frequently to reinitialise.}
 
 \item{print_interval}{How frequently the iteration count is printed.}
+
+\item{gross_outs}{logical vector identifying gross outliers to be removed.}
 }
 \value{
 List of

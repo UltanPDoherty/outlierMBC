@@ -186,7 +186,7 @@ ombc_gmm <- function(
     outlier_num0 <- outlier_num
     labels0 <- labels
 
-    outlier_bool <- matrix(nrow = length(gross_outs, ncol = track_num))
+    outlier_bool <- matrix(nrow = length(gross_outs), ncol = track_num)
     for (j in 1:track_num) {
       outlier_bool[gross_outs, j] <- TRUE
       outlier_bool[!gross_outs, j] <- outlier_bool0[, j]
