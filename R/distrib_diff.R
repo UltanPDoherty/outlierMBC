@@ -15,7 +15,7 @@
 distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
-  track_num1 <- 8
+  track_num1 <- 5
 
   z_map <- apply(z, 1, which.max)
 
@@ -81,19 +81,24 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   mean_abs_roll1000mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 1000)))
 
   pos_cdf_pmean_1 <- mean(pos_cdf_diffs)
-  pos_cdf_pmean_2 <- sqrt(mean(pos_cdf_diffs^2))
-  pos_cdf_pmean_4 <- (mean(pos_cdf_diffs^4))^(1 / 4)
-  pos_cdf_pmean_inf <- max(pos_cdf_diffs)
+  pos_cdf_pmean_2 <- (mean(pos_cdf_diffs^(1.25)))^(1 / (1.25))
+  pos_cdf_pmean_3 <- (mean(pos_cdf_diffs^(1.50)))^(1 / (1.50))
+  pos_cdf_pmean_4 <- (mean(pos_cdf_diffs^(1.75)))^(1 / (1.75))
+  pos_cdf_pmean_5 <- (mean(pos_cdf_diffs^(2.00)))^(1 / (2.00))
+
+  # pos_cdf_pmean_inf <- max(pos_cdf_diffs)
 
   betamix_diff <- c(
-    mean(abs(cdf_diffs)),
-    max(abs(cdf_diffs)),
-    mean(neg_cdf_diffs),
-    max(neg_cdf_diffs),
+    # mean(abs(cdf_diffs)),
+    # max(abs(cdf_diffs)),
+    # mean(neg_cdf_diffs),
+    # max(neg_cdf_diffs),
     pos_cdf_pmean_1,
     pos_cdf_pmean_2,
+    pos_cdf_pmean_3,
     pos_cdf_pmean_4,
-    pos_cdf_pmean_inf
+    pos_cdf_pmean_5
+    # pos_cdf_pmean_inf
     # mean(abs(pmf_diffs)),
     # mean_abs_roll10mean_pmf_diffs,
     # mean_abs_roll100mean_pmf_diffs,
@@ -183,19 +188,26 @@ distrib_diff_mahalanobis <- function(
   mean_abs_roll1000mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 1000)))
 
   pos_cdf_pmean_1 <- mean(pos_cdf_diffs)
-  pos_cdf_pmean_2 <- sqrt(mean(pos_cdf_diffs^2))
-  pos_cdf_pmean_4 <- (mean(pos_cdf_diffs^4))^(1 / 4)
-  pos_cdf_pmean_inf <- max(pos_cdf_diffs)
+  pos_cdf_pmean_2 <- (mean(pos_cdf_diffs^(1.25)))^(1 / (1.25))
+  pos_cdf_pmean_3 <- (mean(pos_cdf_diffs^(1.50)))^(1 / (1.50))
+  pos_cdf_pmean_4 <- (mean(pos_cdf_diffs^(1.75)))^(1 / (1.75))
+  pos_cdf_pmean_5 <- (mean(pos_cdf_diffs^(2.00)))^(1 / (2.00))
+
+  # pos_cdf_pmean_1 <- mean(pos_cdf_diffs)
+  # pos_cdf_pmean_2 <- sqrt(mean(pos_cdf_diffs^2))
+  # pos_cdf_pmean_4 <- (mean(pos_cdf_diffs^4))^(1 / 4)
+  # pos_cdf_pmean_inf <- max(pos_cdf_diffs)
 
   distrib_diff_g_x <- c(
-    mean(abs(cdf_diffs)),
-    max(abs(cdf_diffs)),
-    mean(neg_cdf_diffs),
-    max(neg_cdf_diffs),
+    # mean(abs(cdf_diffs)),
+    # max(abs(cdf_diffs)),
+    # mean(neg_cdf_diffs),
+    # max(neg_cdf_diffs),
     pos_cdf_pmean_1,
     pos_cdf_pmean_2,
+    pos_cdf_pmean_3,
     pos_cdf_pmean_4,
-    pos_cdf_pmean_inf
+    pos_cdf_pmean_5
     # mean(abs(pmf_diffs)),
     # mean_abs_roll10mean_pmf_diffs,
     # mean_abs_roll100mean_pmf_diffs,

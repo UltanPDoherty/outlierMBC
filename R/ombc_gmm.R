@@ -56,8 +56,8 @@ ombc_gmm <- function(
   max_out <- max_out - sum(gross_outs)
 
   obs_num <- nrow(x0)
-  track_num1 <- 8
-  track_num2 <- 8
+  track_num1 <- 5
+  track_num2 <- 5
   track_num <- track_num1 + track_num2
 
   dist_mat0 <- as.matrix(stats::dist(x0))
