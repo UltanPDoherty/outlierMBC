@@ -15,11 +15,11 @@
 distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
-  track_num <- 6
+  track_num1 <- 8
 
   z_map <- apply(z, 1, which.max)
 
-  distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
+  distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num1)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
   mahala_mat <- matrix(nrow = obs_num, ncol = comp_num)
   for (g in seq_len(comp_num)) {
@@ -77,6 +77,8 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   pmf_diffs <- betamix_pmf_vals - mahala_ewpmf_vals
 
   mean_abs_roll10mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 10)))
+  mean_abs_roll100mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 100)))
+  mean_abs_roll1000mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 1000)))
 
   betamix_diff <- c(
     mean(abs(cdf_diffs)),
@@ -84,7 +86,9 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
     mean(pos_cdf_diffs),
     max(pos_cdf_diffs),
     mean(abs(pmf_diffs)),
-    mean_abs_roll10mean_pmf_diffs
+    mean_abs_roll10mean_pmf_diffs,
+    mean_abs_roll100mean_pmf_diffs,
+    mean_abs_roll1000mean_pmf_diffs
   )
   mix_dens <- dens_mat %*% t(prop)
 
@@ -165,6 +169,8 @@ distrib_diff_mahalanobis <- function(
 
   pmf_diffs <- beta_pmf_g - mahala_ewpmf_g
   mean_abs_roll10mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 10)))
+  mean_abs_roll100mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 100)))
+  mean_abs_roll1000mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 1000)))
 
   distrib_diff_g_x <- c(
     mean(abs(cdf_diffs)),
@@ -172,7 +178,9 @@ distrib_diff_mahalanobis <- function(
     mean(pos_cdf_diffs),
     max(pos_cdf_diffs),
     mean(abs(pmf_diffs)),
-    mean_abs_roll10mean_pmf_diffs
+    mean_abs_roll10mean_pmf_diffs,
+    mean_abs_roll100mean_pmf_diffs,
+    mean_abs_roll1000mean_pmf_diffs
   )
 
   dens_g_x <- exp(
