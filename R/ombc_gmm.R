@@ -53,6 +53,8 @@ ombc_gmm <- function(
   x <- as.matrix(x[!gross_outs, ])
   x0 <- x
 
+  max_out <- max_out - sum(gross_outs)
+
   obs_num <- nrow(x0)
   track_num1 <- 8
   track_num2 <- 8
@@ -191,9 +193,8 @@ ombc_gmm <- function(
       outlier_bool[gross_outs, j] <- TRUE
       outlier_bool[!gross_outs, j] <- outlier_bool0[, j]
 
-      outlier_rank[gross_outs, j] <- 1
-      outlier_rank[!gross_outs, j] <-
-        outlier_rank0[, j] + (outlier_rank0[, j] != 0)
+      outlier_rank[gross_outs] <- 1
+      outlier_rank[!gross_outs] <- outlier_rank0 + (outlier_rank0 != 0)
 
       outlier_num <- outlier_num0 + sum(gross_outs)
 
