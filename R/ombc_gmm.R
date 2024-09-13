@@ -47,8 +47,9 @@ ombc_gmm <- function(
     mnames = "VVV",
     seed = 123,
     reinit_interval = Inf,
-    print_interval = Inf) {
-  x <- as.matrix(x)
+    print_interval = Inf,
+    gross_outs = NULL) {
+  x <- as.matrix(x[!gross_outs, ])
   x0 <- x
 
   obs_num <- nrow(x0)
@@ -176,6 +177,28 @@ ombc_gmm <- function(
   labels <- matrix(0, nrow = obs_num, ncol = track_num)
   for (j in 1:track_num) {
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
+  }
+
+  if (!is.null(gross_outs)) {
+    outlier_bool0 <- outlier_bool
+    outlier_rank0 <- outlier_rank
+    outlier_num0 <- outlier_num
+    labels0 <- labels
+
+    outlier_bool <- matrix(nrow = length(gross_outs, ncol = track_num))
+    for (j in 1:track_num) {
+      outlier_bool[gross_outs, j] <- TRUE
+      outlier_bool[!gross_outs, j] <- outlier_bool0[, j]
+
+      outlier_rank[gross_outs, j] <- 1
+      outlier_rank[!gross_outs, j] <-
+        outlier_rank0[, j] + (outlier_rank0[, j] != 0)
+
+      outlier_num <- outlier_num0 + sum(gross_outs)
+
+      labels[gross_outs, j] <- 0
+      labels[!gross_outs, j] <- labels0[, j]
+    }
   }
 
   return(list(
