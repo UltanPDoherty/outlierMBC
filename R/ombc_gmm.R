@@ -50,14 +50,18 @@ ombc_gmm <- function(
     reinit_interval = Inf,
     print_interval = Inf,
     gross_outs = NULL) {
-  x <- as.matrix(x[!gross_outs, ])
+
+  if (!is.null(gross_outs)) {
+    x <- x[!gross_outs, ]
+    max_out <- max_out - sum(gross_outs)
+  }
+
+  x <- as.matrix(x)
   x0 <- x
 
-  max_out <- max_out - sum(gross_outs)
-
   obs_num <- nrow(x0)
-  track_num1 <- 5
-  track_num2 <- 5
+  track_num1 <- 10
+  track_num2 <- 10
   track_num <- track_num1 + track_num2
 
   dist_mat0 <- as.matrix(stats::dist(x0))
