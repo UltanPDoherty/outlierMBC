@@ -10,6 +10,7 @@
 #' @param seed Seed.
 #' @param reinit_interval How frequently to reinitialise.
 #' @param print_interval How frequently the iteration count is printed.
+#' @param gross_outs logical vector identifying gross outliers to be removed.
 #'
 #' @return List of
 #' * distrib_diffs
