@@ -15,7 +15,7 @@
 distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
-  track_num1 <- 10
+  track_num1 <- 8
 
   z_map <- apply(z, 1, which.max)
 
@@ -80,22 +80,20 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet) {
   mean_abs_roll100mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 100)))
   mean_abs_roll1000mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 1000)))
 
-  cdf_pmean_1 <- mean(cdf_diffs)
-  cdf_pmean_2 <- sqrt(mean(cdf_diffs^2))
-  cdf_pmean_4 <- (mean(cdf_diffs^4))^(1 / 4)
-  cdf_pmean_inf <- max(cdf_diffs)
+  pos_cdf_pmean_1 <- mean(pos_cdf_diffs)
+  pos_cdf_pmean_2 <- sqrt(mean(pos_cdf_diffs^2))
+  pos_cdf_pmean_4 <- (mean(pos_cdf_diffs^4))^(1 / 4)
+  pos_cdf_pmean_inf <- max(pos_cdf_diffs)
 
   betamix_diff <- c(
     mean(abs(cdf_diffs)),
     max(abs(cdf_diffs)),
-    mean(pos_cdf_diffs),
-    max(pos_cdf_diffs),
     mean(neg_cdf_diffs),
     max(neg_cdf_diffs),
-    cdf_pmean_1,
-    cdf_pmean_2,
-    cdf_pmean_4,
-    cdf_pmean_inf
+    pos_cdf_pmean_1,
+    pos_cdf_pmean_2,
+    pos_cdf_pmean_4,
+    pos_cdf_pmean_inf
     # mean(abs(pmf_diffs)),
     # mean_abs_roll10mean_pmf_diffs,
     # mean_abs_roll100mean_pmf_diffs,
@@ -184,22 +182,20 @@ distrib_diff_mahalanobis <- function(
   mean_abs_roll100mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 100)))
   mean_abs_roll1000mean_pmf_diffs <- mean(abs(zoo::rollmean(pmf_diffs, 1000)))
 
-  cdf_pmean_1 <- mean(cdf_diffs)
-  cdf_pmean_2 <- sqrt(mean(cdf_diffs^2))
-  cdf_pmean_4 <- (mean(cdf_diffs^4))^(1 / 4)
-  cdf_pmean_inf <- max(cdf_diffs)
+  pos_cdf_pmean_1 <- mean(pos_cdf_diffs)
+  pos_cdf_pmean_2 <- sqrt(mean(pos_cdf_diffs^2))
+  pos_cdf_pmean_4 <- (mean(pos_cdf_diffs^4))^(1 / 4)
+  pos_cdf_pmean_inf <- max(pos_cdf_diffs)
 
   distrib_diff_g_x <- c(
     mean(abs(cdf_diffs)),
     max(abs(cdf_diffs)),
-    mean(pos_cdf_diffs),
-    max(pos_cdf_diffs),
     mean(neg_cdf_diffs),
     max(neg_cdf_diffs),
-    cdf_pmean_1,
-    cdf_pmean_2,
-    cdf_pmean_4,
-    cdf_pmean_inf
+    pos_cdf_pmean_1,
+    pos_cdf_pmean_2,
+    pos_cdf_pmean_4,
+    pos_cdf_pmean_inf
     # mean(abs(pmf_diffs)),
     # mean_abs_roll10mean_pmf_diffs,
     # mean_abs_roll100mean_pmf_diffs,
