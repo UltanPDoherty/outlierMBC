@@ -52,17 +52,16 @@ ombc_gmm <- function(
     gross_outs = NULL) {
 
   if (!is.null(gross_outs)) {
+    gross_num <- sum(gross_outs)
     x <- x[!gross_outs, ]
-    max_out <- max_out - sum(gross_outs)
+    max_out <- max_out - gross_num
   }
 
   x <- as.matrix(x)
   x0 <- x
 
   obs_num <- nrow(x0)
-  track_num1 <- 10
-  track_num2 <- 10
-  track_num <- track_num1 + track_num2
+  track_num <- 10
 
   dist_mat0 <- as.matrix(stats::dist(x0))
   dist_mat <- dist_mat0
@@ -75,10 +74,9 @@ ombc_gmm <- function(
   min_diff_z <- list()
   loglike <- c()
   min_dens <- c()
-  distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num1))
+  distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = track_num)
   outlier_rank <- rep(0, obs_num)
-  # check_quants <- matrix(nrow = max_out + 1, ncol = 11)
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
@@ -131,9 +129,7 @@ ombc_gmm <- function(
     )
 
     distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
-    distrib_diff_mat[i, ] <- c(dd$distrib_diff_vec, dd$betamix_diff)
-
-    # check_quants[i, ] <- dd$check_quants
+    distrib_diff_mat[i, ] <- dd$distrib_diff_vec
 
     for (j in 1:track_num) {
       if (distrib_diff_mat[i, j] < min_diff[j]) {
@@ -203,12 +199,47 @@ ombc_gmm <- function(
       outlier_rank[gross_outs] <- 1
       outlier_rank[!gross_outs] <- outlier_rank0 + (outlier_rank0 != 0)
 
-      outlier_num <- outlier_num0 + sum(gross_outs)
+      outlier_num <- outlier_num0 + gross_num
 
       labels[gross_outs, j] <- 0
       labels[!gross_outs, j] <- labels0[, j]
     }
   }
+
+  p_vals <- round(seq(1, 2, length.out = 10), 2)
+  out_nums <- seq(0, max_out)
+  if (!is.null(gross_outs)) { out_nums <- out_nums + gross_num }
+  gg_curves_list <- list()
+  for (j in 1:10) {
+    gg_curves_list[[j]] <- as.data.frame(cbind(
+      "outlier_number" = out_nums,
+      "distrib_diff" = distrib_diff_mat[, j]
+    )) |>
+      ggplot2::ggplot(ggplot2::aes(x = outlier_number, y = distrib_diff)) +
+      ggplot2::geom_line() +
+      ggplot2::geom_vline(xintercept = outlier_num[j]) +
+      ggplot2::labs(
+        title = paste0(
+          j, ": outlier number = ", outlier_num[j]
+        ),
+        x = "Outlier Number",
+        y = "Distributional Difference"
+      )
+  }
+  gg_curves <- ggpubr::ggarrange(plotlist = gg_curves_list, nrow = 2, ncol = 5)
+
+  gg_choice <- as.data.frame(cbind(
+    "outlier_number" = out_nums,
+    "removal_density" = min_dens
+    )) |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_number, y = removal_density)) +
+    ggplot2::geom_line() +
+    ggplot2::geom_vline(xintercept = outlier_num) +
+    ggplot2::labs(
+      title = paste0(1:10, ": ", outlier_num, collapse = ", "),
+      x = "Outlier Number",
+      y = "Removal Density"
+    )
 
   return(list(
     distrib_diff_arr = distrib_diff_arr,
@@ -219,8 +250,9 @@ ombc_gmm <- function(
     labels = labels,
     final_gmm = mix,
     loglike = loglike,
-    min_dens = min_dens#,
-    # check_quants = check_quants
+    min_dens = min_dens,
+    plot_curves = gg_curves,
+    plot_choice = gg_choice
   ))
 }
 
