@@ -1,22 +1,23 @@
 #' @title Alternate between trimming the lowest density point and refitting a
 #' Gaussian mixture model.
-#' 
+#'
 #' @description
 #' Record the order and mixture density of the trimmed points.
-#' 
+#'
 #' @param x Data set.
 #' @param comp_num Number of mixture components.
 #' @param max_out Maximum number of outliers.
 #' @param mnames Gaussian mixture model covariance structure.
 #' @param seed Seed.
-#' @param reinit_interval Number of iterations between proposed reinitialisations.
+#' @param reinit_interval Number of iterations between proposed
+#'                        reinitialisations.
 #' @param print_interval Number of iterations between print statements.
 #'
 #' @return List:
 #' * $densities
 #' * $outlier_rank
 #' * $loglike
-#' 
+#'
 #' @export
 outcast_gmm <- function(
     x,
@@ -98,9 +99,9 @@ outcast_gmm <- function(
 
 # ------------------------------------------------------------------------------
 
-#' @title Alternate between returning the highest density trimmed point and 
+#' @title Alternate between returning the highest density trimmed point and
 #' refitting a Gaussian mixture model.
-#' 
+#'
 #' @inheritParams outcast_gmm
 #' @param outlier_rank Order in which points were trimmed / removed.
 #' @param turning_point Point at which to start returning points.
@@ -109,7 +110,7 @@ outcast_gmm <- function(
 #' * $densities
 #' * $outlier_rank
 #' * $loglike
-#' 
+#'
 #' @export
 outback_gmm <- function(
     x,
@@ -118,11 +119,9 @@ outback_gmm <- function(
     turning_point = NULL,
     mnames = "VVV",
     seed = 123,
-    print_interval = Inf
-) {
+    print_interval = Inf) {
   x0 <- as.matrix(x)
   obs_num <- nrow(x0)
-  var_num <- ncol(x0)
 
   if (is.null(turning_point)) {
     turning_point <- max(outlier_rank)
@@ -169,7 +168,7 @@ outback_gmm <- function(
     outlier_rank[return_bool] <- turning_point - i + 1
 
     subset_bool <- subset_bool | return_bool
-    z <- (prop_dens_mat / dens_vec) [subset_bool, ]
+    z <- (prop_dens_mat / dens_vec)[subset_bool, ]
   }
 
   return(list(

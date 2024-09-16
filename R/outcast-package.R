@@ -15,6 +15,7 @@
 ## usethis namespace: start
 #' @importFrom ClusterR KMeans_rcpp
 #' @importFrom cpop cpop
+#' @importFrom dbscan glosh
 #' @importFrom mixture gpcm
 #' @importFrom mvtnorm dmvnorm
 #' @importFrom stats lm
