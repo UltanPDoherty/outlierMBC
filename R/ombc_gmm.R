@@ -77,10 +77,6 @@ ombc_gmm <- function(
         cat("Previous z matrix carried forward at i = ", i, ".\n")
         mix <- alt_mix
       }
-
-      if (mix$best_model$loglik < loglike[i - 1]) {
-        cat("Log-likelihood decreased at i = ", i, ".\n")
-      }
     }
     loglike[i] <- mix$best_model$loglik
 
@@ -122,6 +118,8 @@ ombc_gmm <- function(
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
+  outlier_seq <- seq(0, max_out)
+
   if (!is.null(gross_outs)) {
     outlier_bool0 <- outlier_bool
     outlier_rank0 <- outlier_rank
@@ -142,12 +140,11 @@ ombc_gmm <- function(
 
     labels[gross_outs, ] <- 0
     labels[!gross_outs, ] <- labels0
+
+    outlier_seq <- outlier_seq + gross_num
   }
 
   p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
-
-  outlier_seq <- seq(0, max_out)
-  if (!is.null(gross_outs)) outlier_seq <- outlier_seq + gross_num
 
   gg_curves_list <- list()
   for (j in 1:10) {
