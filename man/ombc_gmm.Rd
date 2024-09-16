@@ -50,7 +50,7 @@ Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 \examples{
 
 ombc_gmm_k3n1000o10 <- ombc_gmm(
-  gmm_k3n1000o10[, 1:2], comp_num = 3, max_out = 40
+  gmm_k3n1000o10[, 1:2], comp_num = 3, max_out = 20
 )
 
 ombc_gmm_k3n1000o10$plot_curves

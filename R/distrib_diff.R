@@ -17,8 +17,6 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet, p_range = c(1, 2)) {
   comp_num <- ncol(z)
   track_num <- 10
 
-  z_map <- apply(z, 1, which.max)
-
   distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
   mahala_mat <- matrix(nrow = obs_num, ncol = comp_num)
@@ -66,8 +64,7 @@ distrib_diff_mahalanobis <- function(
     mu_g,
     sigma_g,
     logdet_g,
-    p_range = c(1, 2)
-  ) {
+    p_range = c(1, 2)) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
 

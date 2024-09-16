@@ -27,7 +27,8 @@
 #' @examples
 #'
 #' ombc_gmm_k3n1000o10 <- ombc_gmm(
-#'   gmm_k3n1000o10[, 1:2], comp_num = 3, max_out = 20
+#'   gmm_k3n1000o10[, 1:2],
+#'   comp_num = 3, max_out = 20
 #' )
 #'
 #' ombc_gmm_k3n1000o10$plot_curves
@@ -41,9 +42,7 @@ ombc_gmm <- function(
     gross_outs = NULL,
     p_range = c(1, 2),
     mnames = "VVV",
-    print_interval = Inf
-    ) {
-
+    print_interval = Inf) {
   if (!is.null(gross_outs)) {
     gross_num <- sum(gross_outs)
     x <- x[!gross_outs, ]
@@ -60,10 +59,6 @@ ombc_gmm <- function(
   dist_mat <- dist_mat0
   z <- init_hc(dist_mat, comp_num)
 
-  var_num <- ncol(x)
-
-  min_diff <- rep(Inf, track_num)
-  min_diff_z <- list()
   loglike <- c()
   min_dens <- c()
   distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
@@ -101,20 +96,17 @@ ombc_gmm <- function(
   outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
-  for (j in 1:track_num) {
-    outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
-  }
-
   mix <- list()
-  for (j in 1:track_num) {
-    z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
-    mix[[j]] <- mixture::gpcm(
-      x0[!outlier_bool[, j], ], G = comp_num, mnames = mnames, start = z
-    )
-  }
-
   labels <- matrix(0, nrow = obs_num, ncol = track_num)
   for (j in 1:track_num) {
+    outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
+
+    z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
+    mix[[j]] <- mixture::gpcm(
+      x0[!outlier_bool[, j], ],
+      G = comp_num, mnames = mnames, start = z
+    )
+
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
@@ -128,24 +120,22 @@ ombc_gmm <- function(
     outlier_rank <- double(length(gross_outs))
     labels <- matrix(nrow = length(gross_outs), ncol = track_num)
 
-    for (j in 1:track_num) {
-      outlier_bool[gross_outs, j] <- TRUE
-      outlier_bool[!gross_outs, j] <- outlier_bool0[, j]
+    outlier_rank[gross_outs] <- 1
+    outlier_rank[!gross_outs] <- outlier_rank0 + (outlier_rank0 != 0)
 
-      outlier_rank[gross_outs] <- 1
-      outlier_rank[!gross_outs] <- outlier_rank0 + (outlier_rank0 != 0)
+    outlier_num <- outlier_num0 + gross_num
 
-      outlier_num <- outlier_num0 + gross_num
+    outlier_bool[gross_outs, ] <- TRUE
+    outlier_bool[!gross_outs, ] <- outlier_bool0
 
-      labels[gross_outs, j] <- 0
-      labels[!gross_outs, j] <- labels0[, j]
-    }
+    labels[gross_outs, ] <- 0
+    labels[!gross_outs, ] <- labels0
   }
 
   p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
 
   outlier_seq <- seq(0, max_out)
-  if (!is.null(gross_outs)) { outlier_seq <- outlier_seq + gross_num }
+  if (!is.null(gross_outs)) outlier_seq <- outlier_seq + gross_num
 
   gg_curves_list <- list()
   for (j in 1:10) {
@@ -155,7 +145,7 @@ ombc_gmm <- function(
       ggplot2::geom_line() +
       ggplot2::geom_vline(xintercept = outlier_num[j]) +
       ggplot2::labs(
-        title = paste0(j, ": ", outlier_num[j],  " (p = ", p_vals[j], ")"),
+        title = paste0(j, ": ", outlier_num[j], " (p = ", p_vals[j], ")"),
         x = "Outlier Number",
         y = "Distibutional Difference"
       ) +
