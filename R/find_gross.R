@@ -44,11 +44,8 @@ plot_gross <- function(x, max_out, k_neighbours = 10) {
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = glosh_sort)) +
     ggplot2::geom_line() +
     ggplot2::labs(
-      title = paste0(
-        "k = ", k_neighbours
-      ),
       x = "Outlier Number",
-      y = "Sorted dbscan::glosh Values"
+      y = paste0("Sorted dbscan::glosh Values (k = ", k_neighbours, ")")
     )
 
   return(gg)

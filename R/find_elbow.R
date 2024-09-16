@@ -84,7 +84,8 @@ find_elbow <- function(y, search_centre = NULL, concave = TRUE) {
         "choice = ", choice,
         " (search_interval = [", search_interval[1],
         ", ", search_interval[2], "])"
-      )
+      ),
+      x = "Outliers Removed"
     )
 
   return(list(
