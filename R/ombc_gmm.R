@@ -70,6 +70,20 @@ ombc_gmm <- function(
     z <- init_hc(dist_mat, comp_num)
     mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = z)
 
+    if (i > 1 && mix$best_model$loglik < loglike[i - 1]) {
+      alt_mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = prev_z)
+
+      if (alt_mix$best_model$loglik > mix$best_model$loglik) {
+        cat("Previous z matrix carried forward at i = ", i, ".\n")
+        mix <- alt_mix
+      }
+
+      if (mix$best_model$loglik < loglike[i - 1]) {
+        cat("Log-likelihood decreased at i = ", i, ".\n")
+      }
+    }
+    loglike[i] <- mix$best_model$loglik
+
     dd <- distrib_diff_gmm(
       x,
       mix$z,
@@ -82,13 +96,11 @@ ombc_gmm <- function(
 
     distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
     distrib_diff_mat[i, ] <- dd$distrib_diff_vec
-
-    loglike[i] <- mix$best_model$loglik
     min_dens[i] <- dd$min_dens
 
     outlier_rank[!outlier_rank][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
-    z <- mix$z[-dd$choice_id, , drop = FALSE]
+    prev_z <- mix$z[-dd$choice_id, , drop = FALSE]
 
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
   }
