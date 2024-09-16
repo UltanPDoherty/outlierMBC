@@ -4,10 +4,10 @@
 \alias{distrib_diff_gmm}
 \title{distrib_diff_gmm}
 \usage{
-distrib_diff_gmm(x, z, prop, mu, sigma, logdet)
+distrib_diff_gmm(x, z, prop, mu, sigma, logdet, p_range = c(1, 2))
 }
 \arguments{
-\item{x}{Covariate data only.}
+\item{x}{Data.}
 
 \item{z}{Component assignment probability matrix.}
 
@@ -18,6 +18,9 @@ distrib_diff_gmm(x, z, prop, mu, sigma, logdet)
 \item{sigma}{List of component covariance matrices.}
 
 \item{logdet}{Vector of log-determinants for covariance matrices.}
+
+\item{p_range}{Range for power mean parameter, p, when summarising CDF
+differences.}
 }
 \value{
 List of

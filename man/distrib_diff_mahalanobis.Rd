@@ -4,18 +4,21 @@
 \alias{distrib_diff_mahalanobis}
 \title{distrib_diff_mahalanobis}
 \usage{
-distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g, bool_g)
+distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g, p_range = c(1, 2))
 }
 \arguments{
-\item{x}{Covariate data only.}
+\item{x}{Data.}
 
-\item{z_g}{Component assignment probability vector.}
+\item{z_g}{Assignment probability vector for component g.}
 
-\item{mu_g}{Component mean vector.}
+\item{mu_g}{Mean vector for component g.}
 
-\item{sigma_g}{Component covariance matrix.}
+\item{sigma_g}{Covariance matrix for component g.}
 
-\item{logdet_g}{Log-determinants for covariance matrix of component g.}
+\item{logdet_g}{Log-determinants of covariance matrix for component g.}
+
+\item{p_range}{Range for power mean parameter, p, when summarising CDF
+differences.}
 }
 \value{
 List of

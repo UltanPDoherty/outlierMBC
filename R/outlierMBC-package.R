@@ -16,6 +16,7 @@
 #' @importFrom ClusterR KMeans_rcpp
 #' @importFrom cpop cpop
 #' @importFrom flexCWM cwm
+#' @importFrom ggpubr ggarrange
 #' @importFrom mixture gpcm
 #' @importFrom mvtnorm dmvnorm
 #' @importFrom spatstat.univar ewcdf

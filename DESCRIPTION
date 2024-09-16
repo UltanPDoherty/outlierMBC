@@ -13,7 +13,12 @@ Imports:
     ClusterR,
     cpop,
     flexCWM,
+    ggplot2,
+    ggpubr,
     mixture,
     mvtnorm,
     spatstat.univar,
     stats
+Depends: 
+    R (>= 2.10)
+LazyData: true

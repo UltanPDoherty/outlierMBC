@@ -45,15 +45,18 @@ samples be than the range of the Normal samples?}
 Simulate a Gaussian mixture model with multivariate outliers.
 }
 \examples{
-gmm <- simulate_gmm(
-  n = c(2000, 1000, 1000),
+gmm_k3n1000o10 <- simulate_gmm(
+  n = c(500, 250, 250),
   mu = list(c(-1, 0), c(+1, -1), c(+1, +1)),
   sigma = list(diag(c(0.2, 4 * 0.2)), diag(c(0.2, 0.2)), diag(c(0.2, 0.2))),
-  outlier_num = 40,
+  outlier_num = 10,
   seed = 123,
   crit_val = 0.9999,
   range_multiplier = 1.5
 )
 
-plot(gmm[, c("X1", "X2")], col = gmm$G + 1, pch = gmm$G + 1)
+plot(
+  gmm_k3n1000o10[, c("X1", "X2")],
+  col = gmm_k3n1000o10$G + 1, pch = gmm_k3n1000o10$G + 1
+)
 }

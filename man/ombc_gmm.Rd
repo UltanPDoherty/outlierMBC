@@ -8,11 +8,10 @@ ombc_gmm(
   x,
   comp_num,
   max_out,
+  gross_outs = NULL,
+  p_range = c(1, 2),
   mnames = "VVV",
-  seed = 123,
-  reinit_interval = Inf,
-  print_interval = Inf,
-  gross_outs = NULL
+  print_interval = Inf
 )
 }
 \arguments{
@@ -22,15 +21,14 @@ ombc_gmm(
 
 \item{max_out}{Maximum number of outliers.}
 
+\item{gross_outs}{logical vector identifying gross outliers to be removed.}
+
+\item{p_range}{Range for power mean parameter, p, when summarising CDF
+differences.}
+
 \item{mnames}{Model names for mixture::gpcm.}
 
-\item{seed}{Seed.}
-
-\item{reinit_interval}{How frequently to reinitialise.}
-
 \item{print_interval}{How frequently the iteration count is printed.}
-
-\item{gross_outs}{logical vector identifying gross outliers to be removed.}
 }
 \value{
 List of
@@ -50,20 +48,13 @@ List of
 Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 }
 \examples{
-gmm <- simulate_gmm(
-  n = c(2000, 1000, 1000),
-  mu = list(c(-1, 0), c(+1, -1), c(+1, +1)),
-  sigma = list(diag(c(0.2, 4 * 0.2)), diag(c(0.2, 0.2)), diag(c(0.2, 0.2))),
-  outlier_num = 40,
-  seed = 123,
-  crit_val = 0.9999,
-  range_multiplier = 1.5
+
+ombc_gmm_k3n1000o10 <- ombc_gmm(
+  gmm_k3n1000o10[, 1:2], comp_num = 3, max_out = 40
 )
 
-ombc_gmm <- ombc_gmm(gmm[, 1:2], comp_num = 3, max_out = 80)
+ombc_gmm_k3n1000o10$plot_curves
 
-plot(0:80, ombc_gmm$distrib_diffs, type = "l")
-abline(v = ombc_gmm$outlier_num)
+ombc_gmm_k3n1000o10$plot_choice
 
-plot(gmm[, c("X1", "X2")], col = ombc_gmm$labels + 1, pch = gmm$G + 1)
 }
