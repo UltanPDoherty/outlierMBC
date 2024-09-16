@@ -220,10 +220,14 @@ ombc_gmm <- function(
       ggplot2::geom_vline(xintercept = outlier_num[j]) +
       ggplot2::labs(
         title = paste0(
-          j, ": outlier number = ", outlier_num[j]
+          j, ": ", outlier_num[j]
         ),
         x = "Outlier Number",
-        y = "Distributional Difference"
+        y = "Distibutional Difference"
+      ) +
+      ggplot2::theme(
+        axis.text.y = ggplot2::element_blank(),
+        axis.ticks.y.left = ggplot2::element_blank()
       )
   }
   gg_curves <- ggpubr::ggarrange(plotlist = gg_curves_list, nrow = 2, ncol = 5)
