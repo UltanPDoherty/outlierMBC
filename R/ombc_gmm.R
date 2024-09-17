@@ -10,6 +10,7 @@
 #' @param p_range Range for power mean parameter, p, when summarising CDF
 #'                differences.
 #' @param mnames Model names for mixture::gpcm.
+#' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return List of
@@ -42,6 +43,7 @@ ombc_gmm <- function(
     gross_outs = NULL,
     p_range = c(1, 2),
     mnames = "VVV",
+    nmax = 10,
     print_interval = Inf) {
   if (!is.null(gross_outs)) {
     gross_num <- sum(gross_outs)
@@ -67,7 +69,10 @@ ombc_gmm <- function(
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
     z <- init_hc(dist_mat, comp_num)
-    mix <- mixture::gpcm(x, G = comp_num, mnames = mnames, start = z)
+    mix <- mixture::gpcm(
+      x,
+      G = comp_num, mnames = mnames, start = z, nmax = nmax
+    )
     loglike[i] <- mix$best_model$loglik
 
     dd <- distrib_diff_gmm(
@@ -101,7 +106,7 @@ ombc_gmm <- function(
     z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
     mix[[j]] <- mixture::gpcm(
       x0[!outlier_bool[, j], ],
-      G = comp_num, mnames = mnames, start = z
+      G = comp_num, mnames = mnames, start = z, nmax = nmax
     )
 
     labels[!outlier_bool[, j], j] <- mix[[j]]$map

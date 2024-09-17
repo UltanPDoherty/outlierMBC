@@ -11,6 +11,7 @@ ombc_gmm(
   gross_outs = NULL,
   p_range = c(1, 2),
   mnames = "VVV",
+  nmax = 10,
   print_interval = Inf
 )
 }
@@ -27,6 +28,8 @@ ombc_gmm(
 differences.}
 
 \item{mnames}{Model names for mixture::gpcm.}
+
+\item{nmax}{Maximum number of iterations for mixture::gpcm.}
 
 \item{print_interval}{How frequently the iteration count is printed.}
 }
