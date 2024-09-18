@@ -6,7 +6,6 @@
 #' @param x Data.
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
-#' @param gross_outs logical vector identifying gross outliers to be removed.
 #' @param p_range Range for power mean parameter, p, when summarising CDF
 #'                differences.
 #' @param mnames Model names for mixture::gpcm.
@@ -27,14 +26,15 @@
 #'
 #' @examples
 #'
-#' ombc_gmm_k3n1000o10 <- ombc_gmm(
+#' ombc1_gmm_k3n1000o10 <- ombc1_gmm(
 #'   gmm_k3n1000o10[, 1:2],
 #'   comp_num = 3, max_out = 20
 #' )
 #'
-#' ombc_gmm_k3n1000o10$plot_curves
-#'
-#' ombc_gmm_k3n1000o10$plot_choice
+#' ombc1_gmm_k3n1000o10$plot_curves
+#' ombc1_gmm_k3n1000o10$plot_stacked
+#' ombc1_gmm_k3n1000o10$plot_changes
+#' ombc1_gmm_k3n1000o10$plot_removal
 #'
 ombc1_gmm <- function(
     x,
@@ -110,6 +110,7 @@ ombc1_gmm <- function(
   }
   gg_curves <- ggpubr::ggarrange(plotlist = gg_curves_list, nrow = 2, ncol = 5)
 
+  option <- diffs <- NULL
   gg_stacked <- as.data.frame(scale(distrib_diff_mat)) |>
     dplyr::mutate("outlier_seq" = outlier_seq) |>
     tidyr::pivot_longer(
@@ -171,9 +172,9 @@ ombc1_gmm <- function(
 #' @description
 #' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 #'
-#' @param ombc1 Output from `ombc_gmm_ombc1`.
+#' @param ombc1 Output from `ombc1_gmm1`.
 #' @param pre_removed_num Number of points to be trimmed, chosen based on ombc1.
-#' @inheritParams ombc_gmm_ombc1.
+#' @inheritParams ombc1_gmm
 #'
 #' @return List of
 #' * distrib_diffs
@@ -189,20 +190,25 @@ ombc1_gmm <- function(
 #'
 #' @examples
 #'
-#' ombc_gmm_k3n1000o10 <- ombc_gmm(
+#' ombc1_gmm_k3n1000o10 <- ombc1_gmm(
 #'   gmm_k3n1000o10[, 1:2],
 #'   comp_num = 3, max_out = 20
 #' )
 #'
-#' ombc_gmm_k3n1000o10$plot_curves
+#' ombc2_gmm_k3n1000o10 <- ombc2_gmm(
+#'   gmm_k3n1000o10[, 1:2],
+#'   ombc1_gmm_k3n1000o10,
+#'   pre_removed_num = 0
+#' )
 #'
-#' ombc_gmm_k3n1000o10$plot_choice
+#' ombc2_gmm_k3n1000o10$plot_curves
+#' ombc2_gmm_k3n1000o10$plot_removal
 #'
 ombc2_gmm <- function(
     x,
     ombc1,
     pre_removed_num = 0
-    ) {
+  ) {
 
   comp_num <- ombc1$params$comp_num
   max_out <- ombc1$params$max_out

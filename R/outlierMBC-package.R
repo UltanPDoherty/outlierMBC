@@ -15,6 +15,7 @@
 ## usethis namespace: start
 #' @importFrom ClusterR KMeans_rcpp
 #' @importFrom cpop cpop
+#' @importFrom dplyr mutate
 #' @importFrom flexCWM cwm
 #' @importFrom ggpubr ggarrange
 #' @importFrom mixture gpcm
@@ -26,5 +27,6 @@
 #' @importFrom stats lm
 #' @importFrom stats quantile
 #' @importFrom stats sd
+#' @importFrom tidyr pivot_longer
 ## usethis namespace: end
 NULL

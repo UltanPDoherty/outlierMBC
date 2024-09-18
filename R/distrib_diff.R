@@ -1,6 +1,6 @@
 #' distrib_diff_gmm
 #'
-#' @inheritParams ombc_gmm
+#' @inheritParams ombc1_gmm
 #' @param z Component assignment probability matrix.
 #' @param prop Vector of component proportions.
 #' @param mu List of component mean vectors.

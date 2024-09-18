@@ -28,7 +28,7 @@ List of
 \item distrib_diff
 \item distrib_diff_vec
 \item choice_id
-\item min_dens
+\item removal_dens
 }
 }
 \description{

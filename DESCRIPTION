@@ -12,13 +12,15 @@ RoxygenNote: 7.3.2
 Imports: 
     ClusterR,
     cpop,
+    dplyr,
     flexCWM,
     ggplot2,
     ggpubr,
     mixture,
     mvtnorm,
     spatstat.univar,
-    stats
+    stats,
+    tidyr
 Depends: 
     R (>= 2.10)
 LazyData: true
