@@ -79,9 +79,10 @@ ombc1_gmm <- function(
             )
         )
       ))
-      cat("Alternative covariance structure model fits attempted.\n")
       if (!is.null(mix)) {
-        cat(paste0(mix$best_model$cov_type, " selected.\n"))
+        cat(paste0(
+          mix$best_model$cov_type, " covariance structure implemented.\n"
+        ))
       }
     }
     loglike[i] <- mix$best_model$loglik
@@ -273,9 +274,10 @@ ombc2_gmm <- function(
           )
         )
       ))
-      cat("Alternative covariance structure model fits attempted.\n")
       if (!is.null(mix[[j]])) {
-        cat(paste0(mix[[j]]$best_model$cov_type, " selected.\n"))
+        cat(paste0(
+          mix[[j]]$best_model$cov_type, " covariance structure implemented.\n"
+        ))
       }
     }
 
