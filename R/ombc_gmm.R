@@ -172,7 +172,7 @@ ombc1_gmm <- function(
 #' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 #'
 #' @param ombc1 Output from `ombc1_gmm1`.
-#' @param pre_removed_num Number of points to be trimmed, chosen based on ombc1.
+#' @param start_point Number of points to be trimmed, chosen based on ombc1.
 #' @inheritParams ombc1_gmm
 #'
 #' @return List of
@@ -197,7 +197,7 @@ ombc1_gmm <- function(
 #' ombc2_gmm_k3n1000o10 <- ombc2_gmm(
 #'   gmm_k3n1000o10[, 1:2],
 #'   ombc1_gmm_k3n1000o10,
-#'   pre_removed_num = 0
+#'   start_point = 1
 #' )
 #'
 #' ombc2_gmm_k3n1000o10$plot_curves
@@ -206,7 +206,7 @@ ombc1_gmm <- function(
 ombc2_gmm <- function(
     x,
     ombc1,
-    pre_removed_num = 0) {
+    start_point = 1) {
   comp_num <- ombc1$params$comp_num
   max_out <- ombc1$params$max_out
   p_range <- ombc1$params$p_range
@@ -224,11 +224,12 @@ ombc2_gmm <- function(
 
   dist_mat0 <- as.matrix(stats::dist(x0))
 
-  if (pre_removed_num > 0) {
-    distrib_diff_mat <- distrib_diff_mat[-seq_len(pre_removed_num), ]
+  if (start_point > 1) {
+    distrib_diff_mat <- distrib_diff_mat[-seq_len(start_point - 1), ]
+    removal_dens <- removal_dens[-seq_len(start_point - 1)]
   }
 
-  outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 + pre_removed_num
+  outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 + (start_point - 1)
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
   mix <- list()
@@ -245,7 +246,7 @@ ombc2_gmm <- function(
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
-  outlier_seq <- seq(0, max_out)
+  outlier_seq <- seq(start_point - 1, max_out)
   p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
 
   gg_curves_list <- list()
