@@ -44,7 +44,6 @@ ombc1_gmm <- function(
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
-
   x <- as.matrix(x)
   x0 <- x
 
@@ -115,7 +114,7 @@ ombc1_gmm <- function(
     dplyr::mutate("outlier_seq" = outlier_seq) |>
     tidyr::pivot_longer(
       cols = !outlier_seq, names_to = "option", values_to = "diffs"
-      ) |>
+    ) |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = diffs, group = option)) +
     ggplot2::geom_line() +
     ggplot2::labs(
@@ -207,9 +206,7 @@ ombc1_gmm <- function(
 ombc2_gmm <- function(
     x,
     ombc1,
-    pre_removed_num = 0
-  ) {
-
+    pre_removed_num = 0) {
   comp_num <- ombc1$params$comp_num
   max_out <- ombc1$params$max_out
   p_range <- ombc1$params$p_range
@@ -226,10 +223,9 @@ ombc2_gmm <- function(
   track_num <- 10
 
   dist_mat0 <- as.matrix(stats::dist(x0))
-  dist_mat <- dist_mat0
 
   if (pre_removed_num > 0) {
-    distrib_diff_mat <- distrib_diff_mat[-seq_len(pre_removed_num),]
+    distrib_diff_mat <- distrib_diff_mat[-seq_len(pre_removed_num), ]
   }
 
   outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 + pre_removed_num
