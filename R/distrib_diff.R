@@ -11,7 +11,7 @@
 #' * distrib_diff
 #' * distrib_diff_vec
 #' * choice_id
-#' * min_dens
+#' * removal_dens
 distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet, p_range = c(1, 2)) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
@@ -32,7 +32,7 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet, p_range = c(1, 2)) {
   mix_dens <- dens_mat %*% t(prop)
 
   choice_id <- which.min(mix_dens)
-  min_dens <- mix_dens[choice_id]
+  removal_dens <- mix_dens[choice_id]
 
   distrib_diff_vec <- as.numeric(sqrt(prop %*% (distrib_diff_mat^2)))
 
@@ -40,7 +40,7 @@ distrib_diff_gmm <- function(x, z, prop, mu, sigma, logdet, p_range = c(1, 2)) {
     distrib_diff_mat = distrib_diff_mat,
     distrib_diff_vec = distrib_diff_vec,
     choice_id = choice_id,
-    min_dens = min_dens
+    removal_dens = removal_dens
   ))
 }
 

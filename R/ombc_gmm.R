@@ -22,7 +22,7 @@
 #' * labels
 #' * final_gmm
 #' * loglike
-#' * min_dens
+#' * removal_dens
 #' @export
 #'
 #' @examples
@@ -36,20 +36,14 @@
 #'
 #' ombc_gmm_k3n1000o10$plot_choice
 #'
-ombc_gmm <- function(
+ombc1_gmm <- function(
     x,
     comp_num,
     max_out,
-    gross_outs = NULL,
     p_range = c(1, 2),
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
-  if (!is.null(gross_outs)) {
-    gross_num <- sum(gross_outs)
-    x <- x[!gross_outs, ]
-    max_out <- max_out - gross_num
-  }
 
   x <- as.matrix(x)
   x0 <- x
@@ -61,7 +55,7 @@ ombc_gmm <- function(
   dist_mat <- dist_mat0
 
   loglike <- c()
-  min_dens <- c()
+  removal_dens <- c()
   distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = track_num)
   outlier_rank <- rep(0, obs_num)
@@ -87,7 +81,7 @@ ombc_gmm <- function(
 
     distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
     distrib_diff_mat[i, ] <- dd$distrib_diff_vec
-    min_dens[i] <- dd$min_dens
+    removal_dens[i] <- dd$removal_dens
 
     outlier_rank[!outlier_rank][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
@@ -95,7 +89,144 @@ ombc_gmm <- function(
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
   }
 
-  outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1
+  outlier_seq <- seq(0, max_out)
+  p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
+
+  gg_curves_list <- list()
+  for (j in 1:10) {
+    distrib_diff_j <- distrib_diff_mat[, j]
+    gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
+      ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
+      ggplot2::geom_line() +
+      ggplot2::labs(
+        title = paste0(j, " (p = ", p_vals[j], ")"),
+        x = "Outlier Number",
+        y = "Distributional Difference"
+      ) +
+      ggplot2::theme(
+        axis.text.y = ggplot2::element_blank(),
+        axis.ticks.y.left = ggplot2::element_blank()
+      )
+  }
+  gg_curves <- ggpubr::ggarrange(plotlist = gg_curves_list, nrow = 2, ncol = 5)
+
+  gg_stacked <- as.data.frame(scale(distrib_diff_mat)) |>
+    dplyr::mutate("outlier_seq" = outlier_seq) |>
+    tidyr::pivot_longer(
+      cols = !outlier_seq, names_to = "option", values_to = "diffs"
+      ) |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = diffs, group = option)) +
+    ggplot2::geom_line() +
+    ggplot2::labs(
+      x = "Outlier_Number", y = "Scaled DD Values",
+      title = "Scaled Distributional Differences"
+    )
+
+  gg_changes <- as.data.frame(diff(scale(distrib_diff_mat))) |>
+    dplyr::mutate("outlier_seq" = outlier_seq[-1]) |>
+    tidyr::pivot_longer(
+      cols = !outlier_seq, names_to = "option", values_to = "diffs"
+    ) |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = diffs, group = option)) +
+    ggplot2::geom_line() +
+    ggplot2::labs(
+      x = "Outlier_Number", y = "Changes in Scaled DD Values",
+      title = "Changes in Scaled Distributional Differences"
+    )
+
+  gg_removal <- data.frame(outlier_seq, removal_dens) |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = removal_dens)) +
+    ggplot2::geom_line() +
+    ggplot2::labs(
+      x = "Outlier Number",
+      y = "Removal Density"
+    )
+
+  params <- list(
+    "comp_num" = comp_num,
+    "max_out" = max_out,
+    "p_range" = p_range,
+    "mnames" = mnames,
+    "nmax" = nmax
+  )
+
+  return(list(
+    distrib_diff_arr = distrib_diff_arr,
+    distrib_diff_mat = distrib_diff_mat,
+    outlier_rank = outlier_rank,
+    loglike = loglike,
+    removal_dens = removal_dens,
+    plot_curves = gg_curves,
+    plot_stacked = gg_stacked,
+    plot_changes = gg_changes,
+    plot_removal = gg_removal,
+    params = params
+  ))
+}
+
+# ------------------------------------------------------------------------------
+
+#' ombc_gmm
+#'
+#' @description
+#' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
+#'
+#' @param ombc1 Output from `ombc_gmm_ombc1`.
+#' @param pre_removed_num Number of points to be trimmed, chosen based on ombc1.
+#' @inheritParams ombc_gmm_ombc1.
+#'
+#' @return List of
+#' * distrib_diffs
+#' * distrib_diff_mat
+#' * outlier_bool
+#' * outlier_num
+#' * outlier_rank
+#' * labels
+#' * final_gmm
+#' * loglike
+#' * removal_dens
+#' @export
+#'
+#' @examples
+#'
+#' ombc_gmm_k3n1000o10 <- ombc_gmm(
+#'   gmm_k3n1000o10[, 1:2],
+#'   comp_num = 3, max_out = 20
+#' )
+#'
+#' ombc_gmm_k3n1000o10$plot_curves
+#'
+#' ombc_gmm_k3n1000o10$plot_choice
+#'
+ombc2_gmm <- function(
+    x,
+    ombc1,
+    pre_removed_num = 0
+    ) {
+
+  comp_num <- ombc1$params$comp_num
+  max_out <- ombc1$params$max_out
+  p_range <- ombc1$params$p_range
+  mnames <- ombc1$params$mnames
+  nmax <- ombc1$params$nmax
+  outlier_rank <- ombc1$outlier_rank
+  removal_dens <- ombc1$removal_dens
+  distrib_diff_mat <- ombc1$distrib_diff_mat
+
+  x <- as.matrix(x)
+  x0 <- x
+
+  obs_num <- nrow(x0)
+  track_num <- 10
+
+  dist_mat0 <- as.matrix(stats::dist(x0))
+  dist_mat <- dist_mat0
+
+  if (pre_removed_num > 0) {
+    distrib_diff_mat <- distrib_diff_mat[-seq_len(pre_removed_num),]
+  }
+
+  outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 + pre_removed_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
   mix <- list()
@@ -113,31 +244,6 @@ ombc_gmm <- function(
   }
 
   outlier_seq <- seq(0, max_out)
-
-  if (!is.null(gross_outs)) {
-    outlier_bool0 <- outlier_bool
-    outlier_rank0 <- outlier_rank
-    outlier_num0 <- outlier_num
-    labels0 <- labels
-
-    outlier_bool <- matrix(nrow = length(gross_outs), ncol = track_num)
-    outlier_rank <- double(length(gross_outs))
-    labels <- matrix(nrow = length(gross_outs), ncol = track_num)
-
-    outlier_rank[gross_outs] <- 1
-    outlier_rank[!gross_outs] <- outlier_rank0 + (outlier_rank0 != 0)
-
-    outlier_num <- outlier_num0 + gross_num
-
-    outlier_bool[gross_outs, ] <- TRUE
-    outlier_bool[!gross_outs, ] <- outlier_bool0
-
-    labels[gross_outs, ] <- 0
-    labels[!gross_outs, ] <- labels0
-
-    outlier_seq <- outlier_seq + gross_num
-  }
-
   p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
 
   gg_curves_list <- list()
@@ -159,8 +265,8 @@ ombc_gmm <- function(
   }
   gg_curves <- ggpubr::ggarrange(plotlist = gg_curves_list, nrow = 2, ncol = 5)
 
-  gg_choice <- data.frame(outlier_seq, min_dens) |>
-    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = min_dens)) +
+  gg_removal <- data.frame(outlier_seq, removal_dens) |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = removal_dens)) +
     ggplot2::geom_line() +
     ggplot2::geom_vline(xintercept = outlier_num) +
     ggplot2::labs(
@@ -170,21 +276,17 @@ ombc_gmm <- function(
     )
 
   return(list(
-    distrib_diff_arr = distrib_diff_arr,
     distrib_diff_mat = distrib_diff_mat,
     outlier_bool = outlier_bool,
     outlier_num = outlier_num,
-    outlier_rank = outlier_rank,
     labels = labels,
-    final_gmm = mix,
-    loglike = loglike,
-    min_dens = min_dens,
     plot_curves = gg_curves,
-    plot_choice = gg_choice
+    plot_removal = gg_removal
   ))
 }
 
 # ------------------------------------------------------------------------------
+
 
 init_hc <- function(dist_mat, comp_num) {
   hc <- stats::hclust(stats::as.dist(dist_mat), method = "ward.D2")
