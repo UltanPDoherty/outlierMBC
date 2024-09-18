@@ -62,10 +62,28 @@ ombc1_gmm <- function(
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
     z <- init_hc(dist_mat, comp_num)
-    mix <- mixture::gpcm(
+    mix <- NULL
+    try(mix <- mixture::gpcm(
       x,
       G = comp_num, mnames = mnames, start = z, nmax = nmax
-    )
+    ))
+    if (is.null(mix)) {
+      try(mix <- mixture::gpcm(
+        x,
+        G = comp_num, start = z, nmax = nmax,
+        mnames = setdiff(
+          mnames,
+          c(
+            "EII", "VII", "EEI", "VEI", "EVI", "VVI", "EEE",
+            "EEV", "VEV", "VVV", "EVE", "VVE", "VEE", "EVV"
+            )
+        )
+      ))
+      cat("Alternative covariance structure model fits attempted.\n")
+      if (!is.null(mix)) {
+        cat(paste0(mix$best_model$cov_type, " selected.\n"))
+      }
+    }
     loglike[i] <- mix$best_model$loglik
 
     dd <- distrib_diff_gmm(
@@ -238,10 +256,28 @@ ombc2_gmm <- function(
     outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
 
     z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
-    mix[[j]] <- mixture::gpcm(
+
+    try(mix[[j]] <- mixture::gpcm(
       x0[!outlier_bool[, j], ],
       G = comp_num, mnames = mnames, start = z, nmax = nmax
-    )
+    ))
+    if (is.null(mix[[j]])) {
+      try(mix[[j]] <- mixture::gpcm(
+        x0[!outlier_bool[, j], ],
+        G = comp_num, start = z, nmax = nmax,
+        mnames = setdiff(
+          mnames,
+          c(
+            "EII", "VII", "EEI", "VEI", "EVI", "VVI", "EEE",
+            "EEV", "VEV", "VVV", "EVE", "VVE", "VEE", "EVV"
+          )
+        )
+      ))
+      cat("Alternative covariance structure model fits attempted.\n")
+      if (!is.null(mix[[j]])) {
+        cat(paste0(mix[[j]]$best_model$cov_type, " selected.\n"))
+      }
+    }
 
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
