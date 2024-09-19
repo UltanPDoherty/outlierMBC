@@ -55,6 +55,8 @@ ombc1_gmm <- function(
   dist_mat0 <- as.matrix(stats::dist(x0))
   dist_mat <- dist_mat0
 
+  z <- init_hc(dist_mat, comp_num)
+
   loglike <- c()
   removal_dens <- c()
   mu_change <- c()
