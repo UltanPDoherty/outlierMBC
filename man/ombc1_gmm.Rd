@@ -11,7 +11,7 @@ ombc1_gmm(
   min_size = 10,
   p_range = c(1, 2),
   mnames = "VVV",
-  nmax = 10,
+  nmax = 1000,
   print_interval = Inf
 )
 }
