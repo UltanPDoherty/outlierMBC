@@ -41,7 +41,7 @@ ombc1_gmm <- function(
     x,
     comp_num,
     max_out,
-    min_size = 10,
+    min_size = floor(nrow(x) / (comp_num * 11)),
     p_range = c(1, 2),
     mnames = "VVV",
     nmax = 1000,
@@ -81,7 +81,7 @@ ombc1_gmm <- function(
       mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
 
       small_components <- colSums(mix$z) < min_size
-      cat("Small cluster reinitialisation.\n")
+      cat(paste0("Small cluster reinitialisation at i = ", i, ".\n"))
     }
     stopifnot("Minimum cluster size violated.\n" = all(!small_components))
 
