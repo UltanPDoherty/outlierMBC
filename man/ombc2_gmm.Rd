@@ -4,14 +4,14 @@
 \alias{ombc2_gmm}
 \title{ombc_gmm}
 \usage{
-ombc2_gmm(x, ombc1, pre_removed_num = 0)
+ombc2_gmm(x, ombc1, start_point = 1)
 }
 \arguments{
 \item{x}{Data.}
 
 \item{ombc1}{Output from \code{ombc1_gmm1}.}
 
-\item{pre_removed_num}{Number of points to be trimmed, chosen based on ombc1.}
+\item{start_point}{Number of points to be trimmed, chosen based on ombc1.}
 }
 \value{
 List of
@@ -40,7 +40,7 @@ ombc1_gmm_k3n1000o10 <- ombc1_gmm(
 ombc2_gmm_k3n1000o10 <- ombc2_gmm(
   gmm_k3n1000o10[, 1:2],
   ombc1_gmm_k3n1000o10,
-  pre_removed_num = 0
+  start_point = 1
 )
 
 ombc2_gmm_k3n1000o10$plot_curves

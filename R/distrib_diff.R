@@ -67,6 +67,7 @@ distrib_diff_mahalanobis <- function(
     p_range = c(1, 2)) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
+  stopifnot("A cluster has become too small (< 4 points).\n" = n_g > 3)
 
   param1 <- var_num / 2
   param2 <- (n_g - var_num - 1) / 2

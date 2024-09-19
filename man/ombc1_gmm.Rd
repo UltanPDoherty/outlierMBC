@@ -8,6 +8,7 @@ ombc1_gmm(
   x,
   comp_num,
   max_out,
+  min_size = 10,
   p_range = c(1, 2),
   mnames = "VVV",
   nmax = 10,
@@ -20,6 +21,8 @@ ombc1_gmm(
 \item{comp_num}{Number of components.}
 
 \item{max_out}{Maximum number of outliers.}
+
+\item{min_size}{Minimum component size.}
 
 \item{p_range}{Range for power mean parameter, p, when summarising CDF
 differences.}
