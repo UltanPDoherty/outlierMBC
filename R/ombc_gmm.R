@@ -72,15 +72,11 @@ ombc1_gmm <- function(
       exclude_points <- mix$map %in% which(small_components)
       z <- init_hc(dist_mat[!exclude_points, !exclude_points], comp_num)
 
-      mix <- try_mixture_gpcm(
-        x[!exclude_points, ], comp_num, mnames, z, nmax
-      )
+      mix <- try_mixture_gpcm(x[!exclude_points, ], comp_num, mnames, z, nmax)
 
       z <- mixture::e_step(x, mix$best_model)$z
 
-      mix <- try_mixture_gpcm(
-        x, comp_num, mnames, z, nmax
-      )
+      mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
 
       small_components <- colSums(mix$z) < min_size
     }
