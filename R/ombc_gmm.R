@@ -117,8 +117,8 @@ ombc1_gmm <- function(
   }
 
   outlier_seq <- seq(0, max_out)
-  p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
-
+  diffs <- NULL
+  option <- NULL
   gg_changes <- as.data.frame(diff(scale(distrib_diff_mat))) |>
     dplyr::mutate("outlier_seq" = outlier_seq[-1]) |>
     tidyr::pivot_longer(
