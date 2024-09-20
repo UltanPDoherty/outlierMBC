@@ -6,7 +6,6 @@
 #' @param x Data.
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
-#' @param min_size Minimum component size.
 #' @param p_range Range for power mean parameter, p, when summarising CDF
 #'                differences.
 #' @param mnames Model names for mixture::gpcm.
@@ -41,7 +40,6 @@ ombc1_gmm <- function(
     x,
     comp_num,
     max_out,
-    min_size = floor(nrow(x) / (comp_num * 11)),
     p_range = c(1, 2),
     mnames = "VVV",
     nmax = 10,
@@ -68,22 +66,6 @@ ombc1_gmm <- function(
 
     z <- init_hc(dist_mat, comp_num)
     mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
-
-    small_components <- colSums(mix$z) < min_size
-    if (any(small_components)) {
-      exclude_points <- mix$map %in% which(small_components)
-      z <- init_hc(dist_mat[!exclude_points, !exclude_points], comp_num)
-
-      mix <- try_mixture_gpcm(x[!exclude_points, ], comp_num, mnames, z, nmax)
-
-      z <- mixture::e_step(x, mix$best_model)$z
-
-      mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
-
-      small_components <- colSums(mix$z) < min_size
-      cat(paste0("Small cluster reinitialisation at i = ", i, ".\n"))
-    }
-    stopifnot("Minimum cluster size violated.\n" = all(!small_components))
 
     loglike[i] <- mix$best_model$loglik
 
