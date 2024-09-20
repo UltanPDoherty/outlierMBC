@@ -83,9 +83,7 @@ distrib_diff_mahalanobis <- function(
   beta_cdf_g <- stats::pbeta(check_seq, param1, param2)
 
   cdf_diffs <- beta_cdf_g - mahala_ewcdf_g
-  abs_cdf_diffs <- abs(cdf_diffs)
   pos_cdf_diffs <- pmax(rep(0, length(check_seq)), cdf_diffs)
-  neg_cdf_diffs <- pmax(rep(0, length(check_seq)), -cdf_diffs)
 
   p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
   pos_cdf_pmeans <- vapply(

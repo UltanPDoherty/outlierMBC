@@ -16,6 +16,7 @@
 #' @importFrom clue solve_LSAP
 #' @importFrom ClusterR KMeans_rcpp
 #' @importFrom cpop cpop
+#' @importFrom dbscan kNNdist
 #' @importFrom dplyr mutate
 #' @importFrom flexCWM cwm
 #' @importFrom ggpubr ggarrange
