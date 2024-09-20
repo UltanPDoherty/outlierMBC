@@ -15,7 +15,6 @@ Imports:
     cpop,
     dplyr,
     flexCWM,
-    dbscan,
     ggplot2,
     ggpubr,
     mixture,
