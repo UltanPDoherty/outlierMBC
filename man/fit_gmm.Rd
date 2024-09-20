@@ -2,8 +2,8 @@
 % Please edit documentation in R/fit_gmm.R
 \name{fit_gmm}
 \alias{fit_gmm}
-\title{Fit a Gaussian mixture model given the number of outliers and a ranking of
-the candidate outliers.}
+\title{Fit a Gaussian mixture model given the number of outliers and a
+ranking of the candidate outliers.}
 \usage{
 fit_gmm(
   x,
@@ -38,6 +38,6 @@ List:
 }
 }
 \description{
-Fit a Gaussian mixture model given the number of outliers and a ranking of
-the candidate outliers.
+Fit a Gaussian mixture model given the number of outliers and a
+ranking of the candidate outliers.
 }

@@ -26,7 +26,8 @@ outcast_gmm(
 
 \item{seed}{Seed.}
 
-\item{reinit_interval}{Number of iterations between proposed reinitialisations.}
+\item{reinit_interval}{Number of iterations between proposed
+reinitialisations.}
 
 \item{print_interval}{Number of iterations between print statements.}
 }

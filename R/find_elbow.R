@@ -81,11 +81,11 @@ find_elbow <- function(y, search_centre = NULL, concave = TRUE) {
     ) +
     ggplot2::labs(
       title = paste0(
-        "choice = ", choice,
-        " (search_interval = [", search_interval[1],
+        "Elbow choice = ", choice,
+        " (Search interval = [", search_interval[1],
         ", ", search_interval[2], "])"
       ),
-      x = "Outliers Removed"
+      x = "Outlier Number"
     )
 
   return(list(

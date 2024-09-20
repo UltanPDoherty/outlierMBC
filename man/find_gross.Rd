@@ -4,12 +4,10 @@
 \alias{find_gross}
 \title{Find the gross outliers.}
 \usage{
-find_gross(x, max_out, search_centre, k_neighbours = 10, choice = NULL)
+find_gross(x, search_centre, k_neighbours = 10, choice = NULL)
 }
 \arguments{
 \item{x}{Data set.}
-
-\item{max_out}{Maximum number of outliers.}
 
 \item{search_centre}{Centre of changepoint search interval.}
 

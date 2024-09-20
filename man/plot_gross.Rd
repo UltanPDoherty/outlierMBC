@@ -5,12 +5,10 @@
 \title{Plot sorted dbscan::glosh values to determine the \code{search_centre} for
 \code{find_gross}.}
 \usage{
-plot_gross(x, max_out, k_neighbours = 10)
+plot_gross(x, k_neighbours = 10)
 }
 \arguments{
 \item{x}{Data set.}
-
-\item{max_out}{Maximum number of outliers.}
 
 \item{k_neighbours}{Number of neighbours for dbscan::glosh}
 }
