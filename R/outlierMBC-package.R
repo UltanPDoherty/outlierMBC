@@ -13,6 +13,7 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @importFrom clue solve_LSAP
 #' @importFrom ClusterR KMeans_rcpp
 #' @importFrom cpop cpop
 #' @importFrom dplyr mutate

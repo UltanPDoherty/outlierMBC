@@ -6,6 +6,7 @@
 #' @param x Data.
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
+#' @param gross_outs Logical vector identifying gross outliers.
 #' @param p_range Range for power mean parameter, p, when summarising CDF
 #'                differences.
 #' @param mnames Model names for mixture::gpcm.
@@ -40,10 +41,17 @@ ombc1_gmm <- function(
     x,
     comp_num,
     max_out,
+    gross_outs = NULL,
     p_range = c(1, 2),
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
+  if (!is.null(gross_outs)) {
+    gross_num <- sum(gross_outs)
+    x <- x[!gross_outs, ]
+    max_out <- max_out - gross_num
+  }
+
   x <- as.matrix(x)
   x0 <- x
 
