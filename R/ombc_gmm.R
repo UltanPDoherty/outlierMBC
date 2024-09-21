@@ -74,6 +74,10 @@ ombc1_gmm <- function(
 
     # z <- init_hc(dist_mat, comp_num)
     mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
+    if (is.null(mix)) {
+      z <- init_hc(dist_mat, comp_num)
+      mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
+    }
 
     loglike[i] <- mix$best_model$loglik
 
