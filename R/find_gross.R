@@ -14,14 +14,16 @@
 #'
 #' @export
 find_gross <- function(
-    x, search_centre,
+    x, max_out, search_centre,
     k_neighbours = floor(nrow(x) / 100),
     underestimate = 0.5,
     choice = NULL) {
   stopifnot(!is.null(search_centre))
 
+  outlier_number <- seq_len(2 * max_out)
+
   x_knndist <- dbscan::kNNdist(x, k_neighbours)
-  knndist_sort <- -sort(-x_knndist)
+  knndist_sort <- -sort(-x_knndist)[outlier_number]
 
   elbow <- find_elbow(knndist_sort, search_centre, TRUE)
   elbow_choice <- elbow$choice
@@ -34,7 +36,6 @@ find_gross <- function(
 
   bool <- rank(-x_knndist) <= gross_choice
 
-  outlier_number <- seq_len(nrow(x))
   search_interval <- elbow$search_interval
   cpop_fitted <- cpop::fitted(elbow$cpop_out)
   gg <- data.frame(outlier_number, knndist_sort) |>
@@ -75,11 +76,11 @@ find_gross <- function(
 #' @return A ggplot2 object
 #'
 #' @export
-plot_gross <- function(x, k_neighbours = floor(nrow(x) / 100)) {
+plot_gross <- function(x, max_out, k_neighbours = floor(nrow(x) / 100)) {
   x_knndist <- dbscan::kNNdist(x, k_neighbours)
 
-  outlier_seq <- seq_len(nrow(x))
-  knndist_sort <- -sort(-x_knndist)
+  outlier_seq <- seq_len(2 * max_out)
+  knndist_sort <- -sort(-x_knndist)[outlier_seq]
   gg <- data.frame(outlier_seq, knndist_sort) |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = knndist_sort)) +
     ggplot2::geom_line() +

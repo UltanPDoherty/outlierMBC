@@ -5,10 +5,12 @@
 \title{Plot kNN distance values to determine the \code{search_centre} for
 \code{find_gross}.}
 \usage{
-plot_gross(x, k_neighbours = floor(nrow(x)/100))
+plot_gross(x, max_out, k_neighbours = floor(nrow(x)/100))
 }
 \arguments{
 \item{x}{Data.}
+
+\item{max_out}{Maximum number of outliers.}
 
 \item{k_neighbours}{Number of neighbours for dbscan::kNNdist.}
 }

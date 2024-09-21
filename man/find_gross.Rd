@@ -6,6 +6,7 @@
 \usage{
 find_gross(
   x,
+  max_out,
   search_centre,
   k_neighbours = floor(nrow(x)/100),
   underestimate = 0.5,
@@ -14,6 +15,8 @@ find_gross(
 }
 \arguments{
 \item{x}{Data.}
+
+\item{max_out}{Maximum number of outliers.}
 
 \item{search_centre}{Centre of elbow search interval.}
 
