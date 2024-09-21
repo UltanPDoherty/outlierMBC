@@ -75,8 +75,17 @@ ombc1_gmm <- function(
     # z <- init_hc(dist_mat, comp_num)
     mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
     if (is.null(mix)) {
+      cat(paste0("Reinitialisation required."))
       z <- init_hc(dist_mat, comp_num)
       mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
+    } else {
+      alt_z <- init_hc(dist_mat, comp_num)
+      alt_mix <- try_mixture_gpcm(x, comp_num, mnames, alt_z, nmax)
+
+      if (alt_mix$best_model$loglik > mix$best_model$loglik) {
+        z <- alt_z
+        mix <- alt_mix
+      }
     }
 
     loglike[i] <- mix$best_model$loglik
