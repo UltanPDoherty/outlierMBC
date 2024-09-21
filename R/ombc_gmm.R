@@ -75,7 +75,7 @@ ombc1_gmm <- function(
     # z <- init_hc(dist_mat, comp_num)
     mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
     if (is.null(mix)) {
-      cat(paste0("Reinitialisation required."))
+      cat(paste0("Model-fitting failure reinitialisation at i = ", i, ".\n"))
       z <- init_hc(dist_mat, comp_num)
       mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
     } else {
@@ -83,6 +83,7 @@ ombc1_gmm <- function(
       alt_mix <- try_mixture_gpcm(x, comp_num, mnames, alt_z, nmax)
 
       if (alt_mix$best_model$loglik > mix$best_model$loglik) {
+        cat("Log-likelihood improvement reinitialisation at i = ", i, ".\n")
         z <- alt_z
         mix <- alt_mix
       }
