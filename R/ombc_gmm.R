@@ -82,14 +82,17 @@ ombc1_gmm <- function(
       alt_z <- init_hc(dist_mat, comp_num)
       alt_mix <- try_mixture_gpcm(x, comp_num, mnames, alt_z, nmax)
 
-      if (alt_mix$best_model$loglik > mix$best_model$loglik) {
+
+      if (
+        !is.null(alt_mix) && alt_mix$best_model$loglik > mix$best_model$loglik
+      ) {
         cat(paste0(
           "Improved log-likelihood reinitialisation at i = ", i, ".\n"
         ))
-        z <- alt_z
         mix <- alt_mix
       }
     }
+    z <- mix$z
 
     loglike[i] <- mix$best_model$loglik
 
