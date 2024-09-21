@@ -46,6 +46,14 @@ ombc1_gmm <- function(
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
+  params <- list(
+    "comp_num" = comp_num,
+    "max_out" = max_out,
+    "p_range" = p_range,
+    "mnames" = mnames,
+    "nmax" = nmax
+  )
+
   if (!is.null(gross_outs)) {
     gross_num <- sum(gross_outs)
     x <- x[!gross_outs, ]
@@ -124,7 +132,13 @@ ombc1_gmm <- function(
     old_mix_means <- mix$best_model$model_obj[[1]]$mu
   }
 
-  outlier_seq <- seq(0, max_out)
+  start_point <- max(apply(
+    distrib_diff_mat,
+    2,
+    function(x) changepoint::cpt.var(diff(x))@cpts[1] + 2 + gross_num
+  ))
+
+  outlier_seq <- seq(gross_num, max_out + gross_num)
   p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
 
   gg_curves_list <- list()
@@ -133,6 +147,7 @@ ombc1_gmm <- function(
     gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
       ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
       ggplot2::geom_line() +
+      ggplot2::geom_vline(xintercept = start_point)
       ggplot2::labs(
         title = paste0(j, " (p = ", p_vals[j], ")"),
         x = "Outlier Number",
@@ -154,18 +169,11 @@ ombc1_gmm <- function(
     ) |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = diffs, group = option)) +
     ggplot2::geom_line() +
+    ggplot2::geom_vline(xintercept = start_point - 1)
     ggplot2::labs(
       x = "Outlier_Number", y = "Changes in Scaled DD Values",
       title = "Changes in Scaled Distributional Differences"
     )
-
-  params <- list(
-    "comp_num" = comp_num,
-    "max_out" = max_out,
-    "p_range" = p_range,
-    "mnames" = mnames,
-    "nmax" = nmax
-  )
 
   return(list(
     distrib_diff_arr = distrib_diff_arr,
