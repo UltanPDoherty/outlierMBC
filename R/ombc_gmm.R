@@ -106,6 +106,26 @@ ombc1_gmm <- function(
   }
 
   outlier_seq <- seq(0, max_out)
+  p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
+
+  gg_curves_list <- list()
+  for (j in 1:10) {
+    distrib_diff_j <- distrib_diff_mat[, j]
+    gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
+      ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
+      ggplot2::geom_line() +
+      ggplot2::labs(
+        title = paste0(j, " (p = ", p_vals[j], ")"),
+        x = "Outlier Number",
+        y = "Distributional Difference"
+      ) +
+      ggplot2::theme(
+        axis.text.y = ggplot2::element_blank(),
+        axis.ticks.y.left = ggplot2::element_blank()
+      )
+  }
+  gg_curves <- ggpubr::ggarrange(plotlist = gg_curves_list, nrow = 2, ncol = 5)
+
   diffs <- NULL
   option <- NULL
   gg_changes <- as.data.frame(diff(scale(distrib_diff_mat))) |>
@@ -135,6 +155,7 @@ ombc1_gmm <- function(
     loglike = loglike,
     removal_dens = removal_dens,
     mu_change = mu_change,
+    plot_curves = gg_curves,
     plot_changes = gg_changes,
     params = params
   ))
