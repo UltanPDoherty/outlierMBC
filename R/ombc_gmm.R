@@ -61,6 +61,8 @@ ombc1_gmm <- function(
   dist_mat0 <- as.matrix(stats::dist(x0))
   dist_mat <- dist_mat0
 
+  z <- init_hc(dist_mat, comp_num)
+
   loglike <- c()
   removal_dens <- c()
   mu_change <- c()
@@ -70,7 +72,7 @@ ombc1_gmm <- function(
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
-    z <- init_hc(dist_mat, comp_num)
+    # z <- init_hc(dist_mat, comp_num)
     mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
 
     loglike[i] <- mix$best_model$loglik
@@ -91,6 +93,7 @@ ombc1_gmm <- function(
 
     outlier_rank[!outlier_rank][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
+    z <- z[-dd$choice_id, ]
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
 
     if (i > 1) {
