@@ -149,3 +149,75 @@ find_elbow <- function(y, search_centre = NULL, concave = TRUE) {
     cpop_out = cpop_out
   ))
 }
+
+# ==============================================================================
+
+#' @title Find the gross outliers.
+#'
+#' @inheritParams ombc1_gmm
+#' @param search_centre Centre of elbow search interval.
+#' @param k_neighbours Number of neighbours for dbscan::kNNdist.
+#' @param underestimate Factor by which to multiply the elbow estimate of the
+#'                      number of outliers to get the number of gross outliers.
+#' @param choice Optional preset number of gross outliers.
+#'
+#' @return List:
+#' * $choice: a numeric value indicating the elbow's location.
+#' * $bool: a logical vector identifying the gross outliers.
+#' * $plot
+#'
+#' @export
+find_gross2 <- function(
+    x, max_out, search_centre,
+    k_neighbours = floor(nrow(x) / 100),
+    underestimate = 0.5,
+    choice = NULL) {
+  stopifnot(!is.null(search_centre))
+
+  outlier_number <- seq_len(2 * max_out)
+
+  x_knndist <- dbscan::kNNdist(x, k_neighbours)
+  knndist_sort <- -sort(-x_knndist)[outlier_number]
+
+  elbow <- find_elbow(knndist_sort, search_centre, TRUE)
+  elbow_choice <- elbow$choice
+
+  gross_choice <- floor(elbow_choice * underestimate)
+
+  if (!is.null(choice)) {
+    gross_choice <- choice
+  }
+
+  bool <- rank(-x_knndist) <= gross_choice
+
+  search_interval <- elbow$search_interval
+  cpop_fitted <- cpop::fitted(elbow$cpop_out)
+  gg <- data.frame(outlier_number, knndist_sort) |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_number, y = knndist_sort)) +
+    ggplot2::geom_line() +
+    ggplot2::geom_vline(xintercept = search_interval, linetype = "dashed") +
+    ggplot2::geom_vline(xintercept = elbow_choice) +
+    ggplot2::geom_vline(xintercept = gross_choice, colour = "red") +
+    ggplot2::geom_abline(
+      slope = cpop_fitted$gradient[1], intercept = cpop_fitted$intercept[1],
+      linetype = "dotted"
+    ) +
+    ggplot2::geom_abline(
+      slope = cpop_fitted$gradient[2], intercept = cpop_fitted$intercept[2],
+      linetype = "dotted"
+    ) +
+    ggplot2::labs(
+      title = paste0(
+        "Chosen number of gross outliers = ", gross_choice
+      ),
+      subtitle = paste0(
+        "Elbow choice = ", elbow_choice,
+        " (search interval = [", search_interval[1],
+        ", ", search_interval[2], "])"
+      ),
+      x = "Outlier Number",
+      y = paste0("kNN Distance (k = ", k_neighbours, ")")
+    )
+
+  return(list(choice = gross_choice, bool = bool, plot = gg))
+}
