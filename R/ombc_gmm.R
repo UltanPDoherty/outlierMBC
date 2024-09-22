@@ -132,13 +132,35 @@ ombc1_gmm <- function(
     old_mix_means <- mix$best_model$model_obj[[1]]$mu
   }
 
-  start_point <- max(apply(
+  outlier_seq <- seq(0, max_out)
+
+  if (!is.null(gross_outs)) {
+    outlier_rank0 <- outlier_rank
+
+    outlier_rank <- double(length(gross_outs))
+
+    outlier_rank[gross_outs] <- 1
+    outlier_rank[!gross_outs] <- outlier_rank0 + (outlier_rank0 != 0)
+
+    outlier_seq <- outlier_seq + gross_num
+  }
+
+  stabilisation_point <- max(apply(
     distrib_diff_mat,
     2,
-    function(x) changepoint::cpt.var(diff(x))@cpts[1] + 2 + gross_num
+    function(x) {
+      cpts <- changepoint::cpt.var(diff(x))@cpts
+      if (length(cpts) == 1) {
+        return(NA)
+      } else {
+        return(cpts[1] + 2)
+      }
+    }
   ))
+  if (is.na(stabilisation_point)) {
+    stabilisation_point <- NULL
+  }
 
-  outlier_seq <- seq(gross_num, max_out + gross_num)
   p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
 
   gg_curves_list <- list()
@@ -147,7 +169,7 @@ ombc1_gmm <- function(
     gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
       ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
       ggplot2::geom_line() +
-      ggplot2::geom_vline(xintercept = start_point)
+      ggplot2::geom_vline(xintercept = stabilisation_point + gross_num) +
       ggplot2::labs(
         title = paste0(j, " (p = ", p_vals[j], ")"),
         x = "Outlier Number",
@@ -169,7 +191,7 @@ ombc1_gmm <- function(
     ) |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = diffs, group = option)) +
     ggplot2::geom_line() +
-    ggplot2::geom_vline(xintercept = start_point - 1)
+    ggplot2::geom_vline(xintercept = stabilisation_point + gross_num - 1) +
     ggplot2::labs(
       x = "Outlier_Number", y = "Changes in Scaled DD Values",
       title = "Changes in Scaled Distributional Differences"
@@ -179,6 +201,7 @@ ombc1_gmm <- function(
     distrib_diff_arr = distrib_diff_arr,
     distrib_diff_mat = distrib_diff_mat,
     outlier_rank = outlier_rank,
+    stabilisation_point = stabilisation_point,
     loglike = loglike,
     removal_dens = removal_dens,
     mu_change = mu_change,
@@ -196,7 +219,7 @@ ombc1_gmm <- function(
 #' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 #'
 #' @param ombc1 Output from `ombc1_gmm1`.
-#' @param start_point Number of points to be trimmed, chosen based on ombc1.
+#' @param stabilisation_point Number of points to be trimmed, chosen based on ombc1.
 #' @inheritParams ombc1_gmm
 #'
 #' @return List of
@@ -221,7 +244,7 @@ ombc1_gmm <- function(
 #' ombc2_gmm_k3n1000o10 <- ombc2_gmm(
 #'   gmm_k3n1000o10[, 1:2],
 #'   ombc1_gmm_k3n1000o10,
-#'   start_point = 1
+#'   stabilisation_point = 1
 #' )
 #'
 #' ombc2_gmm_k3n1000o10$plot_curves
@@ -230,7 +253,7 @@ ombc1_gmm <- function(
 ombc2_gmm <- function(
     x,
     ombc1,
-    start_point = 1) {
+    stabilisation_point = 1) {
   comp_num <- ombc1$params$comp_num
   max_out <- ombc1$params$max_out
   p_range <- ombc1$params$p_range
@@ -248,17 +271,18 @@ ombc2_gmm <- function(
 
   dist_mat0 <- as.matrix(stats::dist(x0))
 
-  if (start_point > 1) {
-    distrib_diff_mat <- distrib_diff_mat[-seq_len(start_point - 1), ]
-    removal_dens <- removal_dens[-seq_len(start_point - 1)]
+  if (stabilisation_point > 1) {
+    distrib_diff_mat <- distrib_diff_mat[-seq_len(stabilisation_point - 1), ]
+    removal_dens <- removal_dens[-seq_len(stabilisation_point - 1)]
   }
 
-  outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 + (start_point - 1)
+  outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 + (stabilisation_point - 1)
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
   mix <- list()
   labels <- matrix(0, nrow = obs_num, ncol = track_num)
   for (j in 1:track_num) {
+
     outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
 
     z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
@@ -270,7 +294,8 @@ ombc2_gmm <- function(
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
-  outlier_seq <- seq(start_point - 1, max_out)
+  outlier_seq <- seq(stabilisation_point - 1, max_out)
+
   p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
 
   gg_curves_list <- list()
