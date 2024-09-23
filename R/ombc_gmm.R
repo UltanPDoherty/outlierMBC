@@ -145,22 +145,6 @@ ombc1_gmm <- function(
     outlier_seq <- outlier_seq + gross_num
   }
 
-  stabilisation_point <- max(apply(
-    distrib_diff_mat,
-    2,
-    function(x) {
-      cpts <- changepoint::cpt.var(diff(x))@cpts
-      if (length(cpts) == 1) {
-        return(NA)
-      } else {
-        return(cpts[1] + 2)
-      }
-    }
-  ))
-  if (is.na(stabilisation_point)) {
-    stabilisation_point <- NULL
-  }
-
   p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
 
   gg_curves_list <- list()
@@ -169,7 +153,6 @@ ombc1_gmm <- function(
     gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
       ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
       ggplot2::geom_line() +
-      ggplot2::geom_vline(xintercept = stabilisation_point + gross_num) +
       ggplot2::labs(
         title = paste0(j, " (p = ", p_vals[j], ")"),
         x = "Outlier Number",
@@ -191,7 +174,6 @@ ombc1_gmm <- function(
     ) |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = diffs, group = option)) +
     ggplot2::geom_line() +
-    ggplot2::geom_vline(xintercept = stabilisation_point + gross_num - 1) +
     ggplot2::labs(
       x = "Outlier_Number", y = "Changes in Scaled DD Values",
       title = "Changes in Scaled Distributional Differences"
@@ -201,7 +183,6 @@ ombc1_gmm <- function(
     distrib_diff_arr = distrib_diff_arr,
     distrib_diff_mat = distrib_diff_mat,
     outlier_rank = outlier_rank,
-    stabilisation_point = stabilisation_point,
     loglike = loglike,
     removal_dens = removal_dens,
     mu_change = mu_change,
