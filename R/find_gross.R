@@ -16,7 +16,7 @@
 find_gross <- function(
     x, max_out,
     k_neighbours = floor(nrow(x) / 100),
-    underestimate = 0.5,
+    underestimate = 2 / 3,
     search_centre = NULL,
     choice = NULL) {
   outlier_number <- seq_len(2 * max_out)
