@@ -7,9 +7,9 @@
 find_gross(
   x,
   max_out,
-  search_centre,
   k_neighbours = floor(nrow(x)/100),
   underestimate = 0.5,
+  search_centre = NULL,
   choice = NULL
 )
 }
@@ -18,12 +18,12 @@ find_gross(
 
 \item{max_out}{Maximum number of outliers.}
 
-\item{search_centre}{Centre of elbow search interval.}
-
 \item{k_neighbours}{Number of neighbours for dbscan::kNNdist.}
 
 \item{underestimate}{Factor by which to multiply the elbow estimate of the
 number of outliers to get the number of gross outliers.}
+
+\item{search_centre}{Optional centre of elbow search interval.}
 
 \item{choice}{Optional preset number of gross outliers.}
 }

@@ -19,17 +19,14 @@ find_gross <- function(
     underestimate = 0.5,
     search_centre = NULL,
     choice = NULL) {
-
   outlier_number <- seq_len(2 * max_out)
 
   x_knndist <- dbscan::kNNdist(x, k_neighbours)
   knndist_sort <- -sort(-x_knndist)[outlier_number]
 
   if (is.null(search_centre)) {
-     cpts <- changepoint::cpt.meanvar(diff(knndist_sort))@cpts
-     stopifnot(
-       "No suitable search_centre found.\n" = length(cpts) > 1
-      )
+    cpts <- changepoint::cpt.meanvar(diff(knndist_sort))@cpts
+    stopifnot("No suitable search_centre found.\n" = length(cpts) > 1)
   }
 
   elbow <- find_elbow(knndist_sort, search_centre, TRUE)
