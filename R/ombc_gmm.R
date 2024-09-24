@@ -179,7 +179,6 @@ ombc1_gmm <- function(
 #' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 #'
 #' @param ombc1 Output from `ombc1_gmm1`.
-#' @param stabilisation_point Number of points to be trimmed.
 #' @inheritParams ombc1_gmm
 #'
 #' @return List of
@@ -212,8 +211,8 @@ ombc1_gmm <- function(
 #'
 ombc2_gmm <- function(
     x,
-    ombc1,
-    stabilisation_point = 1) {
+    ombc1
+    ) {
   comp_num <- ombc1$params$comp_num
   max_out <- ombc1$params$max_out
   p_range <- ombc1$params$p_range
@@ -237,13 +236,8 @@ ombc2_gmm <- function(
 
   dist_mat0 <- as.matrix(stats::dist(x0))
 
-  if (stabilisation_point > 1) {
-    distrib_diff_mat <- distrib_diff_mat[-seq_len(stabilisation_point - 1), ]
-    removal_dens <- removal_dens[-seq_len(stabilisation_point - 1)]
-  }
 
-  outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 +
-    (stabilisation_point - 1) + gross_num
+  outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 + gross_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
   mix <- list()
@@ -260,7 +254,7 @@ ombc2_gmm <- function(
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
-  outlier_seq <- seq(gross_num + stabilisation_point - 1, max_out)
+  outlier_seq <- seq(gross_num, max_out)
 
   p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
 
