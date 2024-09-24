@@ -7,8 +7,8 @@
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
 #' @param gross_outs Logical vector identifying gross outliers.
-#' @param p_range Range for power mean parameter, p, when summarising CDF
-#'                differences.
+#' @param p_vals Values for power mean parameter, p, when summarising CDF
+#'               differences.
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param print_interval How frequently the iteration count is printed.
@@ -40,7 +40,7 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = NULL,
-    p_range = c(1, 2),
+    p_vals = seq(1, 2, 0.2),
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
@@ -61,7 +61,7 @@ ombc_gmm <- function(
     gross_num <- 0
   }
 
-  track_num <- 10
+  track_num <- length(p_vals)
 
   loglike <- c()
   removal_dens <- c()
@@ -83,7 +83,7 @@ ombc_gmm <- function(
       mix$best_model$model_obj[[1]]$mu,
       mix$best_model$model_obj[[1]]$sigs,
       mix$best_model$model_obj[[1]]$log_dets,
-      p_range
+      p_vals
     )
 
     distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
@@ -109,7 +109,7 @@ ombc_gmm <- function(
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
   mix <- list()
   labels <- matrix(0, nrow = obs_num, ncol = track_num)
-  for (j in 1:track_num) {
+  for (j in seq_len(track_num)) {
     outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
 
     z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
@@ -123,17 +123,17 @@ ombc_gmm <- function(
 
   outlier_seq <- seq(gross_num, max_out + gross_num)
 
-  p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
-
   gg_curves_list <- list()
-  for (j in 1:10) {
+  for (j in seq_len(track_num)) {
     distrib_diff_j <- distrib_diff_mat[, j]
     gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
       ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
       ggplot2::geom_line() +
       ggplot2::geom_vline(xintercept = outlier_num[j]) +
       ggplot2::labs(
-        title = paste0(j, ": ", outlier_num[j], " (p = ", p_vals[j], ")"),
+        title = paste0(
+          j, ": ", outlier_num[j], " (p = ", round(p_vals[j], 2), ")"
+        ),
         x = "Outlier Number",
         y = "Distributional Difference"
       ) +
@@ -142,14 +142,16 @@ ombc_gmm <- function(
         axis.ticks.y.left = ggplot2::element_blank()
       )
   }
-  gg_curves <- ggpubr::ggarrange(plotlist = gg_curves_list, nrow = 2, ncol = 5)
+  gg_curves <- ggpubr::ggarrange(
+    plotlist = gg_curves_list, nrow = 2, ncol = ceiling(track_num / 2)
+  )
 
   gg_removal <- data.frame(outlier_seq, removal_dens) |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = removal_dens)) +
     ggplot2::geom_line() +
     ggplot2::geom_vline(xintercept = outlier_num) +
     ggplot2::labs(
-      title = paste0(1:10, ": ", outlier_num, collapse = ", "),
+      title = paste0(seq_len(track_num), ": ", outlier_num, collapse = ", "),
       x = "Outlier Number",
       y = "Removal Density"
     )

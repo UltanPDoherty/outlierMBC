@@ -4,7 +4,14 @@
 \alias{distrib_diff_mahalanobis}
 \title{distrib_diff_mahalanobis}
 \usage{
-distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g, p_range = c(1, 2))
+distrib_diff_mahalanobis(
+  x,
+  z_g,
+  mu_g,
+  sigma_g,
+  logdet_g,
+  p_vals = seq(1, 2, 0.2)
+)
 }
 \arguments{
 \item{x}{Data.}
@@ -17,7 +24,7 @@ distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g, p_range = c(1, 2))
 
 \item{logdet_g}{Log-determinants of covariance matrix for component g.}
 
-\item{p_range}{Range for power mean parameter, p, when summarising CDF
+\item{p_vals}{Values for power mean parameter, p, when summarising CDF
 differences.}
 }
 \value{
