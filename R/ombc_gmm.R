@@ -154,6 +154,12 @@ ombc_gmm <- function(
       y = "Removal Density"
     )
 
+  gg_knn <- plot_gross(x0, max_out + gross_num) +
+    ggplot2::geom_vline(xintercept = outlier_num, colour = "blue") +
+    ggplot2::labs(
+      title = "kNN Distance Plot with Proposals for Number of Outliers"
+    )
+
   return(list(
     distrib_diff_mat = distrib_diff_mat,
     outlier_bool = outlier_bool,
@@ -162,6 +168,7 @@ ombc_gmm <- function(
     labels = labels,
     plot_curves = gg_curves,
     plot_removal = gg_removal,
+    plot_knn = gg_knn,
     loglike = loglike,
     removal_dens = removal_dens,
     distrib_diff_arr = distrib_diff_arr
