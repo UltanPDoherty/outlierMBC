@@ -44,7 +44,6 @@ ombc_gmm <- function(
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
-
   x <- as.matrix(x)
   x0 <- x
 
