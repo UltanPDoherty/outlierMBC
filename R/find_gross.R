@@ -33,6 +33,11 @@ find_gross <- function(
   elbow_choice <- elbow$choice
 
   gross_choice <- floor(elbow_choice * underestimate)
+  cat(paste0(
+    "elbow choice = ", elbow_choice,
+    ", underestimate = ", round(underestimate, 2),
+    ", gross_choice = ", gross_choice, "\n."
+  ))
 
   if (!is.null(choice)) {
     gross_choice <- choice
@@ -145,7 +150,7 @@ find_elbow <- function(y, search_centre = NULL, concave = TRUE) {
   cat("search centre = ", search_centre)
   cat(", search radius = ", search_radius)
   cat(", search interval = ", search_interval)
-  cat(", search choice = ", choice, "\n")
+  cat(", search choice = ", choice, ".\n")
 
   return(list(
     choice = choice,
