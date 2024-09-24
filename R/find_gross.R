@@ -2,8 +2,8 @@
 #'
 #' @inheritParams ombc_gmm
 #' @param k_neighbours Number of neighbours for dbscan::kNNdist.
-#' @param underestimate Factor by which to multiply the elbow estimate of the
-#'                      number of outliers to get the number of gross outliers.
+#' @param gross_prop Factor by which to multiply the elbow estimate of the
+#'                   number of outliers to get the number of gross outliers.
 #' @param search_centre Optional centre of elbow search interval.
 #' @param manual_choice Optional preset number of gross outliers.
 #'
@@ -16,7 +16,7 @@
 find_gross <- function(
     x, max_out,
     k_neighbours = floor(nrow(x) / 100),
-    underestimate = max(0.6, min(0.8, 0.9 - (30 / elbow_choice))),
+    gross_prop = max(0.6, min(0.8, 0.9 - (30 / elbow_choice))),
     search_centre = NULL,
     manual_choice = NULL) {
   outlier_number <- seq_len(2 * max_out)
@@ -32,7 +32,7 @@ find_gross <- function(
   elbow <- find_elbow(knndist_sort, search_centre, TRUE)
   elbow_choice <- elbow$choice
 
-  gross_choice <- floor(elbow_choice * underestimate)
+  gross_choice <- floor(elbow_choice * gross_prop)
 
   if (!is.null(manual_choice)) {
     gross_choice <- manual_choice
@@ -41,7 +41,7 @@ find_gross <- function(
   } else {
     cat(paste0(
       "elbow = ", elbow_choice,
-      ", underestimate = ", round(underestimate, 2),
+      ", gross_prop = ", round(gross_prop, 2),
       ", no. of gross outliers selected = ", gross_choice, ".\n"
     ))
   }
@@ -71,7 +71,8 @@ find_gross <- function(
       subtitle = paste0(
         "Elbow choice = ", elbow_choice,
         " (search interval = [", search_interval[1],
-        ", ", search_interval[2], "])"
+        ", ", search_interval[2],
+        "]), gross proportion = ", round(gross_prop, 2)
       ),
       x = "Outlier Number",
       y = paste0("kNN Distance (k = ", k_neighbours, ")")
