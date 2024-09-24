@@ -1,6 +1,6 @@
 #' @title Find the gross outliers.
 #'
-#' @inheritParams ombc1_gmm
+#' @inheritParams ombc_gmm
 #' @param k_neighbours Number of neighbours for dbscan::kNNdist.
 #' @param underestimate Factor by which to multiply the elbow estimate of the
 #'                      number of outliers to get the number of gross outliers.

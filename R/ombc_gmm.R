@@ -27,17 +27,15 @@
 #'
 #' @examples
 #'
-#' ombc1_gmm_k3n1000o10 <- ombc1_gmm(
+#' ombc_gmm_k3n1000o10 <- ombc_gmm(
 #'   gmm_k3n1000o10[, 1:2],
 #'   comp_num = 3, max_out = 20
 #' )
 #'
-#' ombc1_gmm_k3n1000o10$plot_curves
-#' ombc1_gmm_k3n1000o10$plot_stacked
-#' ombc1_gmm_k3n1000o10$plot_changes
-#' ombc1_gmm_k3n1000o10$plot_removal
+#' ombc_gmm_k3n1000o10$plot_curves
+#' ombc_gmm_k3n1000o10$plot_removal
 #'
-ombc1_gmm <- function(
+ombc_gmm <- function(
     x,
     comp_num,
     max_out,
@@ -46,34 +44,31 @@ ombc1_gmm <- function(
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
-  params <- list(
-    "comp_num" = comp_num,
-    "max_out" = max_out,
-    "p_range" = p_range,
-    "mnames" = mnames,
-    "nmax" = nmax
-  )
+
+  x <- as.matrix(x)
+  x0 <- x
+
+  obs_num <- nrow(x)
+
+  dist_mat0 <- as.matrix(stats::dist(x0))
+  dist_mat <- dist_mat0
 
   if (!is.null(gross_outs)) {
     gross_num <- sum(gross_outs)
     x <- x[!gross_outs, ]
     max_out <- max_out - gross_num
+    dist_mat <- dist_mat[!gross_outs, !gross_outs]
+  } else {
+    gross_num <- 0
   }
 
-  x <- as.matrix(x)
-  x0 <- x
-
-  obs_num <- nrow(x0)
   track_num <- 10
-
-  dist_mat0 <- as.matrix(stats::dist(x0))
-  dist_mat <- dist_mat0
 
   loglike <- c()
   removal_dens <- c()
   distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = track_num)
-  outlier_rank <- rep(0, obs_num)
+  outlier_rank <- rep(0, obs_num - gross_num)
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
@@ -101,8 +96,6 @@ ombc1_gmm <- function(
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
   }
 
-  outlier_seq <- seq(0, max_out)
-
   if (!is.null(gross_outs)) {
     outlier_rank0 <- outlier_rank
 
@@ -110,85 +103,7 @@ ombc1_gmm <- function(
 
     outlier_rank[gross_outs] <- 1
     outlier_rank[!gross_outs] <- outlier_rank0 + (outlier_rank0 != 0)
-
-    outlier_seq <- outlier_seq + gross_num
   }
-
-  return(list(
-    distrib_diff_arr = distrib_diff_arr,
-    distrib_diff_mat = distrib_diff_mat,
-    outlier_rank = outlier_rank,
-    loglike = loglike,
-    removal_dens = removal_dens,
-    params = params,
-    gross_outs = gross_outs
-  ))
-}
-
-# ------------------------------------------------------------------------------
-
-#' ombc_gmm
-#'
-#' @description
-#' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
-#'
-#' @param ombc1 Output from `ombc1_gmm1`.
-#' @inheritParams ombc1_gmm
-#'
-#' @return List of
-#' * distrib_diffs
-#' * distrib_diff_mat
-#' * outlier_bool
-#' * outlier_num
-#' * outlier_rank
-#' * labels
-#' * final_gmm
-#' * loglike
-#' * removal_dens
-#' @export
-#'
-#' @examples
-#'
-#' ombc1_gmm_k3n1000o10 <- ombc1_gmm(
-#'   gmm_k3n1000o10[, 1:2],
-#'   comp_num = 3, max_out = 20
-#' )
-#'
-#' ombc2_gmm_k3n1000o10 <- ombc2_gmm(
-#'   gmm_k3n1000o10[, 1:2],
-#'   ombc1_gmm_k3n1000o10,
-#'   stabilisation_point = 1
-#' )
-#'
-#' ombc2_gmm_k3n1000o10$plot_curves
-#' ombc2_gmm_k3n1000o10$plot_removal
-#'
-ombc2_gmm <- function(
-    x,
-    ombc1
-    ) {
-  comp_num <- ombc1$params$comp_num
-  max_out <- ombc1$params$max_out
-  p_range <- ombc1$params$p_range
-  mnames <- ombc1$params$mnames
-  nmax <- ombc1$params$nmax
-  outlier_rank <- ombc1$outlier_rank
-  removal_dens <- ombc1$removal_dens
-  distrib_diff_mat <- ombc1$distrib_diff_mat
-
-  if (!is.null(ombc1$gross_outs)) {
-    gross_num <- sum(ombc1$gross_outs)
-  } else {
-    gross_num <- 0
-  }
-
-  x <- as.matrix(x)
-  x0 <- x
-
-  obs_num <- nrow(x0)
-  track_num <- 10
-
-  dist_mat0 <- as.matrix(stats::dist(x0))
 
   outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 + gross_num
 
@@ -207,7 +122,7 @@ ombc2_gmm <- function(
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
-  outlier_seq <- seq(gross_num, max_out)
+  outlier_seq <- seq(gross_num, max_out + gross_num)
 
   p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
 
@@ -244,14 +159,17 @@ ombc2_gmm <- function(
     distrib_diff_mat = distrib_diff_mat,
     outlier_bool = outlier_bool,
     outlier_num = outlier_num,
+    outlier_rank = outlier_rank,
     labels = labels,
     plot_curves = gg_curves,
-    plot_removal = gg_removal
+    plot_removal = gg_removal,
+    loglike = loglike,
+    removal_dens = removal_dens,
+    distrib_diff_arr = distrib_diff_arr
   ))
 }
 
 # ------------------------------------------------------------------------------
-
 
 init_hc <- function(dist_mat, comp_num) {
   hc <- stats::hclust(stats::as.dist(dist_mat), method = "ward.D2")

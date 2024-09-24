@@ -8,7 +8,7 @@ find_gross(
   x,
   max_out,
   k_neighbours = floor(nrow(x)/100),
-  underestimate = 0.5,
+  underestimate = max(0.6, min(0.8, 0.9 - (30/elbow_choice))),
   search_centre = NULL,
   choice = NULL
 )
