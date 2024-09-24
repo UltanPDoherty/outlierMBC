@@ -71,7 +71,6 @@ ombc1_gmm <- function(
 
   loglike <- c()
   removal_dens <- c()
-  mu_change <- c()
   distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = track_num)
   outlier_rank <- rep(0, obs_num)
@@ -100,14 +99,6 @@ ombc1_gmm <- function(
     outlier_rank[!outlier_rank][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
-
-    if (i > 1) {
-      mu_change[i - 1] <- two_set_dist(
-        Reduce(rbind, mix$best_model$model_obj[[1]]$mu),
-        Reduce(rbind, old_mix_means)
-      )
-    }
-    old_mix_means <- mix$best_model$model_obj[[1]]$mu
   }
 
   outlier_seq <- seq(0, max_out)
@@ -129,7 +120,6 @@ ombc1_gmm <- function(
     outlier_rank = outlier_rank,
     loglike = loglike,
     removal_dens = removal_dens,
-    mu_change = mu_change,
     params = params,
     gross_outs = gross_outs
   ))
