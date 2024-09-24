@@ -156,10 +156,18 @@ ombc_gmm <- function(
       y = "Removal Density"
     )
 
-  gg_knn <- plot_gross(x0, max_out + gross_num) +
+  k_neighbours <- floor(obs_num / 100)
+  x_knndist <- dbscan::kNNdist(x0, k = k_neighbours)
+  knn_seq <- seq_len(2 * (max_out + gross_num))
+  knndist_sort <- -sort(-x_knndist)[knn_seq]
+  gg_knn <- data.frame(knn_seq, knndist_sort) |>
+    ggplot2::ggplot(ggplot2::aes(x = knn_seq, y = knndist_sort)) +
+    ggplot2::geom_line() +
     ggplot2::geom_vline(xintercept = outlier_num, colour = "blue") +
     ggplot2::labs(
-      title = "kNN Distance Plot with Proposals for Number of Outliers"
+      title = "kNN Distance Plot with Proposals for Number of Outliers",
+      x = "Outlier Number",
+      y = paste0("kNN Distance (k = ", k_neighbours, ")")
     )
 
   return(list(
