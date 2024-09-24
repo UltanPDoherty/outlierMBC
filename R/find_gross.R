@@ -5,7 +5,7 @@
 #' @param underestimate Factor by which to multiply the elbow estimate of the
 #'                      number of outliers to get the number of gross outliers.
 #' @param search_centre Optional centre of elbow search interval.
-#' @param choice Optional preset number of gross outliers.
+#' @param manual_choice Optional preset number of gross outliers.
 #'
 #' @return List:
 #' * $choice: a numeric value indicating the elbow's location.
@@ -18,7 +18,7 @@ find_gross <- function(
     k_neighbours = floor(nrow(x) / 100),
     underestimate = max(0.6, min(0.8, 0.9 - (30 / elbow_choice))),
     search_centre = NULL,
-    choice = NULL) {
+    manual_choice = NULL) {
   outlier_number <- seq_len(2 * max_out)
 
   x_knndist <- dbscan::kNNdist(x, k_neighbours)
@@ -33,14 +33,17 @@ find_gross <- function(
   elbow_choice <- elbow$choice
 
   gross_choice <- floor(elbow_choice * underestimate)
-  cat(paste0(
-    "elbow choice = ", elbow_choice,
-    ", underestimate = ", round(underestimate, 2),
-    ", gross_choice = ", gross_choice, "\n."
-  ))
 
-  if (!is.null(choice)) {
-    gross_choice <- choice
+  if (!is.null(manual_choice)) {
+    gross_choice <- manual_choice
+
+    cat(paste0("manual choice = ", elbow_choice, ".\n"))
+  } else {
+    cat(paste0(
+      "elbow = ", elbow_choice,
+      ", underestimate = ", round(underestimate, 2),
+      ", no. of gross outliers selected = ", gross_choice, ".\n"
+    ))
   }
 
   bool <- rank(-x_knndist) <= gross_choice
@@ -147,10 +150,12 @@ find_elbow <- function(y, search_centre = NULL, concave = TRUE) {
 
   choice <- cpop_out@changepoints[2]
 
-  cat("search centre = ", search_centre)
-  cat(", search radius = ", search_radius)
-  cat(", search interval = ", search_interval)
-  cat(", search choice = ", choice, ".\n")
+  cat(paste0(
+    "elbow search: centre = ", search_centre,
+    ", radius = ", search_radius,
+    ", interval = (", search_interval[1], ", ", search_interval[2], ")",
+    ", choice = ", choice, ".\n"
+  ))
 
   return(list(
     choice = choice,
