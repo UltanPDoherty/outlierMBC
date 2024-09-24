@@ -123,40 +123,6 @@ ombc1_gmm <- function(
     outlier_seq <- outlier_seq + gross_num
   }
 
-  p_vals <- round(seq(p_range[1], p_range[2], length.out = 10), 2)
-
-  gg_curves_list <- list()
-  for (j in 1:10) {
-    distrib_diff_j <- distrib_diff_mat[, j]
-    gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
-      ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
-      ggplot2::geom_line() +
-      ggplot2::labs(
-        title = paste0(j, " (p = ", p_vals[j], ")"),
-        x = "Outlier Number",
-        y = "Distributional Difference"
-      ) +
-      ggplot2::theme(
-        axis.text.y = ggplot2::element_blank(),
-        axis.ticks.y.left = ggplot2::element_blank()
-      )
-  }
-  gg_curves <- ggpubr::ggarrange(plotlist = gg_curves_list, nrow = 2, ncol = 5)
-
-  diffs <- NULL
-  option <- NULL
-  gg_changes <- as.data.frame(diff(scale(distrib_diff_mat))) |>
-    dplyr::mutate("outlier_seq" = outlier_seq[-1]) |>
-    tidyr::pivot_longer(
-      cols = !outlier_seq, names_to = "option", values_to = "diffs"
-    ) |>
-    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = diffs, group = option)) +
-    ggplot2::geom_line() +
-    ggplot2::labs(
-      x = "Outlier_Number", y = "Changes in Scaled DD Values",
-      title = "Changes in Scaled Distributional Differences"
-    )
-
   return(list(
     distrib_diff_arr = distrib_diff_arr,
     distrib_diff_mat = distrib_diff_mat,
@@ -164,8 +130,6 @@ ombc1_gmm <- function(
     loglike = loglike,
     removal_dens = removal_dens,
     mu_change = mu_change,
-    plot_curves = gg_curves,
-    plot_changes = gg_changes,
     params = params,
     gross_outs = gross_outs
   ))
@@ -235,7 +199,6 @@ ombc2_gmm <- function(
   track_num <- 10
 
   dist_mat0 <- as.matrix(stats::dist(x0))
-
 
   outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 + gross_num
 
