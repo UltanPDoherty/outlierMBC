@@ -31,5 +31,6 @@
 #' @importFrom stats quantile
 #' @importFrom stats sd
 #' @importFrom tidyr pivot_longer
+#' @importFrom zoo rollmean
 ## usethis namespace: end
 NULL

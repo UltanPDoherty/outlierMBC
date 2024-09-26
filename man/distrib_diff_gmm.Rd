@@ -4,7 +4,7 @@
 \alias{distrib_diff_gmm}
 \title{distrib_diff_gmm}
 \usage{
-distrib_diff_gmm(x, z, prop, mu, sigma, logdet, p_vals = seq(1, 2, 0.2))
+distrib_diff_gmm(x, z, prop, mu, sigma, logdet, tail_probs = seq(1, 2, 0.2))
 }
 \arguments{
 \item{x}{Data.}
@@ -19,7 +19,7 @@ distrib_diff_gmm(x, z, prop, mu, sigma, logdet, p_vals = seq(1, 2, 0.2))
 
 \item{logdet}{Vector of log-determinants for covariance matrices.}
 
-\item{p_vals}{Values for power mean parameter, p, when summarising CDF
+\item{tail_probs}{Values for power mean parameter, p, when summarising CDF
 differences.}
 }
 \value{

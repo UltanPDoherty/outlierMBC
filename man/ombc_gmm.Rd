@@ -9,7 +9,7 @@ ombc_gmm(
   comp_num,
   max_out,
   gross_outs = NULL,
-  p_vals = seq(1, 2, 0.2),
+  tail_probs = c(0, 0.5, 0.75, 0.9),
   mnames = "VVV",
   nmax = 10,
   print_interval = Inf
@@ -24,7 +24,7 @@ ombc_gmm(
 
 \item{gross_outs}{Logical vector identifying gross outliers.}
 
-\item{p_vals}{Values for power mean parameter, p, when summarising CDF
+\item{tail_probs}{Values for power mean parameter, p, when summarising CDF
 differences.}
 
 \item{mnames}{Model names for mixture::gpcm.}
