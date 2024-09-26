@@ -14,18 +14,18 @@
 #' * removal_dens
 distrib_diff_gmm <- function(
     x, z, prop, mu, sigma, logdet,
-    p_vals = seq(1, 2, 0.2)
+    t_vals = seq(1, 2, 0.2)
   ) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
-  track_num <- length(p_vals)
+  track_num <- length(t_vals)
 
   distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
   mahala_mat <- matrix(nrow = obs_num, ncol = comp_num)
   for (g in seq_len(comp_num)) {
     dd_g <- distrib_diff_mahalanobis(
-      x, z[, g], mu[[g]], sigma[[g]], logdet[g], p_vals
+      x, z[, g], mu[[g]], sigma[[g]], logdet[g], t_vals
     )
     distrib_diff_mat[g, ] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
@@ -67,7 +67,7 @@ distrib_diff_mahalanobis <- function(
     mu_g,
     sigma_g,
     logdet_g,
-    p_vals = seq(1, 2, 0.2)) {
+    t_vals = seq(1, 2, 0.2)) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
   stopifnot("A cluster has become too small (< 4 points).\n" = n_g > 3)
@@ -86,16 +86,23 @@ distrib_diff_mahalanobis <- function(
   beta_cdf_g <- stats::pbeta(check_seq, param1, param2)
 
   cdf_diffs <- beta_cdf_g - mahala_ewcdf_g
-  pos_cdf_diffs <- pmax(rep(0, length(check_seq)), cdf_diffs)
 
-  pos_cdf_pmeans <- vapply(
-    p_vals,
-    function(y) (mean(pos_cdf_diffs^(y)))^(1 / y),
+  # pos_cdf_diffs <- pmax(rep(0, length(check_seq)), cdf_diffs)
+  #
+  # pos_cdf_pmeans <- vapply(
+  #   t_vals,
+  #   function(y) (mean(pos_cdf_diffs^(y)))^(1 / y),
+  #   double(1L)
+  # )
+  #
+  # distrib_diff_g_x <- c(
+  #   pos_cdf_pmeans
+  # )
+
+  distrib_diff_g_x <- vapply(
+    t_vals,
+    function(t) mean(pmax(rep(0, length(check_seq)), cdf_diffs - t)),
     double(1L)
-  )
-
-  distrib_diff_g_x <- c(
-    pos_cdf_pmeans
   )
 
   dens_g_x <- exp(

@@ -7,7 +7,7 @@
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
 #' @param gross_outs Logical vector identifying gross outliers.
-#' @param p_vals Values for power mean parameter, p, when summarising CDF
+#' @param t_vals Values for power mean parameter, p, when summarising CDF
 #'               differences.
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
@@ -40,7 +40,7 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = NULL,
-    p_vals = seq(1, 2, 0.2),
+    t_vals = seq(0, 0.04, length.out = 6),
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
@@ -61,7 +61,7 @@ ombc_gmm <- function(
     gross_num <- 0
   }
 
-  track_num <- length(p_vals)
+  track_num <- length(t_vals)
 
   loglike <- c()
   removal_dens <- c()
@@ -83,7 +83,7 @@ ombc_gmm <- function(
       mix$best_model$model_obj[[1]]$mu,
       mix$best_model$model_obj[[1]]$sigs,
       mix$best_model$model_obj[[1]]$log_dets,
-      p_vals
+      t_vals
     )
 
     distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
@@ -123,16 +123,18 @@ ombc_gmm <- function(
 
   outlier_seq <- seq(gross_num, max_out + gross_num)
 
+  dd_max <- max(distrib_diff_mat)
   gg_curves_list <- list()
   for (j in seq_len(track_num)) {
     distrib_diff_j <- distrib_diff_mat[, j]
     gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
       ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
       ggplot2::geom_line() +
-      ggplot2::geom_vline(xintercept = outlier_num[j]) +
+      ggplot2::ylim(c(0, dd_max)) +
+      ggplot2::geom_vline(xintercept = outlier_num[j], linetype = "dashed") +
       ggplot2::labs(
         title = paste0(
-          j, ": ", outlier_num[j], " (p = ", round(p_vals[j], 2), ")"
+          j, ": ", outlier_num[j], " (p = ", round(t_vals[j], 4), ")"
         ),
         x = "Outlier Number",
         y = "Distributional Difference"
