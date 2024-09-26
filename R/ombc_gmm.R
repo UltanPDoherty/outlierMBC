@@ -101,7 +101,7 @@ ombc_gmm <- function(
     outlier_rank <- double(length(gross_outs))
 
     outlier_rank[gross_outs] <- 1
-    outlier_rank[!gross_outs] <- outlier_rank0 + (outlier_rank0 != 0)
+    outlier_rank[!gross_outs] <- outlier_rank0 + gross_num * (outlier_rank0 != 0)
   }
 
   outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 + gross_num
