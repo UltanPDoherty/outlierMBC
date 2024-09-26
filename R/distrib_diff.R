@@ -89,11 +89,16 @@ distrib_diff_mahalanobis <- function(
     mahala_ewcdf_g <- mahala_ewcdf_g_func(check_seq)
     beta_cdf_g <- stats::pbeta(check_seq, param1, param2)
 
-    pmf_diffs <- diff(c(0, beta_cdf_g)) - diff(c(0, mahala_ewcdf_g))
+    # pmf_diffs <- diff(c(0, beta_cdf_g)) - diff(c(0, mahala_ewcdf_g))
+    #
+    # roll2_pmf_diffs <- zoo::rollmean(pmf_diffs, k = 1e2)
 
-    roll2_pmf_diffs <- zoo::rollmean(pmf_diffs, k = 1e2)
+    # distrib_diff_g_x[i] <- sum(abs(roll2_pmf_diffs))
 
-    distrib_diff_g_x[i] <- sum(abs(roll2_pmf_diffs))
+    cdf_diffs <- beta_cdf_g - mahala_ewcdf_g
+
+    distrib_diff_g_x[i] <- mean(abs(cdf_diffs))
+
   }
 
   dens_g_x <- exp(
