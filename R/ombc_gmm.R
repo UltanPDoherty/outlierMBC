@@ -40,7 +40,7 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = NULL,
-    tail_probs = c(0, 0.5, 0.75, 0.9),
+    tail_probs = c(0, 0.5, 0.75, 0.85, 0.9, 0.95),
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
