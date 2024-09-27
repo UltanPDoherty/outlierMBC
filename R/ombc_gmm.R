@@ -144,7 +144,8 @@ ombc_gmm <- function(
       )
   }
   gg_curves <- ggpubr::ggarrange(
-    plotlist = gg_curves_list, nrow = 2, ncol = ceiling(track_num / 2)
+    plotlist = gg_curves_list,
+    nrow = min(2, track_num), ncol = ceiling(track_num / 2)
   )
 
   gg_removal <- data.frame(outlier_seq, removal_dens) |>
