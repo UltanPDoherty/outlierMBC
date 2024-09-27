@@ -40,7 +40,7 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = NULL,
-    tail_probs = c(0, 0.5, 0.75, 0.85, 0.9, 0.95),
+    tail_probs = c(0, 0.5, 0.75, 0.9, 0.95, 0.99),
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
@@ -101,7 +101,8 @@ ombc_gmm <- function(
     outlier_rank <- double(length(gross_outs))
 
     outlier_rank[gross_outs] <- 1
-    outlier_rank[!gross_outs] <- outlier_rank0 + gross_num * (outlier_rank0 != 0)
+    outlier_rank[!gross_outs] <- outlier_rank0 +
+      gross_num * (outlier_rank0 != 0)
   }
 
   outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 + gross_num
@@ -123,7 +124,6 @@ ombc_gmm <- function(
 
   outlier_seq <- seq(gross_num, max_out + gross_num)
 
-  dd_max <- max(distrib_diff_mat)
   gg_curves_list <- list()
   for (j in seq_len(track_num)) {
     distrib_diff_j <- distrib_diff_mat[, j]
