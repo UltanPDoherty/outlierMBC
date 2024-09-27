@@ -84,13 +84,13 @@ distrib_diff_mahalanobis <- function(
   mahala_ewcdf_g <- mahala_ewcdf_g_func(check_seq)
   beta_cdf_g <- stats::pbeta(check_seq, param1, param2)
 
-  cdf_diffs <- beta_cdf_g - mahala_ewcdf_g
+  abs_cdf_diffs <- abs(beta_cdf_g - mahala_ewcdf_g)
 
   distrib_diff_g_x <- double(length(tail_probs))
   for (i in seq_along(tail_probs)) {
     tail_subset <- check_seq >= ewcdf_tail[i]
 
-    distrib_diff_g_x[i] <- sqrt(mean(cdf_diffs[tail_subset]^2))
+    distrib_diff_g_x[i] <- mean(abs_cdf_diffs[tail_subset])
   }
 
   dens_g_x <- exp(
