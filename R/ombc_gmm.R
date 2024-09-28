@@ -151,16 +151,16 @@ ombc_gmm <- function(
       ggplot2::geom_line() +
       ggplot2::geom_point() +
       ggplot2::geom_vline(
-        xintercept = outlier_num[j], linetype = "dashed") +
+        xintercept = outlier_num[j], linetype = "dashed", linewidth = 0.75) +
       ggplot2::geom_hline(
         data = thresholds_j,
         ggplot2::aes(yintercept = reset, colour = "reset"),
-        linetype = "dashed", show.legend = TRUE
+        linetype = "dashed", linewidth = 0.75, show.legend = TRUE
       ) +
       ggplot2::geom_hline(
         data = thresholds_j,
         ggplot2::aes(yintercept = target, colour = "target"),
-        linetype = "dashed", show.legend = TRUE
+        linetype = "dashed", linewidth = 0.75, show.legend = TRUE
       ) +
       ggplot2::scale_colour_manual(
         values = c(reset = "#D55E00", target = "#009E73")
@@ -172,14 +172,27 @@ ombc_gmm <- function(
         ),
         x = "Outlier Number",
         y = "Tail Proportion Difference",
-        colour = "Thresholds"
+        colour = "Thresholds:"
       ) +
-      ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
+      ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
+      ggplot2::theme(
+        legend.text = ggplot2::element_text(size = 11),
+        legend.title = ggplot2::element_text(size = 11)
+      )
   }
   gg_curves <- ggpubr::ggarrange(
     plotlist = gg_curves_list,
     nrow = min(2, track_num), ncol = ceiling(track_num / 2),
     common.legend = TRUE, legend = "bottom"
+  )
+
+  tp_names <- paste0("tp", tail_probs)
+  colnames(distrib_diff_mat) <- tp_names
+  colnames(outlier_bool) <- tp_names
+  colnames(labels) <- tp_names
+  names(outlier_num) <- tp_names
+  dimnames(distrib_diff_arr) <- list(
+    paste0("k", seq_len(comp_num)), NULL, tp_names
   )
 
   return(list(
