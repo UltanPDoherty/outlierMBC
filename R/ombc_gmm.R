@@ -157,6 +157,7 @@ ombc_gmm <- function(
 
   gg_curves_list <- list()
   reset <- target <- choice <- consensus <- NULL
+  point_size <- 1 / ceiling(max_out / 50)
   for (j in seq_len(track_num)) {
     lines_j <- data.frame(
       "reset" = reset_threshold[j], "target" = target_threshold[j],
@@ -166,7 +167,7 @@ ombc_gmm <- function(
     gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
       ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
       ggplot2::geom_line() +
-      ggplot2::geom_point() +
+      ggplot2::geom_point(size = point_size) +
       ggplot2::geom_vline(
         data = lines_j,
         ggplot2::aes(xintercept = choice, colour = "choice"),
