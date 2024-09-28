@@ -9,6 +9,11 @@
 #' @param gross_outs Logical vector identifying gross outliers.
 #' @param tail_probs Values for power mean parameter, p, when summarising CDF
 #'               differences.
+#' @param target_threshold The accepted number of outliers must have a tail
+#'                         proportion difference less than this level.
+#' @param reset_threshold If the tail proportion difference passes above this
+#'                        level at some point, then no outlier number before
+#'                        that point can be accepted.
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param print_interval How frequently the iteration count is printed.
@@ -141,6 +146,7 @@ ombc_gmm <- function(
   outlier_seq <- seq(gross_num, max_out + gross_num)
 
   gg_curves_list <- list()
+  reset <- target <- NULL
   for (j in seq_len(track_num)) {
     thresholds_j <- data.frame(
       "reset" = reset_threshold[j], "target" = target_threshold[j]
@@ -151,7 +157,8 @@ ombc_gmm <- function(
       ggplot2::geom_line() +
       ggplot2::geom_point() +
       ggplot2::geom_vline(
-        xintercept = outlier_num[j], linetype = "dashed", linewidth = 0.75) +
+        xintercept = outlier_num[j], linetype = "dashed", linewidth = 0.75
+      ) +
       ggplot2::geom_hline(
         data = thresholds_j,
         ggplot2::aes(yintercept = reset, colour = "reset"),

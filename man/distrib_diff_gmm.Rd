@@ -4,7 +4,15 @@
 \alias{distrib_diff_gmm}
 \title{distrib_diff_gmm}
 \usage{
-distrib_diff_gmm(x, z, prop, mu, sigma, logdet, tail_probs = seq(1, 2, 0.2))
+distrib_diff_gmm(
+  x,
+  z,
+  prop,
+  mu,
+  sigma,
+  logdet,
+  tail_probs = c(0, 0.5, 0.75, 0.9, 0.95, 0.99)
+)
 }
 \arguments{
 \item{x}{Data.}

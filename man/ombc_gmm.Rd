@@ -9,7 +9,9 @@ ombc_gmm(
   comp_num,
   max_out,
   gross_outs = NULL,
-  tail_probs = c(0, 0.5, 0.75, 0.85, 0.9, 0.95),
+  tail_probs = c(0.99, 0.999, 0.9999, 0.99999),
+  target_threshold = 1 - tail_probs,
+  reset_threshold = 2 * target_threshold,
   mnames = "VVV",
   nmax = 10,
   print_interval = Inf
@@ -26,6 +28,13 @@ ombc_gmm(
 
 \item{tail_probs}{Values for power mean parameter, p, when summarising CDF
 differences.}
+
+\item{target_threshold}{The accepted number of outliers must have a tail
+proportion difference less than this level.}
+
+\item{reset_threshold}{If the tail proportion difference passes above this
+level at some point, then no outlier number before
+that point can be accepted.}
 
 \item{mnames}{Model names for mixture::gpcm.}
 

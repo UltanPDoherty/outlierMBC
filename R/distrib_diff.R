@@ -78,21 +78,6 @@ distrib_diff_mahalanobis <- function(
   scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
   mahala_ewcdf_g_func <- spatstat.univar::ewcdf(scaled_mahalas_g, z_g / n_g)
 
-  # ewcdf_tail <- spatstat.univar::quantile.ewcdf(mahala_ewcdf_g_func, tail_probs)
-  #
-  # check_seq <- seq(0, max(scaled_mahalas_g), length.out = 1e5)
-  # mahala_ewcdf_g <- mahala_ewcdf_g_func(check_seq)
-  # beta_cdf_g <- stats::pbeta(check_seq, param1, param2)
-  #
-  # abs_cdf_diffs <- abs(beta_cdf_g - mahala_ewcdf_g)
-  #
-  # distrib_diff_g_x <- double(length(tail_probs))
-  # for (i in seq_along(tail_probs)) {
-  #   tail_subset <- check_seq >= ewcdf_tail[i]
-  #
-  #   distrib_diff_g_x[i] <- mean(abs_cdf_diffs[tail_subset])
-  # }
-
   tail_quants <- stats::qbeta(tail_probs, param1, param2)
   mahala_tail_probs <- mahala_ewcdf_g_func(tail_quants)
   distrib_diff_g_x <- abs(mahala_tail_probs - tail_probs)
