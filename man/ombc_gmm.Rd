@@ -9,7 +9,7 @@ ombc_gmm(
   comp_num,
   max_out,
   gross_outs = NULL,
-  tail_probs = c(0.999, 0.9999),
+  tail_probs = 1 - (1/(obs_num - gross_num)),
   target_threshold = 1 - tail_probs,
   reset_threshold = 2 * target_threshold,
   mnames = "VVV",

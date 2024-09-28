@@ -10,7 +10,7 @@ distrib_diff_mahalanobis(
   mu_g,
   sigma_g,
   logdet_g,
-  tail_probs = c(0.999, 0.9999)
+  tail_probs = c(0.9999)
 )
 }
 \arguments{
