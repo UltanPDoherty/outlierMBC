@@ -182,30 +182,6 @@ ombc_gmm <- function(
     common.legend = TRUE, legend = "bottom"
   )
 
-  gg_removal <- data.frame(outlier_seq, removal_dens) |>
-    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = removal_dens)) +
-    ggplot2::geom_line() +
-    ggplot2::geom_vline(xintercept = outlier_num) +
-    ggplot2::labs(
-      title = paste0(seq_len(track_num), ": ", outlier_num, collapse = ", "),
-      x = "Outlier Number",
-      y = "Removal Density"
-    )
-
-  k_neighbours <- floor(obs_num / 100)
-  x_knndist <- dbscan::kNNdist(x0, k = k_neighbours)
-  knn_seq <- seq_len(2 * (max_out + gross_num))
-  knndist_sort <- -sort(-x_knndist)[knn_seq]
-  gg_knn <- data.frame(knn_seq, knndist_sort) |>
-    ggplot2::ggplot(ggplot2::aes(x = knn_seq, y = knndist_sort)) +
-    ggplot2::geom_line() +
-    ggplot2::geom_vline(xintercept = outlier_num, colour = "blue") +
-    ggplot2::labs(
-      title = "kNN Distance Plot with Proposals for Number of Outliers",
-      x = "Outlier Number",
-      y = paste0("kNN Distance (k = ", k_neighbours, ")")
-    )
-
   return(list(
     distrib_diff_mat = distrib_diff_mat,
     outlier_bool = outlier_bool,
@@ -213,8 +189,6 @@ ombc_gmm <- function(
     outlier_rank = outlier_rank,
     labels = labels,
     plot_curves = gg_curves,
-    plot_removal = gg_removal,
-    plot_knn = gg_knn,
     loglike = loglike,
     removal_dens = removal_dens,
     distrib_diff_arr = distrib_diff_arr
