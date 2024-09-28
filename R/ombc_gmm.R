@@ -114,24 +114,34 @@ ombc_gmm <- function(
 
   outlier_num <- integer(track_num)
   last_reset <- integer(track_num)
+  target_bools <- matrix(nrow = max_out + 1, ncol = track_num)
+  last_reset_bools <- matrix(nrow = max_out + 1, ncol = track_num)
   for (j in seq_len(track_num)) {
     reset_bool <- distrib_diff_mat[, j] > reset_threshold[j]
     if (any(reset_bool)) {
       last_reset[j] <- max(which(reset_bool))
-    } else {
-      last_reset[j] <- 0
     }
-    outlier_num[j] <- which.max(
-      distrib_diff_mat[, j] < target_threshold[j] &
-        seq_len(max_out + 1) > last_reset[j]
-    )
+    target_bools[, j] <- distrib_diff_mat[, j] < target_threshold[j]
+    last_reset_bools[, j] <- seq_len(max_out + 1) > last_reset[j]
+    outlier_num[j] <- which.max(target_bools[, j] & last_reset_bools[, j])
   }
+
+  consensus_vec <- apply(
+    target_bools & last_reset_bools, 1, all
+  )
+  if (any(consensus_vec)) {
+    track_num_plus <- track_num + 1
+    outlier_num[track_num_plus] <- which.max(consensus_vec)
+  } else {
+    cat(paste0("No consensus achieved.\n"))
+  }
+
   outlier_num <- outlier_num - 1 + gross_num
 
-  outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
+  outlier_bool <- matrix(nrow = obs_num, ncol = track_num_plus)
   mix <- list()
-  labels <- matrix(0, nrow = obs_num, ncol = track_num)
-  for (j in seq_len(track_num)) {
+  labels <- matrix(0, nrow = obs_num, ncol = track_num_plus)
+  for (j in seq_len(track_num_plus)) {
     outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
 
     z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
@@ -148,8 +158,9 @@ ombc_gmm <- function(
   gg_curves_list <- list()
   reset <- target <- NULL
   for (j in seq_len(track_num)) {
-    thresholds_j <- data.frame(
-      "reset" = reset_threshold[j], "target" = target_threshold[j]
+    lines_j <- data.frame(
+      "reset" = reset_threshold[j], "target" = target_threshold[j],
+      "choice" = outlier_num[j], "consensus" = outlier_num[track_num_plus]
     )
     distrib_diff_j <- distrib_diff_mat[, j]
     gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
@@ -157,20 +168,29 @@ ombc_gmm <- function(
       ggplot2::geom_line() +
       ggplot2::geom_point() +
       ggplot2::geom_vline(
-        xintercept = outlier_num[j], linetype = "dashed", linewidth = 0.75
+        data = lines_j,
+        ggplot2::aes(xintercept = choice, colour = "choice"),
+        linetype = "solid", linewidth = 0.75
+      ) +
+      ggplot2::geom_vline(
+        data = lines_j,
+        ggplot2::aes(xintercept = consensus, colour = "consensus"),
+        linetype = "solid", linewidth = 0.75
       ) +
       ggplot2::geom_hline(
-        data = thresholds_j,
+        data = lines_j,
         ggplot2::aes(yintercept = reset, colour = "reset"),
-        linetype = "dashed", linewidth = 0.75, show.legend = TRUE
+        linetype = "dashed", linewidth = 0.75
       ) +
       ggplot2::geom_hline(
-        data = thresholds_j,
+        data = lines_j,
         ggplot2::aes(yintercept = target, colour = "target"),
-        linetype = "dashed", linewidth = 0.75, show.legend = TRUE
+        linetype = "dashed", linewidth = 0.75
       ) +
       ggplot2::scale_colour_manual(
-        values = c(reset = "#D55E00", target = "#009E73")
+        values = c(
+          reset = "#D55E00", target = "#009E73",
+          choice = "#CC79A7", consensus = "#0072B2")
       ) +
       ggplot2::geom_hline(yintercept = 0, linetype = "dotted") +
       ggplot2::labs(
@@ -195,9 +215,9 @@ ombc_gmm <- function(
 
   tp_names <- paste0("tp", tail_probs)
   colnames(distrib_diff_mat) <- tp_names
-  colnames(outlier_bool) <- tp_names
-  colnames(labels) <- tp_names
-  names(outlier_num) <- tp_names
+  colnames(outlier_bool) <- c(tp_names, "consensus")
+  colnames(labels) <- c(tp_names, "consensus")
+  names(outlier_num) <- c(tp_names, "consensus")
   dimnames(distrib_diff_arr) <- list(
     paste0("k", seq_len(comp_num)), NULL, tp_names
   )
