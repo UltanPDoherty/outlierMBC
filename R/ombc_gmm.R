@@ -40,7 +40,9 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = NULL,
-    tail_probs = c(0, 0.5, 0.75, 0.9, 0.95, 0.99),
+    tail_probs = c(0.999, 0.9999, 0.99999),
+    target_threshold = 1 - tail_probs,
+    reset_threshold = 2 * target_threshold,
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
@@ -105,7 +107,21 @@ ombc_gmm <- function(
       gross_num * (outlier_rank0 != 0)
   }
 
-  outlier_num <- apply(distrib_diff_mat, 2, which.min) - 1 + gross_num
+  outlier_num <- integer(track_num)
+  last_reset <- integer(track_num)
+  for (j in seq_len(track_num)) {
+    reset_bool <- distrib_diff_mat[, j] > reset_threshold[j]
+    if (any(reset_bool)) {
+      last_reset[j] <- max(which(reset_bool))
+    } else {
+      last_reset[j] <- 1
+    }
+    outlier_num[j] <- which.max(
+      distrib_diff_mat[, j] < target_threshold[j] &
+        seq_len(max_out + 1) > last_reset[j]
+    )
+  }
+  outlier_num <- outlier_num - 1 + gross_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
   mix <- list()
@@ -130,18 +146,28 @@ ombc_gmm <- function(
     gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
       ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
       ggplot2::geom_line() +
-      ggplot2::geom_vline(xintercept = outlier_num[j], linetype = "dashed") +
+      ggplot2::geom_point() +
+      ggplot2::geom_vline(
+        xintercept = outlier_num[j], linetype = "dashed") +
+      ggplot2::geom_linerange(
+        y = reset_threshold[j],
+        xmin = gross_num, xmax = last_reset[j] - 1 + gross_num,
+        linetype = "dashed"
+      ) +
+      ggplot2::geom_linerange(
+        y = target_threshold[j],
+        xmin = last_reset[j] - 1 + gross_num, xmax = max_out + gross_num,
+        linetype = "dashed"
+      ) +
+      ggplot2::geom_hline(yintercept = 0, linetype = "dotted") +
       ggplot2::labs(
         title = paste0(
           j, ": ", outlier_num[j], " (tail = ", round(tail_probs[j], 4), ")"
         ),
         x = "Outlier Number",
-        y = "Distributional Difference"
+        y = "Tail Proportion Difference"
       ) +
-      ggplot2::theme(
-        axis.text.y = ggplot2::element_blank(),
-        axis.ticks.y.left = ggplot2::element_blank()
-      )
+      ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
   }
   gg_curves <- ggpubr::ggarrange(
     plotlist = gg_curves_list,
