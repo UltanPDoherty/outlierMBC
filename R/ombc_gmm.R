@@ -40,7 +40,7 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = NULL,
-    tail_probs = c(0.999, 0.9999, 0.99999),
+    tail_probs = c(0.99, 0.999, 0.9999, 0.99999),
     target_threshold = 1 - tail_probs,
     reset_threshold = 2 * target_threshold,
     mnames = "VVV",
@@ -114,7 +114,7 @@ ombc_gmm <- function(
     if (any(reset_bool)) {
       last_reset[j] <- max(which(reset_bool))
     } else {
-      last_reset[j] <- 1
+      last_reset[j] <- 0
     }
     outlier_num[j] <- which.max(
       distrib_diff_mat[, j] < target_threshold[j] &
@@ -142,6 +142,9 @@ ombc_gmm <- function(
 
   gg_curves_list <- list()
   for (j in seq_len(track_num)) {
+    thresholds_j <- data.frame(
+      "reset" = reset_threshold[j], "target" = target_threshold[j]
+    )
     distrib_diff_j <- distrib_diff_mat[, j]
     gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
       ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
@@ -149,29 +152,34 @@ ombc_gmm <- function(
       ggplot2::geom_point() +
       ggplot2::geom_vline(
         xintercept = outlier_num[j], linetype = "dashed") +
-      ggplot2::geom_linerange(
-        y = reset_threshold[j],
-        xmin = gross_num, xmax = last_reset[j] - 1 + gross_num,
-        linetype = "dashed"
+      ggplot2::geom_hline(
+        data = thresholds_j,
+        ggplot2::aes(yintercept = reset, colour = "reset"),
+        linetype = "dashed", show.legend = TRUE
       ) +
-      ggplot2::geom_linerange(
-        y = target_threshold[j],
-        xmin = last_reset[j] - 1 + gross_num, xmax = max_out + gross_num,
-        linetype = "dashed"
+      ggplot2::geom_hline(
+        data = thresholds_j,
+        ggplot2::aes(yintercept = target, colour = "target"),
+        linetype = "dashed", show.legend = TRUE
+      ) +
+      ggplot2::scale_colour_manual(
+        values = c(reset = "#D55E00", target = "#009E73")
       ) +
       ggplot2::geom_hline(yintercept = 0, linetype = "dotted") +
       ggplot2::labs(
         title = paste0(
-          j, ": ", outlier_num[j], " (tail = ", round(tail_probs[j], 4), ")"
+          j, ": ", outlier_num[j], " (tail = ", tail_probs[j], ")"
         ),
         x = "Outlier Number",
-        y = "Tail Proportion Difference"
+        y = "Tail Proportion Difference",
+        colour = "Thresholds"
       ) +
       ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
   }
   gg_curves <- ggpubr::ggarrange(
     plotlist = gg_curves_list,
-    nrow = min(2, track_num), ncol = ceiling(track_num / 2)
+    nrow = min(2, track_num), ncol = ceiling(track_num / 2),
+    common.legend = TRUE, legend = "bottom"
   )
 
   gg_removal <- data.frame(outlier_seq, removal_dens) |>
