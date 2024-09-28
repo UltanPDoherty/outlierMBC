@@ -175,7 +175,7 @@ ombc_gmm <- function(
       ggplot2::geom_hline(yintercept = 0, linetype = "dotted") +
       ggplot2::labs(
         title = paste0(
-          j, ": ", outlier_num[j], " (tail = ", tail_probs[j], ")"
+          j, ": No. of Outliers = ", outlier_num[j], " (tail = ", tail_probs[j], ")"
         ),
         x = "Outlier Number",
         y = "Tail Proportion Difference",
