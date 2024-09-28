@@ -125,18 +125,23 @@ ombc_gmm <- function(
     last_reset_bools[, j] <- seq_len(max_out + 1) > last_reset[j]
     outlier_num[j] <- which.max(target_bools[, j] & last_reset_bools[, j])
   }
+  outlier_num <- outlier_num - 1 + gross_num
 
   consensus_vec <- apply(
     target_bools & last_reset_bools, 1, all
   )
-  if (any(consensus_vec)) {
+  if (any(consensus_vec) & track_num > 1) {
     track_num_plus <- track_num + 1
-    outlier_num[track_num_plus] <- which.max(consensus_vec)
-  } else {
+    consensus_choice <- which.max(consensus_vec) - 1 + gross_num
+    outlier_num[track_num_plus] <- consensus_choice
+  } else if (track_num > 1) {
     cat(paste0("No consensus achieved.\n"))
+    consensus_choice <- NA
+    track_num_plus <- track_num
+  } else {
+    consensus_choice <- NULL
+    track_num_plus <- track_num
   }
-
-  outlier_num <- outlier_num - 1 + gross_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num_plus)
   mix <- list()
@@ -157,12 +162,20 @@ ombc_gmm <- function(
 
   gg_curves_list <- list()
   reset <- target <- choice <- consensus <- NULL
-  point_size <- 1 / ceiling(max_out / 50)
+  point_size <- 1 - min(0.9, max(0, - 0.1 + max_out / 250))
   for (j in seq_len(track_num)) {
-    lines_j <- data.frame(
-      "reset" = reset_threshold[j], "target" = target_threshold[j],
-      "choice" = outlier_num[j], "consensus" = outlier_num[track_num_plus]
-    )
+    if (track_num_plus > track_num) {
+      lines_j <- data.frame(
+        "reset" = reset_threshold[j], "target" = target_threshold[j],
+        "choice" = outlier_num[j], "consensus" = consensus_choice
+      )
+    } else {
+      lines_j <- data.frame(
+        "reset" = reset_threshold[j], "target" = target_threshold[j],
+        "choice" = outlier_num[j]
+      )
+    }
+
     distrib_diff_j <- distrib_diff_mat[, j]
     gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
       ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
@@ -171,11 +184,6 @@ ombc_gmm <- function(
       ggplot2::geom_vline(
         data = lines_j,
         ggplot2::aes(xintercept = choice, colour = "choice"),
-        linetype = "solid", linewidth = 0.75
-      ) +
-      ggplot2::geom_vline(
-        data = lines_j,
-        ggplot2::aes(xintercept = consensus, colour = "consensus"),
         linetype = "solid", linewidth = 0.75
       ) +
       ggplot2::geom_hline(
@@ -209,6 +217,15 @@ ombc_gmm <- function(
         legend.text = ggplot2::element_text(size = 11),
         legend.title = ggplot2::element_text(size = 11)
       )
+
+    if (track_num_plus > track_num) {
+      gg_curves_list[[j]] <- gg_curves_list[[j]] +
+        ggplot2::geom_vline(
+          data = lines_j,
+          ggplot2::aes(xintercept = consensus, colour = "consensus"),
+          linetype = "solid", linewidth = 0.75
+        )
+    }
   }
   gg_curves <- ggpubr::ggarrange(
     plotlist = gg_curves_list,
@@ -218,9 +235,14 @@ ombc_gmm <- function(
 
   tp_names <- paste0("tp", tail_probs)
   colnames(distrib_diff_mat) <- tp_names
-  colnames(outlier_bool) <- c(tp_names, "consensus")
-  colnames(labels) <- c(tp_names, "consensus")
-  names(outlier_num) <- c(tp_names, "consensus")
+  if (track_num_plus > track_num) {
+    tp_names_plus <- c(tp_names, "consensus")
+  } else {
+    tp_names_plus <- tp_names
+  }
+  colnames(outlier_bool) <- tp_names_plus
+  colnames(labels) <- tp_names_plus
+  names(outlier_num) <- tp_names_plus
   dimnames(distrib_diff_arr) <- list(
     paste0("k", seq_len(comp_num)), NULL, tp_names
   )
