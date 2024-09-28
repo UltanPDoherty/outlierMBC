@@ -156,7 +156,7 @@ ombc_gmm <- function(
   outlier_seq <- seq(gross_num, max_out + gross_num)
 
   gg_curves_list <- list()
-  reset <- target <- NULL
+  reset <- target <- choice <- consensus <- NULL
   for (j in seq_len(track_num)) {
     lines_j <- data.frame(
       "reset" = reset_threshold[j], "target" = target_threshold[j],
@@ -190,12 +190,14 @@ ombc_gmm <- function(
       ggplot2::scale_colour_manual(
         values = c(
           reset = "#D55E00", target = "#009E73",
-          choice = "#CC79A7", consensus = "#0072B2")
+          choice = "#CC79A7", consensus = "#0072B2"
+        )
       ) +
       ggplot2::geom_hline(yintercept = 0, linetype = "dotted") +
       ggplot2::labs(
         title = paste0(
-          j, ": No. of Outliers = ", outlier_num[j], " (tail = ", tail_probs[j], ")"
+          j, ": No. of Outliers = ", outlier_num[j],
+          " (tail = ", tail_probs[j], ")"
         ),
         x = "Outlier Number",
         y = "Tail Proportion Difference",
