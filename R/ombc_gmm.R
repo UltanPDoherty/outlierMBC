@@ -166,7 +166,7 @@ ombc_gmm <- function(
       ggplot2::geom_hline(
         data = lines_j,
         ggplot2::aes(yintercept = reset, colour = "reset"),
-        linetype = "dashed", linewidth = 0.75
+        linetype = "dotted", linewidth = 0.75
       ) +
       ggplot2::geom_hline(
         data = lines_j,
@@ -179,11 +179,11 @@ ombc_gmm <- function(
           choice = "#CC79A7", consensus = "#0072B2"
         )
       ) +
-      ggplot2::geom_hline(yintercept = 0, linetype = "dotted") +
       ggplot2::labs(
         title = paste0(
-          j, ": No. of Outliers = ", outlier_num[j],
-          " (tail proportion = ", round(tail_props[j], 7), ")"
+          j, ": No. of outliers = ", outlier_num[j],
+          " (tail: number = ", tail_nums[j],
+          ", proportion = ", round(tail_props[j], 7), ")"
         ),
         x = "Outlier Number",
         y = "Tail Proportion Difference",
@@ -193,7 +193,8 @@ ombc_gmm <- function(
       ggplot2::theme(
         legend.text = ggplot2::element_text(size = 11),
         legend.title = ggplot2::element_text(size = 11)
-      )
+      ) +
+      ggplot::expand_limits(y = 0)
 
     if (track_num_plus > track_num) {
       lines_j <- data.frame(
