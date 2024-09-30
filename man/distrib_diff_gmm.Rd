@@ -4,7 +4,7 @@
 \alias{distrib_diff_gmm}
 \title{distrib_diff_gmm}
 \usage{
-distrib_diff_gmm(x, z, prop, mu, sigma, logdet, tail_props = c(0.9999))
+distrib_diff_gmm(x, z, prop, mu, sigma, logdet, tail_props)
 }
 \arguments{
 \item{x}{Data.}

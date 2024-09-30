@@ -4,14 +4,7 @@
 \alias{distrib_diff_mahalanobis}
 \title{distrib_diff_mahalanobis}
 \usage{
-distrib_diff_mahalanobis(
-  x,
-  z_g,
-  mu_g,
-  sigma_g,
-  logdet_g,
-  tail_props = c(0.9999)
-)
+distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g, tail_props)
 }
 \arguments{
 \item{x}{Data.}

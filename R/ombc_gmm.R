@@ -62,7 +62,7 @@ ombc_gmm <- function(
     tail_nums
   )
   target_threshold <- tail_props
-  reset_threshold <- 2 * target_threshold
+  reset_threshold <- Inf * target_threshold
   tn_names <- paste0("tn", tail_nums)
 
   track_num <- length(tail_nums)
@@ -167,11 +167,11 @@ ombc_gmm <- function(
         ggplot2::aes(xintercept = choice, colour = "choice"),
         linetype = "solid", linewidth = 0.75
       ) +
-      ggplot2::geom_line(
-        data = lines_j,
-        ggplot2::aes(y = reset, colour = "reset"),
-        linetype = "dotted", linewidth = 0.75
-      ) +
+      # ggplot2::geom_line(
+      #   data = lines_j,
+      #   ggplot2::aes(y = reset, colour = "reset"),
+      #   linetype = "dotted", linewidth = 0.75
+      # ) +
       ggplot2::geom_line(
         data = lines_j,
         ggplot2::aes(y = target, colour = "target"),
