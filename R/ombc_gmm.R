@@ -56,12 +56,16 @@ ombc_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  tail_props <- tail_nums / (obs_num - gross_num)
+  # tail_props <- tail_nums / (obs_num - gross_num)
+  tail_props <- outer(
+    1 / seq(obs_num - gross_num, obs_num - gross_num - max_out),
+    tail_nums
+  )
   target_threshold <- tail_props
   reset_threshold <- 2 * target_threshold
-  tp_names <- paste0("tp", tail_props)
+  tn_names <- paste0("tn", tail_nums)
 
-  track_num <- length(tail_props)
+  track_num <- length(tail_nums)
 
   loglike <- c()
   removal_dens <- c()
@@ -83,7 +87,7 @@ ombc_gmm <- function(
       mix$best_model$model_obj[[1]]$mu,
       mix$best_model$model_obj[[1]]$sigs,
       mix$best_model$model_obj[[1]]$log_dets,
-      tail_props
+      tail_props[i, ]
     )
 
     distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
@@ -105,9 +109,9 @@ ombc_gmm <- function(
   target_bools <- matrix(nrow = max_out + 1, ncol = track_num)
   last_reset_bools <- matrix(nrow = max_out + 1, ncol = track_num)
   for (j in seq_len(track_num)) {
-    reset_bool <- distrib_diff_mat[, j] > reset_threshold[j]
+    reset_bool <- distrib_diff_mat[, j] > reset_threshold[, j]
     last_reset[j] <- max(which(c(TRUE, reset_bool))) - 1
-    target_bools[, j] <- distrib_diff_mat[, j] < target_threshold[j]
+    target_bools[, j] <- distrib_diff_mat[, j] < target_threshold[, j]
     last_reset_bools[, j] <- seq_len(max_out + 1) > last_reset[j]
     outlier_num[j] <- which.max(target_bools[, j] & last_reset_bools[, j])
   }
@@ -120,11 +124,11 @@ ombc_gmm <- function(
     track_num_plus <- track_num + 1
     consensus_choice <- which.max(consensus_vec) - 1 + gross_num
     outlier_num[track_num_plus] <- consensus_choice
-    tp_names_plus <- c(tp_names, "consensus")
+    tn_names_plus <- c(tn_names, "consensus")
   } else {
     consensus_choice <- NULL
     track_num_plus <- track_num
-    tp_names_plus <- tp_names
+    tn_names_plus <- tn_names
   }
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num_plus)
@@ -149,7 +153,7 @@ ombc_gmm <- function(
   point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
   for (j in seq_len(track_num)) {
     lines_j <- data.frame(
-      "reset" = reset_threshold[j], "target" = target_threshold[j],
+      "reset" = reset_threshold[, j], "target" = target_threshold[, j],
       "choice" = outlier_num[j]
     )
 
@@ -163,14 +167,14 @@ ombc_gmm <- function(
         ggplot2::aes(xintercept = choice, colour = "choice"),
         linetype = "solid", linewidth = 0.75
       ) +
-      ggplot2::geom_hline(
+      ggplot2::geom_line(
         data = lines_j,
-        ggplot2::aes(yintercept = reset, colour = "reset"),
+        ggplot2::aes(y = reset, colour = "reset"),
         linetype = "dotted", linewidth = 0.75
       ) +
-      ggplot2::geom_hline(
+      ggplot2::geom_line(
         data = lines_j,
-        ggplot2::aes(yintercept = target, colour = "target"),
+        ggplot2::aes(y = target, colour = "target"),
         linetype = "dashed", linewidth = 0.75
       ) +
       ggplot2::scale_colour_manual(
@@ -182,8 +186,7 @@ ombc_gmm <- function(
       ggplot2::labs(
         title = paste0(
           j, ": No. of outliers = ", outlier_num[j],
-          " (tail: number = ", tail_nums[j],
-          ", proportion = ", round(tail_props[j], 7), ")"
+          " (tail number = ", tail_nums[j], ")"
         ),
         x = "Outlier Number",
         y = "Tail Proportion Difference",
@@ -198,7 +201,7 @@ ombc_gmm <- function(
 
     if (track_num_plus > track_num) {
       lines_j <- data.frame(
-        "reset" = reset_threshold[j], "target" = target_threshold[j],
+        "reset" = reset_threshold[, j], "target" = target_threshold[, j],
         "choice" = outlier_num[j], "consensus" = consensus_choice
       )
 
@@ -216,12 +219,12 @@ ombc_gmm <- function(
     common.legend = TRUE, legend = "bottom"
   )
 
-  colnames(distrib_diff_mat) <- tp_names
-  colnames(outlier_bool) <- tp_names_plus
-  colnames(labels) <- tp_names_plus
-  names(outlier_num) <- tp_names_plus
+  colnames(distrib_diff_mat) <- tn_names
+  colnames(outlier_bool) <- tn_names_plus
+  colnames(labels) <- tn_names_plus
+  names(outlier_num) <- tn_names_plus
   dimnames(distrib_diff_arr) <- list(
-    paste0("k", seq_len(comp_num)), NULL, tp_names
+    paste0("k", seq_len(comp_num)), NULL, tn_names
   )
 
   return(list(
