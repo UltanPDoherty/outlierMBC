@@ -7,13 +7,7 @@
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
 #' @param gross_outs Logical vector identifying gross outliers.
-#' @param tail_probs Values for power mean parameter, p, when summarising CDF
-#'               differences.
-#' @param target_threshold The accepted number of outliers must have a tail
-#'                         proportion difference less than this level.
-#' @param reset_threshold If the tail proportion difference passes above this
-#'                        level at some point, then no outlier number before
-#'                        that point can be accepted.
+#' @param tail_nums .
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param print_interval How frequently the iteration count is printed.
@@ -44,10 +38,8 @@ ombc_gmm <- function(
     x,
     comp_num,
     max_out,
-    gross_outs = NULL,
-    tail_probs = 1 - (1 / (obs_num - gross_num)),
-    target_threshold = 1 - tail_probs,
-    reset_threshold = 2 * target_threshold,
+    gross_outs = rep(FALSE, nrow(x)),
+    tail_nums = 1,
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
@@ -59,22 +51,23 @@ ombc_gmm <- function(
   dist_mat0 <- as.matrix(stats::dist(x0))
   dist_mat <- dist_mat0
 
-  if (!is.null(gross_outs)) {
-    gross_num <- sum(gross_outs)
-    x <- x[!gross_outs, ]
-    max_out <- max_out - gross_num
-    dist_mat <- dist_mat[!gross_outs, !gross_outs]
-  } else {
-    gross_num <- 0
-  }
+  gross_num <- sum(gross_outs)
+  x <- x[!gross_outs, ]
+  max_out <- max_out - gross_num
+  dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  track_num <- length(tail_probs)
+  tail_props <- tail_nums / (obs_num - gross_num)
+  target_threshold <- tail_props
+  reset_threshold <- 2 * target_threshold
+  tp_names <- paste0("tp", tail_props)
+
+  track_num <- length(tail_props)
 
   loglike <- c()
   removal_dens <- c()
   distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = track_num)
-  outlier_rank <- rep(0, obs_num - gross_num)
+  outlier_rank_temp <- rep(0, obs_num - gross_num)
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
@@ -90,27 +83,22 @@ ombc_gmm <- function(
       mix$best_model$model_obj[[1]]$mu,
       mix$best_model$model_obj[[1]]$sigs,
       mix$best_model$model_obj[[1]]$log_dets,
-      tail_probs
+      tail_props
     )
 
     distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
     distrib_diff_mat[i, ] <- dd$distrib_diff_vec
     removal_dens[i] <- dd$removal_dens
 
-    outlier_rank[!outlier_rank][dd$choice_id] <- i
+    outlier_rank_temp[!outlier_rank_temp][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
   }
 
-  if (!is.null(gross_outs)) {
-    outlier_rank0 <- outlier_rank
-
-    outlier_rank <- double(length(gross_outs))
-
-    outlier_rank[gross_outs] <- 1
-    outlier_rank[!gross_outs] <- outlier_rank0 +
-      gross_num * (outlier_rank0 != 0)
-  }
+  outlier_rank <- double(length(gross_outs))
+  outlier_rank[gross_outs] <- 1
+  outlier_rank[!gross_outs] <- outlier_rank_temp +
+    gross_num * (outlier_rank_temp != 0)
 
   outlier_num <- integer(track_num)
   last_reset <- integer(track_num)
@@ -118,9 +106,7 @@ ombc_gmm <- function(
   last_reset_bools <- matrix(nrow = max_out + 1, ncol = track_num)
   for (j in seq_len(track_num)) {
     reset_bool <- distrib_diff_mat[, j] > reset_threshold[j]
-    if (any(reset_bool)) {
-      last_reset[j] <- max(which(reset_bool))
-    }
+    last_reset[j] <- max(which(c(TRUE, reset_bool))) - 1
     target_bools[, j] <- distrib_diff_mat[, j] < target_threshold[j]
     last_reset_bools[, j] <- seq_len(max_out + 1) > last_reset[j]
     outlier_num[j] <- which.max(target_bools[, j] & last_reset_bools[, j])
@@ -130,17 +116,15 @@ ombc_gmm <- function(
   consensus_vec <- apply(
     target_bools & last_reset_bools, 1, all
   )
-  if (any(consensus_vec) & track_num > 1) {
+  if (any(consensus_vec) && track_num > 1) {
     track_num_plus <- track_num + 1
     consensus_choice <- which.max(consensus_vec) - 1 + gross_num
     outlier_num[track_num_plus] <- consensus_choice
-  } else if (track_num > 1) {
-    cat(paste0("No consensus achieved.\n"))
-    consensus_choice <- NA
-    track_num_plus <- track_num
+    tp_names_plus <- c(tp_names, "consensus")
   } else {
     consensus_choice <- NULL
     track_num_plus <- track_num
+    tp_names_plus <- tp_names
   }
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num_plus)
@@ -162,19 +146,12 @@ ombc_gmm <- function(
 
   gg_curves_list <- list()
   reset <- target <- choice <- consensus <- NULL
-  point_size <- 1 - min(0.9, max(0, - 0.1 + max_out / 250))
+  point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
   for (j in seq_len(track_num)) {
-    if (track_num_plus > track_num) {
-      lines_j <- data.frame(
-        "reset" = reset_threshold[j], "target" = target_threshold[j],
-        "choice" = outlier_num[j], "consensus" = consensus_choice
-      )
-    } else {
-      lines_j <- data.frame(
-        "reset" = reset_threshold[j], "target" = target_threshold[j],
-        "choice" = outlier_num[j]
-      )
-    }
+    lines_j <- data.frame(
+      "reset" = reset_threshold[j], "target" = target_threshold[j],
+      "choice" = outlier_num[j]
+    )
 
     distrib_diff_j <- distrib_diff_mat[, j]
     gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
@@ -206,11 +183,11 @@ ombc_gmm <- function(
       ggplot2::labs(
         title = paste0(
           j, ": No. of Outliers = ", outlier_num[j],
-          " (tail = ", round(tail_probs[j], 5), ")"
+          " (tail proportion = ", round(tail_props[j], 7), ")"
         ),
         x = "Outlier Number",
         y = "Tail Proportion Difference",
-        colour = "Thresholds:"
+        colour = ""
       ) +
       ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
       ggplot2::theme(
@@ -219,6 +196,11 @@ ombc_gmm <- function(
       )
 
     if (track_num_plus > track_num) {
+      lines_j <- data.frame(
+        "reset" = reset_threshold[j], "target" = target_threshold[j],
+        "choice" = outlier_num[j], "consensus" = consensus_choice
+      )
+
       gg_curves_list[[j]] <- gg_curves_list[[j]] +
         ggplot2::geom_vline(
           data = lines_j,
@@ -233,13 +215,7 @@ ombc_gmm <- function(
     common.legend = TRUE, legend = "bottom"
   )
 
-  tp_names <- paste0("tp", tail_probs)
   colnames(distrib_diff_mat) <- tp_names
-  if (track_num_plus > track_num) {
-    tp_names_plus <- c(tp_names, "consensus")
-  } else {
-    tp_names_plus <- tp_names
-  }
   colnames(outlier_bool) <- tp_names_plus
   colnames(labels) <- tp_names_plus
   names(outlier_num) <- tp_names_plus

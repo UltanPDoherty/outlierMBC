@@ -6,6 +6,7 @@
 #' @param mu List of component mean vectors.
 #' @param sigma List of component covariance matrices.
 #' @param logdet Vector of log-determinants for covariance matrices.
+#' @param tail_props .
 #'
 #' @return List of
 #' * distrib_diff
@@ -14,17 +15,17 @@
 #' * removal_dens
 distrib_diff_gmm <- function(
     x, z, prop, mu, sigma, logdet,
-    tail_probs = c(0.9999)) {
+    tail_props = c(0.9999)) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
-  track_num <- length(tail_probs)
+  track_num <- length(tail_props)
 
   distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
   mahala_mat <- matrix(nrow = obs_num, ncol = comp_num)
   for (g in seq_len(comp_num)) {
     dd_g <- distrib_diff_mahalanobis(
-      x, z[, g], mu[[g]], sigma[[g]], logdet[g], tail_probs
+      x, z[, g], mu[[g]], sigma[[g]], logdet[g], tail_props
     )
     distrib_diff_mat[g, ] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
@@ -66,7 +67,7 @@ distrib_diff_mahalanobis <- function(
     mu_g,
     sigma_g,
     logdet_g,
-    tail_probs = c(0.9999)) {
+    tail_props = c(0.9999)) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
   stopifnot("A cluster has become too small (< 4 points).\n" = n_g > 3)
@@ -78,9 +79,9 @@ distrib_diff_mahalanobis <- function(
   scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
   mahala_ewcdf_g_func <- spatstat.univar::ewcdf(scaled_mahalas_g, z_g / n_g)
 
-  tail_quants <- stats::qbeta(tail_probs, param1, param2)
-  mahala_tail_probs <- mahala_ewcdf_g_func(tail_quants)
-  distrib_diff_g_x <- abs(mahala_tail_probs - tail_probs)
+  tail_quants <- stats::qbeta(1 - tail_props, param1, param2)
+  mahala_tail_props <- 1 - mahala_ewcdf_g_func(tail_quants)
+  distrib_diff_g_x <- abs(mahala_tail_props - tail_props)
 
   dens_g_x <- exp(
     -0.5 * (var_num * log(2 * pi) + logdet_g + mahalas_g)

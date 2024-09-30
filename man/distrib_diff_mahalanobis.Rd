@@ -10,7 +10,7 @@ distrib_diff_mahalanobis(
   mu_g,
   sigma_g,
   logdet_g,
-  tail_probs = c(0.9999)
+  tail_props = c(0.9999)
 )
 }
 \arguments{
@@ -24,8 +24,7 @@ distrib_diff_mahalanobis(
 
 \item{logdet_g}{Log-determinants of covariance matrix for component g.}
 
-\item{tail_probs}{Values for power mean parameter, p, when summarising CDF
-differences.}
+\item{tail_props}{.}
 }
 \value{
 List of
