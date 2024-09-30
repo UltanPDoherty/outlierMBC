@@ -271,6 +271,14 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax) {
       cat(paste0(
         mix$best_model$cov_type, " covariance structure implemented.\n"
       ))
+    } else {
+      cat(paste0("Trying defaul gpcm k-means initialisation.\n"))
+      try(mix <- mixture::gpcm(x, G = comp_num, start = 2, nmax = nmax))
+      if (!is.null(mix)) {
+        cat(paste0(
+          mix$best_model$cov_type, " covariance structure implemented.\n"
+        ))
+      }
     }
   }
 
