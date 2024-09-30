@@ -7,7 +7,8 @@
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
 #' @param gross_outs Logical vector identifying gross outliers.
-#' @param tail_nums .
+#' @param expect_num .
+#' @param accept_num .
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param print_interval How frequently the iteration count is printed.
@@ -39,7 +40,8 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = rep(FALSE, nrow(x)),
-    tail_nums = 1,
+    expect_num = 1,
+    accept_num = 2 * expect_num,
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
@@ -56,16 +58,12 @@ ombc_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  # tail_props <- tail_nums / (obs_num - gross_num)
+  track_num <- length(expect_num)
   tail_props <- outer(
     1 / seq(obs_num - gross_num, obs_num - gross_num - max_out),
-    tail_nums
+    expect_num
   )
-  target_threshold <- tail_props
-  reset_threshold <- Inf * target_threshold
-  tn_names <- paste0("tn", tail_nums)
-
-  track_num <- length(tail_nums)
+  en_names <- paste0("en", expect_num)
 
   loglike <- c()
   removal_dens <- c()
@@ -105,30 +103,23 @@ ombc_gmm <- function(
     gross_num * (outlier_rank_temp != 0)
 
   outlier_num <- integer(track_num)
-  last_reset <- integer(track_num)
-  target_bools <- matrix(nrow = max_out + 1, ncol = track_num)
-  last_reset_bools <- matrix(nrow = max_out + 1, ncol = track_num)
+  accept_bools <- matrix(nrow = max_out + 1, ncol = track_num)
   for (j in seq_len(track_num)) {
-    reset_bool <- distrib_diff_mat[, j] > reset_threshold[, j]
-    last_reset[j] <- max(which(c(TRUE, reset_bool))) - 1
-    target_bools[, j] <- distrib_diff_mat[, j] < target_threshold[, j]
-    last_reset_bools[, j] <- seq_len(max_out + 1) > last_reset[j]
-    outlier_num[j] <- which.max(target_bools[, j] & last_reset_bools[, j])
+    accept_bools[, j] <- distrib_diff_mat[, j] < accept_num[j]
+    outlier_num[j] <- which.max(accept_bools[, j])
   }
   outlier_num <- outlier_num - 1 + gross_num
 
-  consensus_vec <- apply(
-    target_bools & last_reset_bools, 1, all
-  )
+  consensus_vec <- apply(accept_bools, 1, all)
   if (any(consensus_vec) && track_num > 1) {
     track_num_plus <- track_num + 1
     consensus_choice <- which.max(consensus_vec) - 1 + gross_num
     outlier_num[track_num_plus] <- consensus_choice
-    tn_names_plus <- c(tn_names, "consensus")
+    en_names_plus <- c(en_names, "consensus")
   } else {
     consensus_choice <- NULL
     track_num_plus <- track_num
-    tn_names_plus <- tn_names
+    en_names_plus <- en_names
   }
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num_plus)
@@ -149,47 +140,46 @@ ombc_gmm <- function(
   outlier_seq <- seq(gross_num, max_out + gross_num)
 
   gg_curves_list <- list()
-  reset <- target <- choice <- consensus <- NULL
+  observed <- acceptable <- expected <- choice <- consensus <- NULL
   point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
   for (j in seq_len(track_num)) {
-    lines_j <- data.frame(
-      "reset" = reset_threshold[, j], "target" = target_threshold[, j],
+    df_j <- data.frame(
+      "outlier_seq" = outlier_seq,
+      "observed" = distrib_diff_mat[, j],
+      "expected" = expect_num[j],
+      "acceptable" = accept_num[j],
       "choice" = outlier_num[j]
     )
 
-    distrib_diff_j <- distrib_diff_mat[, j]
-    gg_curves_list[[j]] <- data.frame(outlier_seq, distrib_diff_j) |>
-      ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = distrib_diff_j)) +
-      ggplot2::geom_line() +
-      ggplot2::geom_point(size = point_size) +
+    gg_curves_list[[j]] <- df_j |>
+      ggplot2::ggplot(ggplot2::aes(x = outlier_seq)) +
+      ggplot2::geom_line(ggplot2::aes(y = observed, colour = "observed")) +
+      ggplot2::geom_point(
+        ggplot2::aes(y = observed, colour = "observed"),
+        size = point_size
+      ) +
       ggplot2::geom_vline(
-        data = lines_j,
         ggplot2::aes(xintercept = choice, colour = "choice"),
         linetype = "solid", linewidth = 0.75
       ) +
-      # ggplot2::geom_line(
-      #   data = lines_j,
-      #   ggplot2::aes(y = reset, colour = "reset"),
-      #   linetype = "dotted", linewidth = 0.75
-      # ) +
-      ggplot2::geom_line(
-        data = lines_j,
-        ggplot2::aes(y = target, colour = "target"),
+      ggplot2::geom_hline(
+        ggplot2::aes(yintercept = acceptable, colour = "acceptable"),
         linetype = "dashed", linewidth = 0.75
+      ) +
+      ggplot2::geom_hline(
+        ggplot2::aes(yintercept = expected, colour = "expected"),
+        linetype = "dotted", linewidth = 0.75
       ) +
       ggplot2::scale_colour_manual(
         values = c(
-          reset = "#D55E00", target = "#009E73",
-          choice = "#CC79A7", consensus = "#0072B2"
+          observed = "#000000", expected = "#0072B2", acceptable = "#009E73",
+          choice = "#CC79A7", consensus = "#D55E00"
         )
       ) +
       ggplot2::labs(
-        title = paste0(
-          j, ": No. of outliers = ", outlier_num[j],
-          " (tail number = ", tail_nums[j], ")"
-        ),
+        title = paste0(j, ": Number of Outliers = ", outlier_num[j]),
         x = "Outlier Number",
-        y = "Tail Proportion Difference",
+        y = "Number of Extreme Points",
         colour = ""
       ) +
       ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
@@ -200,14 +190,16 @@ ombc_gmm <- function(
       ggplot2::expand_limits(y = 0)
 
     if (track_num_plus > track_num) {
-      lines_j <- data.frame(
-        "reset" = reset_threshold[, j], "target" = target_threshold[, j],
-        "choice" = outlier_num[j], "consensus" = consensus_choice
+      df_j <- data.frame(
+        "expected" = expect_num[j],
+        "acceptable" = accept_num[j],
+        "choice" = outlier_num[j],
+        "consensus" = consensus_choice
       )
 
       gg_curves_list[[j]] <- gg_curves_list[[j]] +
         ggplot2::geom_vline(
-          data = lines_j,
+          data = df_j,
           ggplot2::aes(xintercept = consensus, colour = "consensus"),
           linetype = "solid", linewidth = 0.75
         )
@@ -219,12 +211,12 @@ ombc_gmm <- function(
     common.legend = TRUE, legend = "bottom"
   )
 
-  colnames(distrib_diff_mat) <- tn_names
-  colnames(outlier_bool) <- tn_names_plus
-  colnames(labels) <- tn_names_plus
-  names(outlier_num) <- tn_names_plus
+  colnames(distrib_diff_mat) <- en_names
+  colnames(outlier_bool) <- en_names_plus
+  colnames(labels) <- en_names_plus
+  names(outlier_num) <- en_names_plus
   dimnames(distrib_diff_arr) <- list(
-    paste0("k", seq_len(comp_num)), NULL, tn_names
+    paste0("k", seq_len(comp_num)), NULL, en_names
   )
 
   return(list(

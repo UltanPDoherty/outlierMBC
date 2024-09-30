@@ -37,7 +37,7 @@ distrib_diff_gmm <- function(
   choice_id <- which.min(mix_dens)
   removal_dens <- mix_dens[choice_id]
 
-  distrib_diff_vec <- as.numeric(prop %*% (distrib_diff_mat))
+  distrib_diff_vec <- colSums(distrib_diff_mat)
 
   return(list(
     distrib_diff_mat = distrib_diff_mat,
@@ -81,8 +81,7 @@ distrib_diff_mahalanobis <- function(
 
   tail_quants <- stats::qbeta(1 - tail_props, param1, param2)
   mahala_tail_props <- 1 - mahala_ewcdf_g_func(tail_quants)
-  # distrib_diff_g_x <- abs(mahala_tail_props - tail_props)
-  distrib_diff_g_x <- mahala_tail_props - tail_props
+  distrib_diff_g_x <- n_g * mahala_tail_props
 
   dens_g_x <- exp(
     -0.5 * (var_num * log(2 * pi) + logdet_g + mahalas_g)
