@@ -15,7 +15,7 @@
 #' * removal_dens
 distrib_diff_gmm <- function(
     x, z, prop, mu, sigma, logdet,
-    tail_props = c(0.9999)) {
+    tail_props) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
   track_num <- length(tail_props)
@@ -67,7 +67,7 @@ distrib_diff_mahalanobis <- function(
     mu_g,
     sigma_g,
     logdet_g,
-    tail_props = c(0.9999)) {
+    tail_props) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
   stopifnot("A cluster has become too small (< 4 points).\n" = n_g > 3)
