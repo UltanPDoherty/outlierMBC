@@ -260,15 +260,16 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax) {
     G = comp_num, mnames = mnames, start = z, nmax = nmax
   ))
   if (is.null(mix)) {
+    cat(paste0("Trying alternative covariance structures.\n"))
     try(mix <- mixture::gpcm(
       x,
       G = comp_num, start = z, nmax = nmax,
       mnames = setdiff(
-        mnames,
         c(
           "EII", "VII", "EEI", "VEI", "EVI", "VVI", "EEE",
           "EEV", "VEV", "VVV", "EVE", "VVE", "VEE", "EVV"
-        )
+        ),
+        mnames
       )
     ))
     if (!is.null(mix)) {
