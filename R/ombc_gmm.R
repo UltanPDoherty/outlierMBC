@@ -194,7 +194,7 @@ ombc_gmm <- function(
         legend.text = ggplot2::element_text(size = 11),
         legend.title = ggplot2::element_text(size = 11)
       ) +
-      ggplot::expand_limits(y = 0)
+      ggplot2::expand_limits(y = 0)
 
     if (track_num_plus > track_num) {
       lines_j <- data.frame(
