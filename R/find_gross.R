@@ -27,6 +27,7 @@ find_gross <- function(
   if (is.null(search_centre)) {
     cpts <- changepoint::cpt.meanvar(diff(knndist_sort))@cpts
     stopifnot("No suitable search_centre found.\n" = length(cpts) > 1)
+    search_centre <- cpts[1]
   }
 
   elbow <- find_elbow(knndist_sort, search_centre, TRUE)
@@ -37,7 +38,7 @@ find_gross <- function(
   if (!is.null(manual_choice)) {
     gross_choice <- manual_choice
 
-    cat(paste0("manual choice = ", elbow_choice, ".\n"))
+    cat(paste0("manual choice = ", manual_choice, ".\n"))
   } else {
     cat(paste0(
       "elbow = ", elbow_choice,
