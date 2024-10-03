@@ -8,7 +8,6 @@ find_gross(
   x,
   max_out,
   k_neighbours = floor(nrow(x)/100),
-  gross_prop = max(0.6, min(0.8, 0.9 - (30/elbow_choice))),
   extra_candidate = NULL,
   manual_gross_choice = NULL
 )
@@ -19,9 +18,6 @@ find_gross(
 \item{max_out}{Maximum number of outliers.}
 
 \item{k_neighbours}{Number of neighbours for dbscan::kNNdist.}
-
-\item{gross_prop}{Factor by which to multiply the elbow estimate of the
-number of outliers to get the number of gross outliers.}
 
 \item{extra_candidate}{Optional additional candidate to check.}
 

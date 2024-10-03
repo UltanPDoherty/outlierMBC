@@ -2,8 +2,6 @@
 #'
 #' @inheritParams ombc_gmm
 #' @param k_neighbours Number of neighbours for dbscan::kNNdist.
-#' @param gross_prop Factor by which to multiply the elbow estimate of the
-#'                   number of outliers to get the number of gross outliers.
 #' @param extra_candidate Optional additional candidate to check.
 #' @param manual_gross_choice Optional preset number of gross outliers.
 #'
@@ -16,7 +14,6 @@
 find_gross <- function(
     x, max_out,
     k_neighbours = floor(nrow(x) / 100),
-    gross_prop = max(0.6, min(0.8, 0.9 - (30 / elbow_choice))),
     extra_candidate = NULL,
     manual_gross_choice = NULL) {
   outlier_number <- seq_len(2 * max_out)
@@ -91,6 +88,7 @@ find_gross <- function(
   best_test <- tests[[which_best]]
   elbow_choice <- candidates[which_best]
 
+  gross_prop <- max(0.6, min(0.9, 0.95 - (35 / elbow_choice)))
   gross_choice <- floor(elbow_choice * gross_prop)
 
   if (!is.null(manual_gross_choice)) {
