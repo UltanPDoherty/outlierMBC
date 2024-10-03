@@ -61,7 +61,7 @@ find_gross <- function(
     ))
   ))
 
-  len_cand_third <- ceiling(length(candidates) %/% 3)
+  len_cand_third <- ceiling(length(candidates) / 3)
   cat(paste0(
     "All elbow candidates:\n\t",
     paste0(
