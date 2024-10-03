@@ -41,7 +41,7 @@ ombc_gmm <- function(
     max_out,
     gross_outs = rep(FALSE, nrow(x)),
     expect_num = 1,
-    accept_num = 2 * expect_num,
+    accept_num = 1.5 * expect_num,
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
