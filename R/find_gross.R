@@ -4,9 +4,8 @@
 #' @param k_neighbours Number of neighbours for dbscan::kNNdist.
 #' @param gross_prop Factor by which to multiply the elbow estimate of the
 #'                   number of outliers to get the number of gross outliers.
-#' @param search_centre Optional centre of elbow search interval.
 #' @param extra_candidate Optional additional candidate to check.
-#' @param manual_choice Optional preset number of gross outliers.
+#' @param manual_gross_choice Optional preset number of gross outliers.
 #'
 #' @return List:
 #' * $choice: a numeric value indicating the elbow's location.
@@ -39,6 +38,10 @@ find_gross <- function(
     candidates <- append(candidates, cpts_diff_meanvar[1] + 1)
   }
 
+  lm_min_res <- which.min(stats::lm(knndist_sort ~ outlier_number)$residuals)
+  candidates <- append(candidates, lm_min_res)
+  candidates <- append(candidates, lm_min_res + 1)
+
   candidates <- append(candidates, extra_candidate)
 
   stopifnot(
@@ -52,21 +55,27 @@ find_gross <- function(
   candidates <- unique(append(
     candidates,
     round(seq(
-      max(1, min(candidates) - 10),
-      min(max_out, max(candidates) + 10),
-      length.out = 20
+      max(1, min(candidates) - max(20, max_out / 4)),
+      min(max_out, max(candidates) + max(20, max_out / 4)),
+      length.out = 24
     ))
   ))
 
+  len_cand_third <- ceiling(length(candidates) %/% 3)
   cat(paste0(
     "All elbow candidates:\n\t",
     paste0(
-      sort(candidates)[seq(1, 1 + (length(candidates) %/% 2))],
+      sort(candidates)[seq(1, len_cand_third)],
       collapse = ", "
     ),
     ",\n\t",
     paste0(
-      sort(candidates)[seq(2 + (length(candidates) %/% 2), length(candidates))],
+      sort(candidates)[seq(1 + len_cand_third, 2 * len_cand_third)],
+      collapse = ", "
+    ),
+    ",\n\t",
+    paste0(
+      sort(candidates)[seq(1 + 2 * len_cand_third, length(candidates))],
       collapse = ", "
     ),
     ".\n"
@@ -100,6 +109,7 @@ find_gross <- function(
   gross_bool <- rank(-x_knndist) <= gross_choice
 
   choice_df <- data.frame("elbow" = elbow_choice, "gross" = gross_choice)
+  elbow <- gross <- NULL
   gg <- data.frame(outlier_number, knndist_sort) |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_number, y = knndist_sort)) +
     ggplot2::geom_point(size = min(1, max(0.1, 100 / max_out))) +
@@ -153,14 +163,11 @@ find_gross <- function(
 }
 
 lm_test <- function(y, x, split) {
-  y1 <- y[seq(1, split)]
-  x1 <- x[seq(1, split)]
+  df1 <- data.frame("x1" = x[seq(1, split)], "y1" = y[seq(1, split)])
+  df2 <- data.frame("x2" = x[-seq(1, split)], "y2" = y[-seq(1, split)])
 
-  y2 <- y[seq(split+1, length(y))]
-  x2 <- x[seq(split+1, length(x))]
-
-  lm1 <- lm(y1 ~ x1)
-  lm2 <- lm(y2 ~ x2)
+  lm1 <- lm(y1 ~ x1, data = df1)
+  lm2 <- lm(y2 ~ x2, data = df2)
 
   rss1 <- sum(lm1$residuals^2)
   rss2 <- sum(lm2$residuals^2)

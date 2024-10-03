@@ -2,7 +2,6 @@
 
 export(find_gross)
 export(ombc_gmm)
-export(plot_gross)
 export(simulate_gmm)
 importFrom(ClusterR,KMeans_rcpp)
 importFrom(changepoint,cpt.meanvar)
