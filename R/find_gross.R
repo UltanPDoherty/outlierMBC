@@ -189,7 +189,7 @@ find_gross2 <- function(
     k_neighbours = floor(nrow(x) / 100),
     gross_prop = max(0.6, min(0.8, 0.9 - (30 / elbow_choice))),
     extra_candidate = NULL,
-    manual_choice = NULL) {
+    manual_gross_choice = NULL) {
   outlier_number <- seq_len(2 * max_out)
 
   x_knndist <- dbscan::kNNdist(x, k_neighbours)
@@ -254,10 +254,10 @@ find_gross2 <- function(
 
   gross_choice <- floor(elbow_choice * gross_prop)
 
-  if (!is.null(manual_choice)) {
-    gross_choice <- manual_choice
+  if (!is.null(manual_gross_choice)) {
+    gross_choice <- manual_gross_choice
 
-    cat(paste0("manual choice = ", manual_choice, ".\n"))
+    cat(paste0("manual gross choice = ", manual_gross_choice, ".\n"))
   } else {
     cat(paste0(
       "Elbow choice = ", elbow_choice,
