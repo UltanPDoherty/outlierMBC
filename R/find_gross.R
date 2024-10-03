@@ -175,6 +175,7 @@ find_elbow <- function(y, search_centre = NULL, concave = TRUE) {
 #' @param gross_prop Factor by which to multiply the elbow estimate of the
 #'                   number of outliers to get the number of gross outliers.
 #' @param search_centre Optional centre of elbow search interval.
+#' @param extra_candidate Optional additional candidate to check.
 #' @param manual_choice Optional preset number of gross outliers.
 #'
 #' @return List:
@@ -187,7 +188,7 @@ find_gross2 <- function(
     x, max_out,
     k_neighbours = floor(nrow(x) / 100),
     gross_prop = max(0.6, min(0.8, 0.9 - (30 / elbow_choice))),
-    candidate,
+    extra_candidate = NULL,
     manual_choice = NULL) {
   outlier_number <- seq_len(2 * max_out)
 
@@ -207,6 +208,8 @@ find_gross2 <- function(
     candidates <- append(candidates, cpts_diff_meanvar[1])
     candidates <- append(candidates, cpts_diff_meanvar[1] + 1)
   }
+
+  candidates <- append(candidates, extra_candidate)
 
   stopifnot(
     "No suitable candidates found.\n" = length(candidates) > 0
