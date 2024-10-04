@@ -9,6 +9,7 @@
 #' @param gross_outs Logical vector identifying gross outliers.
 #' @param expect_num .
 #' @param accept_num .
+#' @param reject_num .
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param print_interval How frequently the iteration count is printed.
@@ -41,7 +42,8 @@ ombc_gmm <- function(
     max_out,
     gross_outs = rep(FALSE, nrow(x)),
     expect_num = 1,
-    accept_num = 1.5 * expect_num,
+    accept_num = 2 * expect_num,
+    reject_num = 2 * accept_num,
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
@@ -103,14 +105,20 @@ ombc_gmm <- function(
     gross_num * (outlier_rank_temp != 0)
 
   outlier_num <- integer(track_num)
+  final_reject <- integer(track_num)
+  after_final_reject <- matrix(nrow = max_out + 1, ncol = track_num)
   accept_bools <- matrix(nrow = max_out + 1, ncol = track_num)
   for (j in seq_len(track_num)) {
+    reject_bool <- distrib_diff_mat[, j] > reject_num[j]
+    final_reject[j] <- max(which(c(TRUE, reject_bool))) - 1
+    after_final_reject[, j] <- seq_len(max_out + 1) > final_reject[j]
+
     accept_bools[, j] <- distrib_diff_mat[, j] < accept_num[j]
-    outlier_num[j] <- which.max(accept_bools[, j])
+    outlier_num[j] <- which.max(accept_bools[, j] & after_final_reject[, j])
   }
   outlier_num <- outlier_num - 1 + gross_num
 
-  consensus_vec <- apply(accept_bools, 1, all)
+  consensus_vec <- apply(accept_bools & after_final_reject, 1, all)
   if (any(consensus_vec) && track_num > 1) {
     track_num_plus <- track_num + 1
     consensus_choice <- which.max(consensus_vec) - 1 + gross_num
@@ -140,14 +148,15 @@ ombc_gmm <- function(
   outlier_seq <- seq(gross_num, max_out + gross_num)
 
   gg_curves_list <- list()
-  observed <- acceptable <- expected <- choice <- consensus <- NULL
+  observed <- rejection <- acceptance <- expected <- choice <- consensus <- NULL
   point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
   for (j in seq_len(track_num)) {
     df_j <- data.frame(
       "outlier_seq" = outlier_seq,
       "observed" = distrib_diff_mat[, j],
       "expected" = expect_num[j],
-      "acceptable" = accept_num[j],
+      "acceptance" = accept_num[j],
+      "rejection" = reject_num[j],
       "choice" = outlier_num[j]
     )
 
@@ -163,7 +172,11 @@ ombc_gmm <- function(
         linetype = "solid", linewidth = 0.75
       ) +
       ggplot2::geom_hline(
-        ggplot2::aes(yintercept = acceptable, colour = "acceptable"),
+        ggplot2::aes(yintercept = rejection, colour = "rejection"),
+        linetype = "dashed", linewidth = 0.75
+      ) +
+      ggplot2::geom_hline(
+        ggplot2::aes(yintercept = acceptance, colour = "acceptance"),
         linetype = "dashed", linewidth = 0.75
       ) +
       ggplot2::geom_hline(
@@ -172,8 +185,8 @@ ombc_gmm <- function(
       ) +
       ggplot2::scale_colour_manual(
         values = c(
-          observed = "#000000", expected = "#0072B2", acceptable = "#009E73",
-          choice = "#CC79A7", consensus = "#D55E00"
+          observed = "#000000", expected = "#0072B2", acceptance = "#009E73",
+          choice = "#CC79A7", rejection = "#D55E00", consensus = "#F0E442"
         )
       ) +
       ggplot2::labs(
@@ -192,7 +205,8 @@ ombc_gmm <- function(
     if (track_num_plus > track_num) {
       df_j <- data.frame(
         "expected" = expect_num[j],
-        "acceptable" = accept_num[j],
+        "acceptance" = accept_num[j],
+        "rejection" = reject_num[j],
         "choice" = outlier_num[j],
         "consensus" = consensus_choice
       )
