@@ -9,9 +9,6 @@ ombc_gmm(
   comp_num,
   max_out,
   gross_outs = rep(FALSE, nrow(x)),
-  expect_num = c(1),
-  accept_num = expect_num + c(1),
-  reject_num = accept_num + c(2),
   mnames = "VVV",
   nmax = 10,
   print_interval = Inf
@@ -25,12 +22,6 @@ ombc_gmm(
 \item{max_out}{Maximum number of outliers.}
 
 \item{gross_outs}{Logical vector identifying gross outliers.}
-
-\item{expect_num}{.}
-
-\item{accept_num}{.}
-
-\item{reject_num}{.}
 
 \item{mnames}{Model names for mixture::gpcm.}
 

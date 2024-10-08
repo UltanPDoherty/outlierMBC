@@ -7,9 +7,6 @@
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
 #' @param gross_outs Logical vector identifying gross outliers.
-#' @param expect_num .
-#' @param accept_num .
-#' @param reject_num .
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param print_interval How frequently the iteration count is printed.
@@ -41,12 +38,13 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = rep(FALSE, nrow(x)),
-    expect_num = c(1),
-    accept_num = expect_num + c(1),
-    reject_num = accept_num + c(2),
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
+  expect_num <- 1
+  accept_num <- expect_num + 1
+  reject_num <- accept_num + 2
+
   x <- as.matrix(x)
   x0 <- x
 
