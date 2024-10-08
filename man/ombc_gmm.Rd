@@ -53,7 +53,7 @@ ombc_gmm_k3n1000o10 <- ombc_gmm(
   comp_num = 3, max_out = 20
 )
 
-ombc_gmm_k3n1000o10$plot_curves
-ombc_gmm_k3n1000o10$plot_removal
+ombc_gmm_k3n1000o10$plot_tail_num_curve
+ombc_gmm_k3n1000o10$plot_cdf_diff_curve
 
 }

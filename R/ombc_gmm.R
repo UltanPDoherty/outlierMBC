@@ -30,8 +30,8 @@
 #'   comp_num = 3, max_out = 20
 #' )
 #'
-#' ombc_gmm_k3n1000o10$plot_curves
-#' ombc_gmm_k3n1000o10$plot_removal
+#' ombc_gmm_k3n1000o10$plot_tail_num_curve
+#' ombc_gmm_k3n1000o10$plot_cdf_diff_curve
 #'
 ombc_gmm <- function(
     x,
@@ -189,10 +189,12 @@ ombc_gmm <- function(
   cdf_diff_curve <- cdf_diff_curve_df |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = cdf_diffs)) +
     ggplot2::geom_line(
-      ggplot2::aes(colour = "cdf_diffs"), show.legend = FALSE
+      ggplot2::aes(colour = "cdf_diffs"),
+      show.legend = FALSE
     ) +
     ggplot2::geom_point(
-      ggplot2::aes(colour = "cdf_diffs"), size = point_size, show.legend = FALSE
+      ggplot2::aes(colour = "cdf_diffs"),
+      size = point_size, show.legend = FALSE
     ) +
     ggplot2::geom_vline(
       ggplot2::aes(xintercept = minimum, colour = "minimum"),
