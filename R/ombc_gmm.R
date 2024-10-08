@@ -41,9 +41,9 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = rep(FALSE, nrow(x)),
-    expect_num = 1,
-    accept_num = 2 * expect_num,
-    reject_num = 2 * accept_num,
+    expect_num = c(1, 10, 100),
+    accept_num = expect_num + c(1, 2, 4),
+    reject_num = accept_num + c(2, 4, 8),
     mnames = "VVV",
     nmax = 10,
     print_interval = Inf) {
@@ -221,7 +221,7 @@ ombc_gmm <- function(
   }
   gg_curves <- ggpubr::ggarrange(
     plotlist = gg_curves_list,
-    nrow = min(2, track_num), ncol = ceiling(track_num / 2),
+    nrow = 1, ncol = track_num,
     common.legend = TRUE, legend = "bottom"
   )
 

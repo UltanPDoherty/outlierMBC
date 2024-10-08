@@ -9,9 +9,9 @@ ombc_gmm(
   comp_num,
   max_out,
   gross_outs = rep(FALSE, nrow(x)),
-  expect_num = 1,
-  accept_num = 2 * expect_num,
-  reject_num = 2 * accept_num,
+  expect_num = c(1, 10, 100),
+  accept_num = expect_num + c(1, 2, 4),
+  reject_num = accept_num + c(2, 4, 8),
   mnames = "VVV",
   nmax = 10,
   print_interval = Inf
