@@ -58,12 +58,8 @@ ombc_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  track_num <- length(expect_num)
-  tail_props <- outer(
-    1 / seq(obs_num - gross_num, obs_num - gross_num - max_out),
-    expect_num
-  )
-  en_names <- paste0("en", expect_num)
+  track_num <- 1
+  tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
   loglike <- c()
   removal_dens <- c()
@@ -85,7 +81,7 @@ ombc_gmm <- function(
       mix$best_model$model_obj[[1]]$mu,
       mix$best_model$model_obj[[1]]$sigs,
       mix$best_model$model_obj[[1]]$log_dets,
-      tail_props[i, ]
+      tail_props[i]
     )
 
     distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
@@ -194,12 +190,12 @@ ombc_gmm <- function(
     common.legend = TRUE, legend = "bottom"
   )
 
-  colnames(distrib_diff_mat) <- en_names
-  colnames(outlier_bool) <- en_names
-  colnames(labels) <- en_names
-  names(outlier_num) <- en_names
+  colnames(distrib_diff_mat) <- c("tail_num")
+  colnames(outlier_bool) <- c("tail_num")
+  colnames(labels) <- c("tail_num")
+  names(outlier_num) <- c("tail_num")
   dimnames(distrib_diff_arr) <- list(
-    paste0("k", seq_len(comp_num)), NULL, en_names
+    paste0("k", seq_len(comp_num)), NULL, c("tail_num")
   )
 
   return(list(
