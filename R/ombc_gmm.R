@@ -99,17 +99,13 @@ ombc_gmm <- function(
     gross_num * (outlier_rank_temp != 0)
 
   outlier_num <- integer(track_num)
-  final_reject <- integer(track_num)
-  after_final_reject <- matrix(nrow = max_out + 1, ncol = track_num)
-  accept_bools <- matrix(nrow = max_out + 1, ncol = track_num)
-  for (j in seq_len(track_num)) {
-    reject_bool <- distrib_diff_mat[, j] > reject_num[j]
-    final_reject[j] <- max(which(c(TRUE, reject_bool))) - 1
-    after_final_reject[, j] <- seq_len(max_out + 1) > final_reject[j]
 
-    accept_bools[, j] <- distrib_diff_mat[, j] < accept_num[j]
-    outlier_num[j] <- which.max(accept_bools[, j] & after_final_reject[, j])
-  }
+  reject_bool <- distrib_diff_mat[, 1] > reject_num
+  final_reject <- max(which(c(TRUE, reject_bool))) - 1
+  after_final_reject <- seq_len(max_out + 1) > final_reject
+  accept_bools <- distrib_diff_mat[, 1] < accept_num
+  outlier_num[1] <- which.max(accept_bools & after_final_reject)
+
   outlier_num <- outlier_num - 1 + gross_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
@@ -129,66 +125,60 @@ ombc_gmm <- function(
 
   outlier_seq <- seq(gross_num, max_out + gross_num)
 
-  gg_curves_list <- list()
   observed <- rejection <- acceptance <- expected <- choice <- NULL
   point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
-  for (j in seq_len(track_num)) {
-    df_j <- data.frame(
-      "outlier_seq" = outlier_seq,
-      "observed" = distrib_diff_mat[, j],
-      "expected" = expect_num[j],
-      "acceptance" = accept_num[j],
-      "rejection" = reject_num[j],
-      "choice" = outlier_num[j]
-    )
 
-    gg_curves_list[[j]] <- df_j |>
-      ggplot2::ggplot(ggplot2::aes(x = outlier_seq)) +
-      ggplot2::geom_line(ggplot2::aes(y = observed, colour = "observed")) +
-      ggplot2::geom_point(
-        ggplot2::aes(y = observed, colour = "observed"),
-        size = point_size
-      ) +
-      ggplot2::geom_vline(
-        ggplot2::aes(xintercept = choice, colour = "choice"),
-        linetype = "solid", linewidth = 0.75
-      ) +
-      ggplot2::geom_hline(
-        ggplot2::aes(yintercept = rejection, colour = "rejection"),
-        linetype = "dashed", linewidth = 0.75
-      ) +
-      ggplot2::geom_hline(
-        ggplot2::aes(yintercept = acceptance, colour = "acceptance"),
-        linetype = "dashed", linewidth = 0.75
-      ) +
-      ggplot2::geom_hline(
-        ggplot2::aes(yintercept = expected, colour = "expected"),
-        linetype = "dotted", linewidth = 0.75
-      ) +
-      ggplot2::scale_colour_manual(
-        values = c(
-          observed = "#000000", expected = "#0072B2", acceptance = "#009E73",
-          choice = "#CC79A7", rejection = "#D55E00"
-        )
-      ) +
-      ggplot2::labs(
-        title = paste0(j, ": Number of Outliers = ", outlier_num[j]),
-        x = "Outlier Number",
-        y = "Number of Extreme Points",
-        colour = ""
-      ) +
-      ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
-      ggplot2::theme(
-        legend.text = ggplot2::element_text(size = 11),
-        legend.title = ggplot2::element_text(size = 11)
-      ) +
-      ggplot2::expand_limits(y = 0)
-  }
-  gg_curves <- ggpubr::ggarrange(
-    plotlist = gg_curves_list,
-    nrow = 1, ncol = track_num,
-    common.legend = TRUE, legend = "bottom"
+  tail_num_curve_df <- data.frame(
+    "outlier_seq" = outlier_seq,
+    "observed" = distrib_diff_mat[, 1],
+    "expected" = expect_num,
+    "acceptance" = accept_num,
+    "rejection" = reject_num,
+    "choice" = outlier_num[1]
   )
+
+  tail_num_curve <- tail_num_curve_df |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_seq)) +
+    ggplot2::geom_line(ggplot2::aes(y = observed, colour = "observed")) +
+    ggplot2::geom_point(
+      ggplot2::aes(y = observed, colour = "observed"),
+      size = point_size
+    ) +
+    ggplot2::geom_vline(
+      ggplot2::aes(xintercept = choice, colour = "choice"),
+      linetype = "solid", linewidth = 0.75
+    ) +
+    ggplot2::geom_hline(
+      ggplot2::aes(yintercept = rejection, colour = "rejection"),
+      linetype = "dashed", linewidth = 0.75
+    ) +
+    ggplot2::geom_hline(
+      ggplot2::aes(yintercept = acceptance, colour = "acceptance"),
+      linetype = "dashed", linewidth = 0.75
+    ) +
+    ggplot2::geom_hline(
+      ggplot2::aes(yintercept = expected, colour = "expected"),
+      linetype = "dotted", linewidth = 0.75
+    ) +
+    ggplot2::scale_colour_manual(
+      values = c(
+        observed = "#000000", expected = "#0072B2", acceptance = "#009E73",
+        choice = "#CC79A7", rejection = "#D55E00"
+      )
+    ) +
+    ggplot2::labs(
+      title = paste0(j, ": Number of Outliers = ", outlier_num[j]),
+      x = "Outlier Number",
+      y = "Number of Extreme Points",
+      colour = ""
+    ) +
+    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
+    ggplot2::theme(
+      legend.text = ggplot2::element_text(size = 11),
+      legend.title = ggplot2::element_text(size = 11),
+      legend.position = "bottom"
+    ) +
+    ggplot2::expand_limits(y = 0)
 
   colnames(distrib_diff_mat) <- c("tail_num")
   colnames(outlier_bool) <- c("tail_num")
@@ -204,7 +194,7 @@ ombc_gmm <- function(
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
     labels = labels,
-    plot_curves = gg_curves,
+    plot_tail_num_curve = tail_num_curve,
     loglike = loglike,
     removal_dens = removal_dens,
     distrib_diff_arr = distrib_diff_arr
