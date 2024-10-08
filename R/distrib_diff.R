@@ -18,7 +18,7 @@ distrib_diff_gmm <- function(
     tail_prop) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
-  track_num <- 1
+  track_num <- 2
 
   distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
@@ -81,7 +81,17 @@ distrib_diff_mahalanobis <- function(
 
   tail_quant <- stats::qbeta(1 - tail_prop, param1, param2)
   mahala_tail_prop <- 1 - mahala_ewcdf_g_func(tail_quant)
-  distrib_diff_g_x <- n_g * mahala_tail_prop
+
+  eps <- 1e-5
+  check_seq <- seq(eps, 1, by = eps)
+  mahala_ewcdf_g_vals <- mahala_ewcdf_g_func(check_seq)
+  beta_cdf_g_vals <- stats::pbeta(check_seq, param1, param2)
+  cdf_diffs <- mahala_ewcdf_g_vals - beta_cdf_g_vals
+
+  distrib_diff_g_x <- c(
+    n_g * mahala_tail_prop,
+    mean(abs(cdf_diffs))
+  )
 
   dens_g_x <- exp(
     -0.5 * (var_num * log(2 * pi) + logdet_g + mahalas_g)

@@ -58,7 +58,7 @@ ombc_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  track_num <- 1
+  track_num <- 2
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
   loglike <- c()
@@ -106,6 +106,8 @@ ombc_gmm <- function(
   accept_bools <- distrib_diff_mat[, 1] < accept_num
   outlier_num[1] <- which.max(accept_bools & after_final_reject)
 
+  outlier_num[2] <- which.min(distrib_diff_mat[, 2])
+
   outlier_num <- outlier_num - 1 + gross_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
@@ -124,10 +126,9 @@ ombc_gmm <- function(
   }
 
   outlier_seq <- seq(gross_num, max_out + gross_num)
-
-  observed <- rejection <- acceptance <- expected <- choice <- NULL
   point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
 
+  observed <- rejection <- acceptance <- expected <- choice <- NULL
   tail_num_curve_df <- data.frame(
     "outlier_seq" = outlier_seq,
     "observed" = distrib_diff_mat[, 1],
@@ -136,7 +137,6 @@ ombc_gmm <- function(
     "rejection" = reject_num,
     "choice" = outlier_num[1]
   )
-
   tail_num_curve <- tail_num_curve_df |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq)) +
     ggplot2::geom_line(ggplot2::aes(y = observed, colour = "observed")) +
@@ -167,7 +167,7 @@ ombc_gmm <- function(
       )
     ) +
     ggplot2::labs(
-      title = paste0(j, ": Number of Outliers = ", outlier_num[j]),
+      title = paste0("Number of Outliers = ", outlier_num[1]),
       x = "Outlier Number",
       y = "Number of Extreme Points",
       colour = ""
@@ -180,12 +180,42 @@ ombc_gmm <- function(
     ) +
     ggplot2::expand_limits(y = 0)
 
-  colnames(distrib_diff_mat) <- c("tail_num")
-  colnames(outlier_bool) <- c("tail_num")
-  colnames(labels) <- c("tail_num")
-  names(outlier_num) <- c("tail_num")
+  cdf_diffs <- minimum <- NULL
+  cdf_diff_curve_df <- data.frame(
+    "outlier_seq" = outlier_seq,
+    "minimum" = outlier_num[2],
+    "cdf_diffs" = distrib_diff_mat[, 2]
+  )
+  cdf_diff_curve <- cdf_diff_curve_df |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = cdf_diffs)) +
+    ggplot2::geom_line(
+      ggplot2::aes(colour = "cdf_diffs"), show.legend = FALSE
+    ) +
+    ggplot2::geom_point(
+      ggplot2::aes(colour = "cdf_diffs"), size = point_size, show.legend = FALSE
+    ) +
+    ggplot2::geom_vline(
+      ggplot2::aes(xintercept = minimum, colour = "minimum"),
+      linetype = "solid", linewidth = 0.75, show.legend = FALSE
+    ) +
+    ggplot2::scale_colour_manual(
+      values = c(cdf_diffs = "#000000", minimum = "#CC79A7")
+    ) +
+    ggplot2::labs(
+      title = paste0("Number of Outliers = ", outlier_num[2]),
+      x = "Outlier Number",
+      y = "Mean Absolute CDF Difference",
+      colour = ""
+    ) +
+    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
+
+
+  colnames(distrib_diff_mat) <- c("tail_num", "cdf_diff")
+  colnames(outlier_bool) <- c("tail_num", "cdf_diff")
+  colnames(labels) <- c("tail_num", "cdf_diff")
+  names(outlier_num) <- c("tail_num", "cdf_diff")
   dimnames(distrib_diff_arr) <- list(
-    paste0("k", seq_len(comp_num)), NULL, c("tail_num")
+    paste0("k", seq_len(comp_num)), NULL, c("tail_num", "cdf_diff")
   )
 
   return(list(
@@ -195,6 +225,7 @@ ombc_gmm <- function(
     outlier_rank = outlier_rank,
     labels = labels,
     plot_tail_num_curve = tail_num_curve,
+    plot_cdf_diff_curve = cdf_diff_curve,
     loglike = loglike,
     removal_dens = removal_dens,
     distrib_diff_arr = distrib_diff_arr
