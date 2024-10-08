@@ -116,22 +116,10 @@ ombc_gmm <- function(
   }
   outlier_num <- outlier_num - 1 + gross_num
 
-  consensus_vec <- apply(accept_bools & after_final_reject, 1, all)
-  if (any(consensus_vec) && track_num > 1) {
-    track_num_plus <- track_num + 1
-    consensus_choice <- which.max(consensus_vec) - 1 + gross_num
-    outlier_num[track_num_plus] <- consensus_choice
-    en_names_plus <- c(en_names, "consensus")
-  } else {
-    consensus_choice <- NULL
-    track_num_plus <- track_num
-    en_names_plus <- en_names
-  }
-
-  outlier_bool <- matrix(nrow = obs_num, ncol = track_num_plus)
+  outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
   mix <- list()
-  labels <- matrix(0, nrow = obs_num, ncol = track_num_plus)
-  for (j in seq_len(track_num_plus)) {
+  labels <- matrix(0, nrow = obs_num, ncol = track_num)
+  for (j in seq_len(track_num)) {
     outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
 
     z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
@@ -146,7 +134,7 @@ ombc_gmm <- function(
   outlier_seq <- seq(gross_num, max_out + gross_num)
 
   gg_curves_list <- list()
-  observed <- rejection <- acceptance <- expected <- choice <- consensus <- NULL
+  observed <- rejection <- acceptance <- expected <- choice <- NULL
   point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
   for (j in seq_len(track_num)) {
     df_j <- data.frame(
@@ -184,7 +172,7 @@ ombc_gmm <- function(
       ggplot2::scale_colour_manual(
         values = c(
           observed = "#000000", expected = "#0072B2", acceptance = "#009E73",
-          choice = "#CC79A7", rejection = "#D55E00", consensus = "#F0E442"
+          choice = "#CC79A7", rejection = "#D55E00"
         )
       ) +
       ggplot2::labs(
@@ -199,23 +187,6 @@ ombc_gmm <- function(
         legend.title = ggplot2::element_text(size = 11)
       ) +
       ggplot2::expand_limits(y = 0)
-
-    if (track_num_plus > track_num) {
-      df_j <- data.frame(
-        "expected" = expect_num[j],
-        "acceptance" = accept_num[j],
-        "rejection" = reject_num[j],
-        "choice" = outlier_num[j],
-        "consensus" = consensus_choice
-      )
-
-      gg_curves_list[[j]] <- gg_curves_list[[j]] +
-        ggplot2::geom_vline(
-          data = df_j,
-          ggplot2::aes(xintercept = consensus, colour = "consensus"),
-          linetype = "solid", linewidth = 0.75
-        )
-    }
   }
   gg_curves <- ggpubr::ggarrange(
     plotlist = gg_curves_list,
@@ -224,9 +195,9 @@ ombc_gmm <- function(
   )
 
   colnames(distrib_diff_mat) <- en_names
-  colnames(outlier_bool) <- en_names_plus
-  colnames(labels) <- en_names_plus
-  names(outlier_num) <- en_names_plus
+  colnames(outlier_bool) <- en_names
+  colnames(labels) <- en_names
+  names(outlier_num) <- en_names
   dimnames(distrib_diff_arr) <- list(
     paste0("k", seq_len(comp_num)), NULL, en_names
   )
