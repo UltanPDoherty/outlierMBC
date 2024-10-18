@@ -11,6 +11,7 @@ ombc_gmm(
   gross_outs = rep(FALSE, nrow(x)),
   mnames = "VVV",
   nmax = 10,
+  kmpp_seed = NULL,
   print_interval = Inf
 )
 }
@@ -26,6 +27,9 @@ ombc_gmm(
 \item{mnames}{Model names for mixture::gpcm.}
 
 \item{nmax}{Maximum number of iterations for mixture::gpcm.}
+
+\item{kmpp_seed}{Optional seed for k-means++ initialisation. Default is
+hierarchical clustering.}
 
 \item{print_interval}{How frequently the iteration count is printed.}
 }

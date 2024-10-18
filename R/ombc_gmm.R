@@ -9,6 +9,8 @@
 #' @param gross_outs Logical vector identifying gross outliers.
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
+#' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
+#'                  hierarchical clustering.
 #' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return List of
@@ -251,14 +253,14 @@ ombc_gmm <- function(
 # ------------------------------------------------------------------------------
 
 get_init_z <- function(comp_num, dist_mat = NULL, x = NULL, kmpp_seed = NULL) {
-
   if (is.null(kmpp_seed)) {
     hc <- stats::hclust(stats::as.dist(dist_mat), method = "ward.D2")
     init <- stats::cutree(hc, k = comp_num)
   } else {
     kmpp <- ClusterR::KMeans_rcpp(
       x,
-      clusters = comp_num, num_init = 10, seed = kmpp_seed)
+      clusters = comp_num, num_init = 10, seed = kmpp_seed
+    )
     init <- kmpp$clusters
   }
 
