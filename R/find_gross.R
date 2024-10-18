@@ -3,7 +3,6 @@
 #' @inheritParams ombc_gmm
 #' @param k_neighbours Number of neighbours for dbscan::kNNdist.
 #' @param manual_gross_choice Optional preset number of gross outliers.
-#' @param gross_plot logical
 #'
 #' @return List:
 #' * $choice: a numeric value indicating the elbow's location.
@@ -14,8 +13,7 @@
 find_gross <- function(
     x, max_out,
     k_neighbours = floor(nrow(x) / 100),
-    manual_gross_choice = NULL,
-    gross_plot = TRUE) {
+    manual_gross_choice = NULL) {
   outlier_number <- seq_len(2 * max_out)
 
   x_knndist <- dbscan::kNNdist(x, k_neighbours)
@@ -33,24 +31,13 @@ find_gross <- function(
   if (all(is.infinite(test_scores))) {
     cat("No gross outliers identified.\n")
 
-    gg <- data.frame(outlier_number, knndist_sort) |>
-      ggplot2::ggplot(ggplot2::aes(x = outlier_number, y = knndist_sort)) +
-      ggplot2::geom_point(size = min(1, max(0.1, 100 / max_out))) +
-      ggplot2::labs(
-        title = paste0(
-          "No gross outliers identified."
-        ),
-        x = "Outlier Number",
-        y = paste0("kNN Distance (k = ", k_neighbours, ")")
-      )
+    elbow_choice <- 0
+  } else {
+    which_best <- which.min(test_scores)
 
-    return(list(plot = gg))
+    best_test <- tests[[which_best]]
+    elbow_choice <- candidates[which_best]
   }
-
-  which_best <- which.min(test_scores)
-
-  best_test <- tests[[which_best]]
-  elbow_choice <- candidates[which_best]
 
   gross_prop <- max(0.6, min(0.9, 0.95 - (35 / elbow_choice)))
   gross_choice <- floor(elbow_choice * gross_prop)
@@ -70,22 +57,40 @@ find_gross <- function(
   elbow_bool <- rank(-x_knndist) <= elbow_choice
   gross_bool <- rank(-x_knndist) <= gross_choice
 
-  if (gross_plot) {
-    choice_df <- data.frame("elbow" = elbow_choice, "gross" = gross_choice)
-    elbow <- gross <- NULL
-    gg <- data.frame(outlier_number, knndist_sort) |>
-      ggplot2::ggplot(ggplot2::aes(x = outlier_number, y = knndist_sort)) +
-      ggplot2::geom_point(size = min(1, max(0.1, 100 / max_out))) +
-      ggplot2::geom_vline(
-        data = choice_df,
-        ggplot2::aes(xintercept = elbow, colour = "elbow"), linetype = "dashed",
-        linewidth = 0.75
-      ) +
-      ggplot2::geom_vline(
-        data = choice_df,
-        ggplot2::aes(xintercept = gross, colour = "gross"), linetype = "dashed",
-        linewidth = 0.75
-      ) +
+  choice_df <- data.frame("elbow" = elbow_choice, "gross" = gross_choice)
+  elbow <- gross <- NULL
+  gg <- data.frame(outlier_number, knndist_sort) |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_number, y = knndist_sort)) +
+    ggplot2::geom_point(size = min(1, max(0.1, 100 / max_out))) +
+    ggplot2::geom_vline(
+      data = choice_df,
+      ggplot2::aes(xintercept = elbow, colour = "elbow"), linetype = "dashed",
+      linewidth = 0.75
+    ) +
+    ggplot2::geom_vline(
+      data = choice_df,
+      ggplot2::aes(xintercept = gross, colour = "gross"), linetype = "dashed",
+      linewidth = 0.75
+    ) +
+    ggplot2::labs(
+      title = paste0(
+        "Chosen number of gross outliers = ", gross_choice
+      ),
+      subtitle = paste0(
+        "Elbow choice = ", elbow_choice,
+        ", gross proportion = ", round(gross_prop, 2)
+      ),
+      x = "Outlier Number",
+      y = paste0("kNN Distance (k = ", k_neighbours, ")"),
+      colour = "Outlier Number Choices:"
+    ) +
+    ggplot2::scale_colour_manual(
+      values = c(elbow = "#56B4E9", gross = "#E69F00")
+    ) +
+    ggplot2::theme(legend.position = "bottom")
+
+  if (!all(is.infinite(test_scores))) {
+    gg <- gg +
       ggplot2::geom_segment(
         x = 0, y = best_test$coeff1[1],
         xend = elbow_choice,
@@ -98,39 +103,18 @@ find_gross <- function(
         xend = 2 * max_out,
         yend = best_test$coeff2[1] + 2 * max_out * best_test$coeff2[2],
         linewidth = 0.75, colour = "#F0E442"
-      ) +
-      ggplot2::labs(
-        title = paste0(
-          "Chosen number of gross outliers = ", gross_choice
-        ),
-        subtitle = paste0(
-          "Elbow choice = ", elbow_choice,
-          ", gross proportion = ", round(gross_prop, 2)
-        ),
-        x = "Outlier Number",
-        y = paste0("kNN Distance (k = ", k_neighbours, ")"),
-        colour = "Outlier Number Choices:"
-      ) +
-      ggplot2::scale_colour_manual(
-        values = c(elbow = "#56B4E9", gross = "#E69F00")
-      ) +
-      ggplot2::theme(legend.position = "bottom")
-
-    return(list(
-      gross_choice = gross_choice,
-      gross_bool = gross_bool,
-      elbow_choice = elbow_choice,
-      elbow_bool = elbow_bool,
-      plot = gg
-    ))
-  } else {
-    return(list(
-      gross_choice = gross_choice,
-      gross_bool = gross_bool,
-      elbow_choice = elbow_choice,
-      elbow_bool = elbow_bool
-    ))
+      )
   }
+
+  output <- list(
+    gross_choice = gross_choice,
+    gross_bool = gross_bool,
+    elbow_choice = elbow_choice,
+    elbow_bool = elbow_bool,
+    plot = gg
+  )
+
+  return(output)
 }
 
 lm_test <- function(y, x, split) {
