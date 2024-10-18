@@ -220,11 +220,17 @@ ombc_gmm <- function(
     paste0("k", seq_len(comp_num)), NULL, c("tail_num", "cdf_diff")
   )
 
+  outlier_class <- rep("normal", obs_num)
+  outlier_class[outlier_bool[, 1]] <- "outlier"
+  outlier_class[outlier_bool[, 2] & !outlier_bool[, 1]] <- "misfit"
+  outlier_class[!outlier_bool[, 2] & outlier_bool[, 1]] <- "anomaly"
+
   return(list(
     distrib_diff_mat = distrib_diff_mat,
     outlier_bool = outlier_bool,
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
+    outlier_class = outlier_class,
     labels = labels,
     plot_tail_num_curve = tail_num_curve,
     plot_cdf_diff_curve = cdf_diff_curve,
