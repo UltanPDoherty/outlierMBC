@@ -8,8 +8,8 @@ find_gross(
   x,
   max_out,
   k_neighbours = floor(nrow(x)/100),
-  extra_candidate = NULL,
-  manual_gross_choice = NULL
+  manual_gross_choice = NULL,
+  gross_plot = TRUE
 )
 }
 \arguments{
@@ -19,9 +19,9 @@ find_gross(
 
 \item{k_neighbours}{Number of neighbours for dbscan::kNNdist.}
 
-\item{extra_candidate}{Optional additional candidate to check.}
-
 \item{manual_gross_choice}{Optional preset number of gross outliers.}
+
+\item{gross_plot}{logical}
 }
 \value{
 List:
