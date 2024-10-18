@@ -40,6 +40,7 @@ ombc_gmm <- function(
     gross_outs = rep(FALSE, nrow(x)),
     mnames = "VVV",
     nmax = 10,
+    kmpp_seed = NULL,
     print_interval = Inf) {
   expect_num <- 1
   accept_num <- expect_num + 1
@@ -69,7 +70,10 @@ ombc_gmm <- function(
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
-    z <- init_hc(dist_mat, comp_num)
+    z <- get_init_z(
+      comp_num,
+      dist_mat = dist_mat, x = x, kmpp_seed = kmpp_seed
+    )
     mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
 
     loglike[i] <- mix$best_model$loglik
@@ -116,7 +120,12 @@ ombc_gmm <- function(
   for (j in seq_len(track_num)) {
     outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
 
-    z <- init_hc(dist_mat0[!outlier_bool[, j], !outlier_bool[, j]], comp_num)
+    z <- get_init_z(
+      comp_num,
+      dist_mat = dist_mat0[!outlier_bool[, j], !outlier_bool[, j]],
+      x = x0[!outlier_bool[, j], ],
+      kmpp_seed = kmpp_seed
+    )
 
     mix[[j]] <- try_mixture_gpcm(
       x0[!outlier_bool[, j], ], comp_num, mnames, z, nmax
@@ -211,7 +220,6 @@ ombc_gmm <- function(
     ) +
     ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
 
-
   colnames(distrib_diff_mat) <- c("tail_num", "cdf_diff")
   colnames(outlier_bool) <- c("tail_num", "cdf_diff")
   colnames(labels) <- c("tail_num", "cdf_diff")
@@ -242,9 +250,17 @@ ombc_gmm <- function(
 
 # ------------------------------------------------------------------------------
 
-init_hc <- function(dist_mat, comp_num) {
-  hc <- stats::hclust(stats::as.dist(dist_mat), method = "ward.D2")
-  init <- stats::cutree(hc, k = comp_num)
+get_init_z <- function(comp_num, dist_mat = NULL, x = NULL, kmpp_seed = NULL) {
+
+  if (is.null(kmpp_seed)) {
+    hc <- stats::hclust(stats::as.dist(dist_mat), method = "ward.D2")
+    init <- stats::cutree(hc, k = comp_num)
+  } else {
+    kmpp <- ClusterR::KMeans_rcpp(
+      x,
+      clusters = comp_num, num_init = 10, seed = kmpp_seed)
+    init <- kmpp$clusters
+  }
 
   z <- matrix(nrow = nrow(dist_mat), ncol = comp_num)
   for (k in seq_len(comp_num)) {
