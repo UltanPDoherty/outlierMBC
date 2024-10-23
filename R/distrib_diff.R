@@ -37,7 +37,9 @@ distrib_diff_gmm <- function(
   choice_id <- which.min(mix_dens)
   removal_dens <- mix_dens[choice_id]
 
-  distrib_diff_vec <- colSums(distrib_diff_mat)
+  distrib_diff_vec <- c()
+  distrib_diff_vec[1] <- sum(distrib_diff_mat[, 1])
+  distrib_diff_vec[2] <- sum(prop * distrib_diff_mat[, 2])
 
   return(list(
     distrib_diff_mat = distrib_diff_mat,
