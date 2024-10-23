@@ -251,7 +251,7 @@ ombc_gmm <- function(
       values = c(qqfull = "#000000", minimum = "#CC79A7")
     ) +
     ggplot2::labs(
-      title = paste0("Number of Outliers = ", outlier_num[2]),
+      title = paste0("Number of Outliers = ", outlier_num[3]),
       x = "Outlier Number",
       y = "Mean QQ Difference",
       colour = ""
@@ -282,7 +282,7 @@ ombc_gmm <- function(
       values = c(qqtail = "#000000", minimum = "#CC79A7")
     ) +
     ggplot2::labs(
-      title = paste0("Number of Outliers = ", outlier_num[2]),
+      title = paste0("Number of Outliers = ", outlier_num[4]),
       x = "Outlier Number",
       y = "Tail QQ Difference",
       colour = ""
