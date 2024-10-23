@@ -61,7 +61,7 @@ ombc_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  track_num <- 2
+  track_num <- 4
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
   loglike <- c()
@@ -113,6 +113,9 @@ ombc_gmm <- function(
   outlier_num[1] <- which.max(accept_bools & after_final_reject)
 
   outlier_num[2] <- which.min(distrib_diff_mat[, 2])
+
+  outlier_num[3] <- which.min(distrib_diff_mat[, 3])
+  outlier_num[4] <- which.min(distrib_diff_mat[, 4])
 
   outlier_num <- outlier_num - 1 + gross_num
 
@@ -222,19 +225,85 @@ ombc_gmm <- function(
     ) +
     ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
 
-  colnames(distrib_diff_mat) <- c("tail", "full")
-  colnames(outlier_bool) <- c("tail", "full")
-  colnames(labels) <- c("tail", "full")
-  names(outlier_num) <- c("tail", "full")
+
+
+  qqfull <- minimum <- NULL
+  qqfull_curve_df <- data.frame(
+    "outlier_seq" = outlier_seq,
+    "minimum" = outlier_num[3],
+    "qqfull" = distrib_diff_mat[, 3]
+  )
+  qqfull_curve <- qqfull_curve_df |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = qqfull)) +
+    ggplot2::geom_line(
+      ggplot2::aes(colour = "qqfull"),
+      show.legend = FALSE
+    ) +
+    ggplot2::geom_point(
+      ggplot2::aes(colour = "qqfull"),
+      size = point_size, show.legend = FALSE
+    ) +
+    ggplot2::geom_vline(
+      ggplot2::aes(xintercept = minimum, colour = "minimum"),
+      linetype = "solid", linewidth = 0.75, show.legend = FALSE
+    ) +
+    ggplot2::scale_colour_manual(
+      values = c(qqfull = "#000000", minimum = "#CC79A7")
+    ) +
+    ggplot2::labs(
+      title = paste0("Number of Outliers = ", outlier_num[2]),
+      x = "Outlier Number",
+      y = "Mean QQ Difference",
+      colour = ""
+    ) +
+    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
+
+  qqtail <- minimum <- NULL
+  qqtail_curve_df <- data.frame(
+    "outlier_seq" = outlier_seq,
+    "minimum" = outlier_num[4],
+    "qqtail" = distrib_diff_mat[, 4]
+  )
+  qqtail_curve <- qqtail_curve_df |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = qqtail)) +
+    ggplot2::geom_line(
+      ggplot2::aes(colour = "qqtail"),
+      show.legend = FALSE
+    ) +
+    ggplot2::geom_point(
+      ggplot2::aes(colour = "qqtail"),
+      size = point_size, show.legend = FALSE
+    ) +
+    ggplot2::geom_vline(
+      ggplot2::aes(xintercept = minimum, colour = "minimum"),
+      linetype = "solid", linewidth = 0.75, show.legend = FALSE
+    ) +
+    ggplot2::scale_colour_manual(
+      values = c(qqtail = "#000000", minimum = "#CC79A7")
+    ) +
+    ggplot2::labs(
+      title = paste0("Number of Outliers = ", outlier_num[2]),
+      x = "Outlier Number",
+      y = "Tail QQ Difference",
+      colour = ""
+    ) +
+    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
+
+
+  ombc_names <- c("tail", "full", "qq_full", "qq_tail")
+  colnames(distrib_diff_mat) <- ombc_names
+  colnames(outlier_bool) <- ombc_names
+  colnames(labels) <- ombc_names
+  names(outlier_num) <- ombc_names
   dimnames(distrib_diff_arr) <- list(
-    paste0("k", seq_len(comp_num)), NULL, c("tail", "full")
+    paste0("k", seq_len(comp_num)), NULL, ombc_names
   )
 
   outlier_class <- rep("normal", obs_num)
-  outlier_class[outlier_bool[, 1] & outlier_bool[, 2]] <- "outlier_both"
-  outlier_class[!outlier_bool[, 1] & outlier_bool[, 2]] <- "outlier_full"
-  outlier_class[outlier_bool[, 1] & !outlier_bool[, 2]] <- "outlier_tail"
-  outlier_class[gross_outs] <- "outlier_gross"
+  outlier_class[outlier_bool[, 1] & outlier_bool[, 2]] <- "out_tail_&_full"
+  outlier_class[!outlier_bool[, 1] & outlier_bool[, 2]] <- "out_full_only"
+  outlier_class[outlier_bool[, 1] & !outlier_bool[, 2]] <- "out_tail_only"
+  outlier_class[gross_outs] <- "out_gross"
   outlier_class <- as.factor(outlier_class)
 
   return(list(
@@ -246,6 +315,8 @@ ombc_gmm <- function(
     labels = labels,
     plot_tail_curve = tail_curve,
     plot_full_curve = full_curve,
+    plot_qqtail_curve = qqtail_curve,
+    plot_qqfull_curve = qqfull_curve,
     loglike = loglike,
     removal_dens = removal_dens,
     distrib_diff_arr = distrib_diff_arr

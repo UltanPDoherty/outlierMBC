@@ -18,7 +18,7 @@ distrib_diff_gmm <- function(
     tail_prop) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
-  track_num <- 2
+  track_num <- 4
 
   distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
@@ -40,6 +40,8 @@ distrib_diff_gmm <- function(
   distrib_diff_vec <- c()
   distrib_diff_vec[1] <- sum(distrib_diff_mat[, 1])
   distrib_diff_vec[2] <- sum(prop * distrib_diff_mat[, 2])
+  distrib_diff_vec[3] <- sum(prop * distrib_diff_mat[, 3])
+  distrib_diff_vec[4] <- sum(prop * distrib_diff_mat[, 4])
 
   return(list(
     distrib_diff_mat = distrib_diff_mat,
@@ -90,9 +92,16 @@ distrib_diff_mahalanobis <- function(
   beta_cdf_g_vals <- stats::pbeta(check_seq, param1, param2)
   cdf_diffs <- mahala_ewcdf_g_vals - beta_cdf_g_vals
 
+  quant_seq <- seq_len(round(n_g) - 1) / round(n_g)
+  cdf_quant <- stats::qbeta(quant_seq, param1, param2)
+  obs_quant <- spatstat.univar::quantile.ewcdf(mahala_ewcdf_g_func, quant_seq)
+  qq_diffs <- obs_quant - cdf_quant
+
   distrib_diff_g_x <- c(
     n_g * mahala_tail_prop,
-    mean(abs(cdf_diffs))
+    mean(abs(cdf_diffs)),
+    mean(abs(qq_diffs)),
+    tail(abs(qq_diffs), 1)
   )
 
   dens_g_x <- exp(
