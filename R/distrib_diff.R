@@ -92,7 +92,7 @@ distrib_diff_mahalanobis <- function(
   beta_cdf_g_vals <- stats::pbeta(check_seq, param1, param2)
   cdf_diffs <- mahala_ewcdf_g_vals - beta_cdf_g_vals
 
-  quant_seq <- seq_len(round(n_g) - 1) / round(n_g)
+  quant_seq <- seq(tail_prop, 1 - tail_prop, by = tail_prop)
   cdf_quant <- stats::qbeta(quant_seq, param1, param2)
   obs_quant <- spatstat.univar::quantile.ewcdf(mahala_ewcdf_g_func, quant_seq)
   qq_diffs <- obs_quant - cdf_quant
