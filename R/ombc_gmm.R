@@ -32,8 +32,8 @@
 #'   comp_num = 3, max_out = 20
 #' )
 #'
-#' ombc_gmm_k3n1000o10$plot_tail_num_curve
-#' ombc_gmm_k3n1000o10$plot_cdf_diff_curve
+#' ombc_gmm_k3n1000o10$plot_tail_curve
+#' ombc_gmm_k3n1000o10$plot_full_curve
 #'
 ombc_gmm <- function(
     x,
@@ -140,7 +140,7 @@ ombc_gmm <- function(
   point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
 
   observed <- rejection <- acceptance <- expected <- choice <- NULL
-  tail_num_curve_df <- data.frame(
+  tail_curve_df <- data.frame(
     "outlier_seq" = outlier_seq,
     "observed" = distrib_diff_mat[, 1],
     "expected" = expect_num,
@@ -148,7 +148,7 @@ ombc_gmm <- function(
     "rejection" = reject_num,
     "choice" = outlier_num[1]
   )
-  tail_num_curve <- tail_num_curve_df |>
+  tail_curve <- tail_curve_df |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq)) +
     ggplot2::geom_line(ggplot2::aes(y = observed, colour = "observed")) +
     ggplot2::geom_point(
@@ -191,20 +191,20 @@ ombc_gmm <- function(
     ) +
     ggplot2::expand_limits(y = 0)
 
-  cdf_diffs <- minimum <- NULL
-  cdf_diff_curve_df <- data.frame(
+  full <- minimum <- NULL
+  full_curve_df <- data.frame(
     "outlier_seq" = outlier_seq,
     "minimum" = outlier_num[2],
-    "cdf_diffs" = distrib_diff_mat[, 2]
+    "full" = distrib_diff_mat[, 2]
   )
-  cdf_diff_curve <- cdf_diff_curve_df |>
-    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = cdf_diffs)) +
+  full_curve <- full_curve_df |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = full)) +
     ggplot2::geom_line(
-      ggplot2::aes(colour = "cdf_diffs"),
+      ggplot2::aes(colour = "full"),
       show.legend = FALSE
     ) +
     ggplot2::geom_point(
-      ggplot2::aes(colour = "cdf_diffs"),
+      ggplot2::aes(colour = "full"),
       size = point_size, show.legend = FALSE
     ) +
     ggplot2::geom_vline(
@@ -212,7 +212,7 @@ ombc_gmm <- function(
       linetype = "solid", linewidth = 0.75, show.legend = FALSE
     ) +
     ggplot2::scale_colour_manual(
-      values = c(cdf_diffs = "#000000", minimum = "#CC79A7")
+      values = c(full = "#000000", minimum = "#CC79A7")
     ) +
     ggplot2::labs(
       title = paste0("Number of Outliers = ", outlier_num[2]),
@@ -222,18 +222,20 @@ ombc_gmm <- function(
     ) +
     ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
 
-  colnames(distrib_diff_mat) <- c("tail_num", "cdf_diff")
-  colnames(outlier_bool) <- c("tail_num", "cdf_diff")
-  colnames(labels) <- c("tail_num", "cdf_diff")
-  names(outlier_num) <- c("tail_num", "cdf_diff")
+  colnames(distrib_diff_mat) <- c("tail", "full")
+  colnames(outlier_bool) <- c("tail", "full")
+  colnames(labels) <- c("tail", "full")
+  names(outlier_num) <- c("tail", "full")
   dimnames(distrib_diff_arr) <- list(
-    paste0("k", seq_len(comp_num)), NULL, c("tail_num", "cdf_diff")
+    paste0("k", seq_len(comp_num)), NULL, c("tail", "full")
   )
 
   outlier_class <- rep("normal", obs_num)
-  outlier_class[outlier_bool[, 1]] <- "outlier"
-  outlier_class[outlier_bool[, 2] & !outlier_bool[, 1]] <- "misfit"
-  outlier_class[!outlier_bool[, 2] & outlier_bool[, 1]] <- "anomaly"
+  outlier_class[outlier_bool[, 1] & outlier_bool[, 2]] <- "outlier_both"
+  outlier_class[!outlier_bool[, 1] & outlier_bool[, 2]] <- "outlier_full"
+  outlier_class[outlier_bool[, 1] & !outlier_bool[, 2]] <- "outlier_tail"
+  outlier_class[gross_outs] <- "outlier_gross"
+  outlier_class <- as.factor(outlier_class)
 
   return(list(
     distrib_diff_mat = distrib_diff_mat,
@@ -242,8 +244,8 @@ ombc_gmm <- function(
     outlier_rank = outlier_rank,
     outlier_class = outlier_class,
     labels = labels,
-    plot_tail_num_curve = tail_num_curve,
-    plot_cdf_diff_curve = cdf_diff_curve,
+    plot_tail_curve = tail_curve,
+    plot_full_curve = full_curve,
     loglike = loglike,
     removal_dens = removal_dens,
     distrib_diff_arr = distrib_diff_arr
