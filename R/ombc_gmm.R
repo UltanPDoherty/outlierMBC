@@ -42,8 +42,11 @@ ombc_gmm <- function(
     gross_outs = rep(FALSE, nrow(x)),
     mnames = "VVV",
     nmax = 10,
-    kmpp_seed = NULL,
+    init_method = c("hc", "kmpp"),
+    kmpp_seed = 123,
     print_interval = Inf) {
+  init_method <- match.arg(init_method)
+
   expect_num <- 1
   accept_num <- expect_num + 1
   reject_num <- accept_num + 2
@@ -61,7 +64,7 @@ ombc_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  track_num <- 4
+  track_num <- 2
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
   loglike <- c()
@@ -74,7 +77,8 @@ ombc_gmm <- function(
 
     z <- get_init_z(
       comp_num,
-      dist_mat = dist_mat, x = x, kmpp_seed = kmpp_seed
+      dist_mat = dist_mat, x = x,
+      init_method = init_method, kmpp_seed = kmpp_seed
     )
     mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
 
@@ -106,16 +110,13 @@ ombc_gmm <- function(
 
   outlier_num <- integer(track_num)
 
-  reject_bool <- distrib_diff_mat[, 1] > reject_num
+  outlier_num[1] <- which.min(distrib_diff_mat[, 1])
+
+  reject_bool <- distrib_diff_mat[, 2] > reject_num
   final_reject <- max(which(c(TRUE, reject_bool))) - 1
   after_final_reject <- seq_len(max_out + 1) > final_reject
-  accept_bools <- distrib_diff_mat[, 1] < accept_num
-  outlier_num[1] <- which.max(accept_bools & after_final_reject)
-
-  outlier_num[2] <- which.min(distrib_diff_mat[, 2])
-
-  outlier_num[3] <- which.min(distrib_diff_mat[, 3])
-  outlier_num[4] <- which.min(distrib_diff_mat[, 4])
+  accept_bools <- distrib_diff_mat[, 2] < accept_num
+  outlier_num[2] <- which.max(accept_bools & after_final_reject)
 
   outlier_num <- outlier_num - 1 + gross_num
 
@@ -129,7 +130,7 @@ ombc_gmm <- function(
       comp_num,
       dist_mat = dist_mat0[!outlier_bool[, j], !outlier_bool[, j]],
       x = x0[!outlier_bool[, j], ],
-      kmpp_seed = kmpp_seed
+      init_method = init_method, kmpp_seed = kmpp_seed
     )
 
     mix[[j]] <- try_mixture_gpcm(
@@ -142,14 +143,45 @@ ombc_gmm <- function(
   outlier_seq <- seq(gross_num, max_out + gross_num)
   point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
 
+  full <- minimum <- NULL
+  full_curve_df <- data.frame(
+    "outlier_seq" = outlier_seq,
+    "minimum" = outlier_num[1],
+    "full" = distrib_diff_mat[, 1]
+  )
+  full_curve <- full_curve_df |>
+    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = full)) +
+    ggplot2::geom_line(
+      ggplot2::aes(colour = "full"),
+      show.legend = FALSE
+    ) +
+    ggplot2::geom_point(
+      ggplot2::aes(colour = "full"),
+      size = point_size, show.legend = FALSE
+    ) +
+    ggplot2::geom_vline(
+      ggplot2::aes(xintercept = minimum, colour = "minimum"),
+      linetype = "solid", linewidth = 0.75, show.legend = FALSE
+    ) +
+    ggplot2::scale_colour_manual(
+      values = c(full = "#000000", minimum = "#CC79A7")
+    ) +
+    ggplot2::labs(
+      title = paste0("Number of Outliers = ", outlier_num[1]),
+      x = "Outlier Number",
+      y = "Mean Absolute CDF Difference",
+      colour = ""
+    ) +
+    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
+
   observed <- rejection <- acceptance <- expected <- choice <- NULL
   tail_curve_df <- data.frame(
     "outlier_seq" = outlier_seq,
-    "observed" = distrib_diff_mat[, 1],
+    "observed" = distrib_diff_mat[, 2],
     "expected" = expect_num,
     "acceptance" = accept_num,
     "rejection" = reject_num,
-    "choice" = outlier_num[1]
+    "choice" = outlier_num[2]
   )
   tail_curve <- tail_curve_df |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq)) +
@@ -181,7 +213,7 @@ ombc_gmm <- function(
       )
     ) +
     ggplot2::labs(
-      title = paste0("Number of Outliers = ", outlier_num[1]),
+      title = paste0("Number of Outliers = ", outlier_num[2]),
       x = "Outlier Number",
       y = "Number of Extreme Points",
       colour = ""
@@ -194,103 +226,7 @@ ombc_gmm <- function(
     ) +
     ggplot2::expand_limits(y = 0)
 
-  full <- minimum <- NULL
-  full_curve_df <- data.frame(
-    "outlier_seq" = outlier_seq,
-    "minimum" = outlier_num[2],
-    "full" = distrib_diff_mat[, 2]
-  )
-  full_curve <- full_curve_df |>
-    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = full)) +
-    ggplot2::geom_line(
-      ggplot2::aes(colour = "full"),
-      show.legend = FALSE
-    ) +
-    ggplot2::geom_point(
-      ggplot2::aes(colour = "full"),
-      size = point_size, show.legend = FALSE
-    ) +
-    ggplot2::geom_vline(
-      ggplot2::aes(xintercept = minimum, colour = "minimum"),
-      linetype = "solid", linewidth = 0.75, show.legend = FALSE
-    ) +
-    ggplot2::scale_colour_manual(
-      values = c(full = "#000000", minimum = "#CC79A7")
-    ) +
-    ggplot2::labs(
-      title = paste0("Number of Outliers = ", outlier_num[2]),
-      x = "Outlier Number",
-      y = "Mean Absolute CDF Difference",
-      colour = ""
-    ) +
-    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
-
-
-
-  qqfull <- minimum <- NULL
-  qqfull_curve_df <- data.frame(
-    "outlier_seq" = outlier_seq,
-    "minimum" = outlier_num[3],
-    "qqfull" = distrib_diff_mat[, 3]
-  )
-  qqfull_curve <- qqfull_curve_df |>
-    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = qqfull)) +
-    ggplot2::geom_line(
-      ggplot2::aes(colour = "qqfull"),
-      show.legend = FALSE
-    ) +
-    ggplot2::geom_point(
-      ggplot2::aes(colour = "qqfull"),
-      size = point_size, show.legend = FALSE
-    ) +
-    ggplot2::geom_vline(
-      ggplot2::aes(xintercept = minimum, colour = "minimum"),
-      linetype = "solid", linewidth = 0.75, show.legend = FALSE
-    ) +
-    ggplot2::scale_colour_manual(
-      values = c(qqfull = "#000000", minimum = "#CC79A7")
-    ) +
-    ggplot2::labs(
-      title = paste0("Number of Outliers = ", outlier_num[3]),
-      x = "Outlier Number",
-      y = "Mean QQ Difference",
-      colour = ""
-    ) +
-    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
-
-  qqtail <- minimum <- NULL
-  qqtail_curve_df <- data.frame(
-    "outlier_seq" = outlier_seq,
-    "minimum" = outlier_num[4],
-    "qqtail" = distrib_diff_mat[, 4]
-  )
-  qqtail_curve <- qqtail_curve_df |>
-    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = qqtail)) +
-    ggplot2::geom_line(
-      ggplot2::aes(colour = "qqtail"),
-      show.legend = FALSE
-    ) +
-    ggplot2::geom_point(
-      ggplot2::aes(colour = "qqtail"),
-      size = point_size, show.legend = FALSE
-    ) +
-    ggplot2::geom_vline(
-      ggplot2::aes(xintercept = minimum, colour = "minimum"),
-      linetype = "solid", linewidth = 0.75, show.legend = FALSE
-    ) +
-    ggplot2::scale_colour_manual(
-      values = c(qqtail = "#000000", minimum = "#CC79A7")
-    ) +
-    ggplot2::labs(
-      title = paste0("Number of Outliers = ", outlier_num[4]),
-      x = "Outlier Number",
-      y = "Tail QQ Difference",
-      colour = ""
-    ) +
-    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
-
-
-  ombc_names <- c("tail", "full", "qq_full", "qq_tail")
+  ombc_names <- c("full", "tail")
   colnames(distrib_diff_mat) <- ombc_names
   colnames(outlier_bool) <- ombc_names
   colnames(labels) <- ombc_names
@@ -300,36 +236,42 @@ ombc_gmm <- function(
   )
 
   outlier_class <- rep("normal", obs_num)
-  outlier_class[outlier_bool[, 1] & outlier_bool[, 2]] <- "out_tail_&_full"
-  outlier_class[!outlier_bool[, 1] & outlier_bool[, 2]] <- "out_full_only"
-  outlier_class[outlier_bool[, 1] & !outlier_bool[, 2]] <- "out_tail_only"
+  outlier_class[outlier_bool[, 1] & outlier_bool[, 2]] <- "out_full_&_tail"
+  outlier_class[outlier_bool[, 1] & !outlier_bool[, 2]] <- "out_full_only"
+  outlier_class[!outlier_bool[, 1] & outlier_bool[, 2]] <- "out_tail_only"
   outlier_class[gross_outs] <- "out_gross"
   outlier_class <- as.factor(outlier_class)
 
+  labels <- as.data.frame(labels)
+  outlier_bool <- as.data.frame(outlier_bool)
+
   return(list(
-    distrib_diff_mat = distrib_diff_mat,
+    labels = labels,
     outlier_bool = outlier_bool,
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
     outlier_class = outlier_class,
-    labels = labels,
     plot_tail_curve = tail_curve,
     plot_full_curve = full_curve,
-    plot_qqtail_curve = qqtail_curve,
-    plot_qqfull_curve = qqfull_curve,
     loglike = loglike,
     removal_dens = removal_dens,
+    distrib_diff_mat = distrib_diff_mat,
     distrib_diff_arr = distrib_diff_arr
   ))
 }
 
 # ------------------------------------------------------------------------------
 
-get_init_z <- function(comp_num, dist_mat = NULL, x = NULL, kmpp_seed = NULL) {
-  if (is.null(kmpp_seed)) {
+get_init_z <- function(
+    comp_num,
+    dist_mat = NULL, x = NULL,
+    init_method = c("hc", "kmpp"), kmpp_seed = NULL) {
+  init_method <- match.arg(init_method)
+
+  if (init_method == "hc") {
     hc <- stats::hclust(stats::as.dist(dist_mat), method = "ward.D2")
     init <- stats::cutree(hc, k = comp_num)
-  } else {
+  } else if (init_method == "kmpp") {
     kmpp <- ClusterR::KMeans_rcpp(
       x,
       clusters = comp_num, num_init = 10, seed = kmpp_seed
