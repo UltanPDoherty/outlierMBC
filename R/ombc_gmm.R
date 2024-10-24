@@ -167,7 +167,7 @@ ombc_gmm <- function(
       values = c(full = "#000000", minimum = "#CC79A7")
     ) +
     ggplot2::labs(
-      title = paste0("Number of Outliers = ", outlier_num[1]),
+      title = paste0("outlierMBC: Number of Outliers = ", outlier_num[1]),
       x = "Outlier Number",
       y = "Mean Absolute CDF Difference",
       colour = ""
@@ -213,7 +213,7 @@ ombc_gmm <- function(
       )
     ) +
     ggplot2::labs(
-      title = paste0("Number of Outliers = ", outlier_num[2]),
+      title = paste0("outlierMBC-tail: Number of Outliers = ", outlier_num[2]),
       x = "Outlier Number",
       y = "Number of Extreme Points",
       colour = ""
@@ -251,8 +251,8 @@ ombc_gmm <- function(
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
     outlier_class = outlier_class,
-    plot_tail_curve = tail_curve,
     plot_full_curve = full_curve,
+    plot_tail_curve = tail_curve,
     loglike = loglike,
     removal_dens = removal_dens,
     distrib_diff_mat = distrib_diff_mat,
