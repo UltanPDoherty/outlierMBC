@@ -19,7 +19,6 @@ find_gross <- function(
   x_knndist <- dbscan::kNNdist(x, k_neighbours)
   knndist_sort <- -sort(-x_knndist)[outlier_number]
 
-
   candidates <- round(seq(2, max_out - 2, by = 1))
 
   tests <- lapply(
