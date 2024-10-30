@@ -50,7 +50,7 @@ ombc_gmm <- function(
 
   expect_num <- 1
   accept_num <- expect_num + 1
-  reject_num <- accept_num + 2
+  reject_num <- accept_num
 
   x <- as.matrix(x)
   x0 <- x
@@ -194,10 +194,6 @@ ombc_gmm <- function(
     ggplot2::geom_vline(
       ggplot2::aes(xintercept = choice, colour = "choice"),
       linetype = "solid", linewidth = 0.75
-    ) +
-    ggplot2::geom_hline(
-      ggplot2::aes(yintercept = rejection, colour = "rejection"),
-      linetype = "dashed", linewidth = 0.75
     ) +
     ggplot2::geom_hline(
       ggplot2::aes(yintercept = acceptance, colour = "acceptance"),
