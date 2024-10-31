@@ -38,7 +38,7 @@ find_gross <- function(
 
     elbow_choice <- 0
   } else {
-    which_best <- which.min(test_scores)
+    which_best <- which.max(test_scores)
 
     best_test <- tests[[which_best]]
     elbow_choice <- candidates[which_best]
@@ -130,21 +130,19 @@ lm_test <- function(y, x, split) {
 
   lm0 <- lm(y ~ x)
   rss0 <- sum(lm0$residuals^2)
-  bic0 <- 2 * log(n) + n * log(rss0 / n)
 
   lm1 <- lm(y1 ~ x1, data = df1)
   rss1 <- sum(lm1$residuals^2)
   lm2 <- lm(y2 ~ x2, data = df2)
   rss2 <- sum(lm2$residuals^2)
-  bic <- 4 * log(n) + n * log((rss1 + rss2) / n)
 
-  bic_diff <- bic0 - bic
+  likelihood_ratio <- n * log(rss0 / (rss1 + rss2))
 
-  score <- bic
+  score <- likelihood_ratio
 
-  bic_diff_param <- 10
-  if (bic_diff < n * log(bic_diff_param) - 2 * log(n)) {
-    score <- Inf
+  lr_param <- 10
+  if (likelihood_ratio < n * log(lr_param)) {
+    score <- -Inf
   }
 
   return(list(
