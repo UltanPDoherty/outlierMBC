@@ -147,12 +147,6 @@ lm_test <- function(y, x, split) {
     score <- Inf
   }
 
-  # slope_ratio_param <- 10
-  # slope_ratio <- lm1$coefficients[2] / lm2$coefficients[2]
-  # if (slope_ratio < slope_ratio_param) {
-  #   score <- Inf
-  # }
-
   return(list(
     score = score,
     coeff1 = lm1$coefficients,
