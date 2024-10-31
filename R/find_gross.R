@@ -31,7 +31,7 @@ find_gross <- function(
     candidates, function(t) lm_test(knndist_sort, outlier_number, t)
   )
 
-  test_scores <- vapply(tests, function(x) x$rss, double(1L))
+  test_scores <- vapply(tests, function(x) x$score, double(1L))
 
   if (all(is.infinite(test_scores))) {
     cat("No gross outliers identified.\n")
@@ -126,20 +126,25 @@ lm_test <- function(y, x, split) {
   df1 <- data.frame("x1" = x[seq(1, split)], "y1" = y[seq(1, split)])
   df2 <- data.frame("x2" = x[-seq(1, split)], "y2" = y[-seq(1, split)])
 
+  n <- length(y)
+
   lm0 <- lm(y ~ x)
   rss0 <- sum(lm0$residuals^2)
+  bic0 <- 2 * log(n) + n * log(rss0 / n)
 
   lm1 <- lm(y1 ~ x1, data = df1)
   rss1 <- sum(lm1$residuals^2)
-
   lm2 <- lm(y2 ~ x2, data = df2)
   rss2 <- sum(lm2$residuals^2)
+  bic <- 4 * log(n) + n * log((rss1 + rss2) / n)
 
+  bic_diff <- bic0 - bic
 
-  rss_ratio <- rss0 / rss
+  score <- bic
 
-  if (rss_ratio < 10) {
-    rss <- Inf
+  bic_diff_param <- 10
+  if (bic_diff < n * log(bic_diff_param) - 2 * log(n)) {
+    score <- Inf
   }
 
   # slope_ratio_param <- 10
@@ -149,7 +154,7 @@ lm_test <- function(y, x, split) {
   # }
 
   return(list(
-    rss = rss,
+    score = score,
     coeff1 = lm1$coefficients,
     coeff2 = lm2$coefficients
   ))
