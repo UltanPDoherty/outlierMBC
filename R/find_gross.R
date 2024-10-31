@@ -3,6 +3,7 @@
 #' @inheritParams ombc_gmm
 #' @param k_neighbours Number of neighbours for dbscan::kNNdist.
 #' @param manual_gross_choice Optional preset number of gross outliers.
+#' @param scale Logical
 #'
 #' @return List:
 #' * $choice: a numeric value indicating the elbow's location.
@@ -13,8 +14,13 @@
 find_gross <- function(
     x, max_out,
     k_neighbours = floor(nrow(x) / 100),
-    manual_gross_choice = NULL) {
+    manual_gross_choice = NULL,
+    scale = TRUE) {
   outlier_number <- seq_len(2 * max_out)
+
+  if (scale) {
+    x <- scale(x)
+  }
 
   x_knndist <- dbscan::kNNdist(x, k_neighbours)
   knndist_sort <- -sort(-x_knndist)[outlier_number]
