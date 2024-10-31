@@ -135,18 +135,18 @@ lm_test <- function(y, x, split) {
   lm2 <- lm(y2 ~ x2, data = df2)
   rss2 <- sum(lm2$residuals^2)
 
-  slope_ratio <- lm1$coefficients[2] / lm2$coefficients[2]
-  if (slope_ratio > 10) {
-    rss <- rss1 + rss2
-  } else {
-    rss <- Inf
-  }
 
   rss_ratio <- rss0 / rss
 
   if (rss_ratio < 10) {
     rss <- Inf
   }
+
+  # slope_ratio_param <- 10
+  # slope_ratio <- lm1$coefficients[2] / lm2$coefficients[2]
+  # if (slope_ratio < slope_ratio_param) {
+  #   score <- Inf
+  # }
 
   return(list(
     rss = rss,
