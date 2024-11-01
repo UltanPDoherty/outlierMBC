@@ -1,8 +1,17 @@
-#' @title Find the gross outliers.
+#' @title Find gross outliers.
+#'
+#' @description
+#' The distance of each observation to its \eqn{k^{th}}{k^th} nearest neighbour
+#' is computed. We assume that the largest `max_out` kNN distances correspond to
+#' potential outliers. We select the next largest kNN distance, outside of the
+#' top `max_out`, as a benchmark value. We multiply this benchmark kNN distance
+#' by `multiplier` to get the minimum threshold for our gross outliers. In other
+#' words, a gross outlier must have a kNN distance at least `multiplier` times
+#' greater than all of the observations which we do not consider to be potential
+#' outliers.
 #'
 #' @inheritParams ombc_gmm
-#' @param multiplier Factor by which the `max_out`th kNN Distance is multiplied
-#'                   to get the gross outlier threshold.
+#' @param multiplier Multiplicative factor used to get gross outlier threshold.
 #' @param k_neighbours Number of neighbours for dbscan::kNNdist.
 #' @param manual_gross_threshold Optional preset number of gross outliers.
 #' @param scale Logical
@@ -29,10 +38,10 @@ find_gross <- function(
   x_knndist <- dbscan::kNNdist(x, k_neighbours)
   knndist_sort <- -sort(-x_knndist)[outlier_number]
 
-  knndist_maxout <- knndist_sort[max_out]
+  knndist_benchmark <- knndist_sort[max_out + 1]
 
   if (is.null(manual_gross_threshold)) {
-    gross_threshold <- multiplier * knndist_maxout
+    gross_threshold <- multiplier * knndist_benchmark
   } else {
     gross_threshold <- manual_gross_threshold
     multiplier <- NA
@@ -65,11 +74,11 @@ find_gross <- function(
   if (is.null(manual_gross_threshold)) {
     curve <- curve +
       ggplot2::geom_linerange(
-        ymax = knndist_maxout, ymin = 0, x = max_out,
+        ymax = knndist_benchmark, ymin = 0, x = max_out,
         linetype = "dashed", colour = "black", show.legend = FALSE
       ) +
       ggplot2::geom_linerange(
-        y = knndist_maxout, xmin = 0, xmax = max_out,
+        y = knndist_benchmark, xmin = 0, xmax = max_out,
         linetype = "dashed", colour = "black", show.legend = FALSE
       )
   }
@@ -82,7 +91,7 @@ find_gross <- function(
     ggplot2::geom_point(
       size = min(1, max(0.1, 100 / max_out)), show.legend = FALSE
     ) +
-    ggplot2::geom_hline(yintercept = 3 * knndist_maxout, colour = "#E69F00") +
+    ggplot2::geom_hline(yintercept = 3 * knndist_benchmark, colour = "#E69F00") +
     ggplot2::labs(
       x = "Index",
       y = paste0("kNN Distance (k = ", k_neighbours, ")")
@@ -92,7 +101,7 @@ find_gross <- function(
 
   if (is.null(manual_gross_threshold)) {
     scatter <- scatter +
-      ggplot2::geom_hline(yintercept = knndist_maxout, linetype = "dashed")
+      ggplot2::geom_hline(yintercept = knndist_benchmark, linetype = "dashed")
   }
 
   plot <- ggpubr::annotate_figure(

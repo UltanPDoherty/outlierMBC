@@ -2,7 +2,7 @@
 % Please edit documentation in R/find_gross.R
 \name{find_gross}
 \alias{find_gross}
-\title{Find the gross outliers.}
+\title{Find gross outliers.}
 \usage{
 find_gross(
   x,
@@ -18,8 +18,7 @@ find_gross(
 
 \item{max_out}{Maximum number of outliers.}
 
-\item{multiplier}{Factor by which the \code{max_out}th kNN Distance is multiplied
-to get the gross outlier threshold.}
+\item{multiplier}{Multiplicative factor used to get gross outlier threshold.}
 
 \item{k_neighbours}{Number of neighbours for dbscan::kNNdist.}
 
@@ -36,5 +35,12 @@ List:
 }
 }
 \description{
-Find the gross outliers.
+The distance of each observation to its \eqn{k^{th}}{k^th} nearest neighbour
+is computed. We assume that the largest \code{max_out} kNN distances correspond to
+potential outliers. We select the next largest kNN distance, outside of the
+top \code{max_out}, as a benchmark value. We multiply this benchmark kNN distance
+by \code{multiplier} to get the minimum threshold for our gross outliers. In other
+words, a gross outlier must have a kNN distance at least \code{multiplier} times
+greater than all of the observations which we do not consider to be potential
+outliers.
 }
