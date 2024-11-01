@@ -91,7 +91,7 @@ find_gross <- function(
     ggplot2::geom_point(
       size = min(1, max(0.1, 100 / max_out)), show.legend = FALSE
     ) +
-    ggplot2::geom_hline(yintercept = 3 * knndist_benchmark, colour = "#E69F00") +
+    ggplot2::geom_hline(yintercept = gross_threshold, colour = "#E69F00") +
     ggplot2::labs(
       x = "Index",
       y = paste0("kNN Distance (k = ", k_neighbours, ")")
