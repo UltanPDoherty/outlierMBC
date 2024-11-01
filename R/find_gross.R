@@ -74,11 +74,11 @@ find_gross <- function(
   if (is.null(manual_gross_threshold)) {
     curve <- curve +
       ggplot2::geom_linerange(
-        ymax = knndist_benchmark, ymin = 0, x = max_out,
+        ymax = knndist_benchmark, ymin = 0, x = max_out + 1,
         linetype = "dashed", colour = "black", show.legend = FALSE
       ) +
       ggplot2::geom_linerange(
-        y = knndist_benchmark, xmin = 0, xmax = max_out,
+        y = knndist_benchmark, xmin = 0, xmax = max_out + 1,
         linetype = "dashed", colour = "black", show.legend = FALSE
       )
   }
