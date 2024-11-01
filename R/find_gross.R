@@ -110,7 +110,7 @@ find_gross <- function(
       "No. of Gross Outliers = ", gross_choice,
       " (max_out = ", max_out, ", multiplier = ", multiplier, ")"
     )
-  ) + ggpubr::bgcolor("white")
+  ) + ggpubr::bgcolor("white") + ggpubr::border("white")
 
   output <- list(
     gross_choice = gross_choice,
