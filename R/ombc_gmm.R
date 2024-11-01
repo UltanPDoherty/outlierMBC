@@ -175,7 +175,7 @@ ombc_gmm <- function(
     ) +
     ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
 
-  observed <- rejection <- acceptance <- expected <- choice <- NULL
+  observed <- acceptance <- expected <- choice <- NULL
   tail_curve_df <- data.frame(
     "outlier_seq" = outlier_seq,
     "observed" = distrib_diff_mat[, 2],

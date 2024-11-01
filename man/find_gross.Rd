@@ -7,8 +7,10 @@
 find_gross(
   x,
   max_out,
+  multiplier = 3,
   k_neighbours = floor(nrow(x)/100),
-  manual_gross_choice = NULL
+  manual_gross_threshold = NULL,
+  scale = TRUE
 )
 }
 \arguments{
@@ -16,9 +18,14 @@ find_gross(
 
 \item{max_out}{Maximum number of outliers.}
 
+\item{multiplier}{Factor by which the \code{max_out}th kNN Distance is multiplied
+to get the gross outlier threshold.}
+
 \item{k_neighbours}{Number of neighbours for dbscan::kNNdist.}
 
-\item{manual_gross_choice}{Optional preset number of gross outliers.}
+\item{manual_gross_threshold}{Optional preset number of gross outliers.}
+
+\item{scale}{Logical}
 }
 \value{
 List:

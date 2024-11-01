@@ -1,6 +1,8 @@
 #' @title Find the gross outliers.
 #'
 #' @inheritParams ombc_gmm
+#' @param multiplier Factor by which the `max_out`th kNN Distance is multiplied
+#'                   to get the gross outlier threshold.
 #' @param k_neighbours Number of neighbours for dbscan::kNNdist.
 #' @param manual_gross_threshold Optional preset number of gross outliers.
 #' @param scale Logical
@@ -41,7 +43,8 @@ find_gross <- function(
 
   gross <- NULL
   curve <- data.frame(
-    outlier_number, knndist_sort, gross = outlier_number <= gross_choice
+    outlier_number, knndist_sort,
+    gross = outlier_number <= gross_choice
   ) |>
     ggplot2::ggplot(
       ggplot2::aes(x = outlier_number, y = knndist_sort, colour = gross)
@@ -71,6 +74,7 @@ find_gross <- function(
       )
   }
 
+  x_seq <- NULL
   scatter <- data.frame(x_seq = seq_len(nrow(x)), x_knndist, gross_bool) |>
     ggplot2::ggplot(ggplot2::aes(
       x = x_seq, y = x_knndist, colour = gross_bool
@@ -92,12 +96,12 @@ find_gross <- function(
   }
 
   plot <- ggpubr::annotate_figure(
-      ggpubr::ggarrange(curve, scatter, nrow = 1, ncol = 2),
-      top = paste0(
-        "No. of Gross Outliers = ", gross_choice,
-        " (max_out = ", max_out, ", multiplier = ", multiplier, ")"
-      )
-    ) + ggpubr::bgcolor("white")
+    ggpubr::ggarrange(curve, scatter, nrow = 1, ncol = 2),
+    top = paste0(
+      "No. of Gross Outliers = ", gross_choice,
+      " (max_out = ", max_out, ", multiplier = ", multiplier, ")"
+    )
+  ) + ggpubr::bgcolor("white")
 
   output <- list(
     gross_choice = gross_choice,
