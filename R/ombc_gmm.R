@@ -9,6 +9,7 @@
 #' @param gross_outs Logical vector identifying gross outliers.
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
+#' @param atol EM convergence tolerance threshold for mixture::gpcm.
 #' @param init_method Method used to initialise each mixture model.
 #' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
 #'                  hierarchical clustering.
@@ -43,6 +44,7 @@ ombc_gmm <- function(
     gross_outs = rep(FALSE, nrow(x)),
     mnames = "VVV",
     nmax = 10,
+    atol = 1e-8,
     init_method = c("hc", "kmpp"),
     kmpp_seed = 123,
     print_interval = Inf) {
@@ -81,7 +83,7 @@ ombc_gmm <- function(
       dist_mat = dist_mat, x = x,
       init_method = init_method, kmpp_seed = kmpp_seed
     )
-    mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax)
+    mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
 
     loglike[i] <- mix$best_model$loglik
 
@@ -135,7 +137,7 @@ ombc_gmm <- function(
     )
 
     mix[[j]] <- try_mixture_gpcm(
-      x0[!outlier_bool[, j], ], comp_num, mnames, z, nmax
+      x0[!outlier_bool[, j], ], comp_num, mnames, z, nmax, atol
     )
 
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
@@ -286,7 +288,7 @@ get_init_z <- function(
 
 # ------------------------------------------------------------------------------
 
-try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax) {
+try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
   mix <- NULL
   try(mix <- mixture::gpcm(
     x,
@@ -296,7 +298,7 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax) {
     cat(paste0("Trying alternative covariance structures.\n"))
     try(mix <- mixture::gpcm(
       x,
-      G = comp_num, start = z, nmax = nmax,
+      G = comp_num, start = z, nmax = nmax, atol = atol,
       mnames = setdiff(
         c(
           "EII", "VII", "EEI", "VEI", "EVI", "VVI", "EEE",

@@ -11,6 +11,7 @@ ombc_gmm(
   gross_outs = rep(FALSE, nrow(x)),
   mnames = "VVV",
   nmax = 10,
+  atol = 1e-08,
   init_method = c("hc", "kmpp"),
   kmpp_seed = 123,
   print_interval = Inf
@@ -28,6 +29,8 @@ ombc_gmm(
 \item{mnames}{Model names for mixture::gpcm.}
 
 \item{nmax}{Maximum number of iterations for mixture::gpcm.}
+
+\item{atol}{EM convergence tolerance threshold for mixture::gpcm.}
 
 \item{init_method}{Method used to initialise each mixture model.}
 
