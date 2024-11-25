@@ -352,26 +352,53 @@ two_set_dist <- function(x, y) {
 
 # ==============================================================================
 
-#' fixed_ombc_gmm
+#' ombc2_gmm
 #'
 #' @description
 #' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 #'
-#' @inheritParams ombc_gmm
-#' @param outlier_bool Logical vector indicating which observations are outliers
-#'                     for the fixed model.
+#' @param x Data.
+#' @param comp_num Number of components.
+#' @param max_out Maximum number of outliers.
+#' @param gross_outs Logical vector identifying gross outliers.
+#' @param mnames Model names for mixture::gpcm.
+#' @param nmax Maximum number of iterations for mixture::gpcm.
+#' @param atol EM convergence tolerance threshold for mixture::gpcm.
+#' @param init_method Method used to initialise each mixture model.
+#' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
+#'                  hierarchical clustering.
+#' @param print_interval How frequently the iteration count is printed.
 #'
-#' @inherit ombc_gmm return
-#'
+#' @return List of
+#' * distrib_diffs
+#' * distrib_diff_mat
+#' * outlier_bool
+#' * outlier_num
+#' * outlier_rank
+#' * labels
+#' * final_gmm
+#' * loglike
+#' * removal_dens
 #' @export
 #'
-fixed_ombc_gmm <- function(
-    outlier_bool,
+#' @examples
+#'
+#' ombc2_gmm_k3n1000o10 <- ombc2_gmm(
+#'   gmm_k3n1000o10[, 1:2],
+#'   comp_num = 3, max_out = 20
+#' )
+#'
+#' ombc2_gmm_k3n1000o10$plot_tail_curve
+#' ombc2_gmm_k3n1000o10$plot_full_curve
+#'
+ombc2_gmm <- function(
     x,
     comp_num,
     max_out,
+    gross_outs = rep(FALSE, nrow(x)),
     mnames = "VVV",
-    nmax = 10,
+    nmax = 1000,
+    atol = 1e-8,
     init_method = c("hc", "kmpp"),
     kmpp_seed = 123,
     print_interval = Inf) {
@@ -379,7 +406,7 @@ fixed_ombc_gmm <- function(
 
   expect_num <- 1
   accept_num <- expect_num + 1
-  reject_num <- accept_num + 2
+  reject_num <- accept_num
 
   x <- as.matrix(x)
   x0 <- x
@@ -389,30 +416,35 @@ fixed_ombc_gmm <- function(
   dist_mat0 <- as.matrix(stats::dist(x0))
   dist_mat <- dist_mat0
 
-  track_num <- 2
-  tail_props <- expect_num / seq(obs_num, obs_num - max_out)
+  gross_num <- sum(gross_outs)
+  x <- x[!gross_outs, ]
+  max_out <- max_out - gross_num
+  dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
   z <- get_init_z(
     comp_num,
-    dist_mat = dist_mat[!outlier_bool, !outlier_bool], x = x[!outlier_bool, ],
+    dist_mat = dist_mat, x = x,
     init_method = init_method, kmpp_seed = kmpp_seed
   )
-  mix <- try_mixture_gpcm(x[!outlier_bool, ], comp_num, mnames, z, nmax)
-  z <- mixture::e_step(x, mix$best_model)$z
+
+  track_num <- 2
+  tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
   loglike <- c()
   removal_dens <- c()
   distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = track_num)
-  outlier_rank_temp <- rep(0, obs_num)
+  outlier_rank_temp <- rep(0, obs_num - gross_num)
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
+
+    mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
 
     loglike[i] <- mix$best_model$loglik
 
     dd <- distrib_diff_gmm(
       x,
-      z,
+      mix$z,
       mix$best_model$model_obj[[1]]$pi_gs,
       mix$best_model$model_obj[[1]]$mu,
       mix$best_model$model_obj[[1]]$sigs,
@@ -430,8 +462,10 @@ fixed_ombc_gmm <- function(
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
   }
 
-  outlier_rank <- double(obs_num)
-  outlier_rank <- outlier_rank_temp
+  outlier_rank <- double(length(gross_outs))
+  outlier_rank[gross_outs] <- 1
+  outlier_rank[!gross_outs] <- outlier_rank_temp +
+    gross_num * (outlier_rank_temp != 0)
 
   outlier_num <- integer(track_num)
 
@@ -443,7 +477,7 @@ fixed_ombc_gmm <- function(
   accept_bools <- distrib_diff_mat[, 2] < accept_num
   outlier_num[2] <- which.max(accept_bools & after_final_reject)
 
-  outlier_num <- outlier_num - 1
+  outlier_num <- outlier_num - 1 + gross_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
   mix <- list()
@@ -459,13 +493,13 @@ fixed_ombc_gmm <- function(
     )
 
     mix[[j]] <- try_mixture_gpcm(
-      x0[!outlier_bool[, j], ], comp_num, mnames, z, nmax
+      x0[!outlier_bool[, j], ], comp_num, mnames, z, nmax, atol
     )
 
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
-  outlier_seq <- seq(0, max_out)
+  outlier_seq <- seq(gross_num, max_out + gross_num)
   point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
 
   full <- minimum <- NULL
@@ -492,16 +526,14 @@ fixed_ombc_gmm <- function(
       values = c(full = "#000000", minimum = "#CC79A7")
     ) +
     ggplot2::labs(
-      title = paste0(
-        "outlierMBC (fixed model): Number of Outliers = ", outlier_num[1]
-      ),
+      title = paste0("outlierMBC: Number of Outliers = ", outlier_num[1]),
       x = "Outlier Number",
       y = "Mean Absolute CDF Difference",
       colour = ""
     ) +
     ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
 
-  observed <- rejection <- acceptance <- expected <- choice <- NULL
+  observed <- acceptance <- expected <- choice <- NULL
   tail_curve_df <- data.frame(
     "outlier_seq" = outlier_seq,
     "observed" = distrib_diff_mat[, 2],
@@ -522,10 +554,6 @@ fixed_ombc_gmm <- function(
       linetype = "solid", linewidth = 0.75
     ) +
     ggplot2::geom_hline(
-      ggplot2::aes(yintercept = rejection, colour = "rejection"),
-      linetype = "dashed", linewidth = 0.75
-    ) +
-    ggplot2::geom_hline(
       ggplot2::aes(yintercept = acceptance, colour = "acceptance"),
       linetype = "dashed", linewidth = 0.75
     ) +
@@ -540,9 +568,7 @@ fixed_ombc_gmm <- function(
       )
     ) +
     ggplot2::labs(
-      title = paste0(
-        "outlierMBC-tail (fixed model): Number of Outliers = ", outlier_num[2]
-      ),
+      title = paste0("outlierMBC-tail: Number of Outliers = ", outlier_num[2]),
       x = "Outlier Number",
       y = "Number of Extreme Points",
       colour = ""
@@ -568,6 +594,7 @@ fixed_ombc_gmm <- function(
   outlier_class[outlier_bool[, 1] & outlier_bool[, 2]] <- "out_full_&_tail"
   outlier_class[outlier_bool[, 1] & !outlier_bool[, 2]] <- "out_full_only"
   outlier_class[!outlier_bool[, 1] & outlier_bool[, 2]] <- "out_tail_only"
+  outlier_class[gross_outs] <- "out_gross"
   outlier_class <- as.factor(outlier_class)
 
   labels <- as.data.frame(labels)
