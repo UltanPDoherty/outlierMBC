@@ -447,7 +447,8 @@ ombc2_gmm <- function(
   ))
 
   mclust_params <- mclust_out$parameters
-  mclust_params$pro <- mclust_params$pro[1:3] / sum(mclust_params$pro[1:3])
+  mclust_params$pro <- mclust_params$pro[-(comp_num + 1)]
+  mclust_params$pro <- mclust_params$pro / sum(mclust_params$pro)
 
   z <- mclust::estep(x, mnames, mclust_params)$z
 
