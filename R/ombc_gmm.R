@@ -458,7 +458,7 @@ ombc2_gmm <- function(
 
     outlier_rank_temp[!outlier_rank_temp][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
-    z <- z[-dd$choice_id, , drop = FALSE]
+    z <- mix$z[-dd$choice_id, , drop = FALSE]
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
   }
 
