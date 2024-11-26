@@ -19,6 +19,7 @@ Imports:
     flexCWM,
     ggplot2,
     ggpubr,
+    mclust,
     mixture,
     mvtnorm,
     spatstat.univar,

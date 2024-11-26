@@ -421,11 +421,35 @@ ombc2_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  z <- get_init_z(
-    comp_num,
-    dist_mat = dist_mat, x = x,
-    init_method = init_method, kmpp_seed = kmpp_seed
+  set.seed(123)
+  mclust_pre <- mclust::Mclust(x, comp_num, mnames)
+
+  pre_dens <- mclust::dens(
+    data = x,
+    modelName = mclust_pre$modelName,
+    parameters = mclust_pre$parameters
   )
+
+  init_noise <- pre_dens < mclust::hypvol(x, TRUE)
+
+  set.seed(123)
+  mclust_out <- mclust::Mclust(
+    data = x,
+    G = comp_num,
+    modelNames = mnames,
+    initialization = list(noise = init_noise)
+  )
+
+  cat(paste0(
+    "With ", gross_num,
+    " gross outliers removed, mclust identifies a further ",
+    sum(mclust_out$classification == 0), " outliers.\n\n"
+  ))
+
+  mclust_params <- mclust_out$parameters
+  mclust_params$pro <- mclust_params$pro[1:3] / sum(mclust_params$pro[1:3])
+
+  z <- mclust::estep(x, mnames, mclust_params)$z
 
   track_num <- 2
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
@@ -458,7 +482,7 @@ ombc2_gmm <- function(
 
     outlier_rank_temp[!outlier_rank_temp][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
-    z <- mix$z[-dd$choice_id, , drop = FALSE]
+    z <- z[-dd$choice_id, , drop = FALSE]
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
   }
 
