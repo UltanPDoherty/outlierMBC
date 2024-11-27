@@ -67,7 +67,7 @@ ombc_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  track_num <- 2
+  track_num <- 2 + 1
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
   loglike <- c()
@@ -225,7 +225,7 @@ ombc_gmm <- function(
     ) +
     ggplot2::expand_limits(y = 0)
 
-  ombc_names <- c("full", "tail")
+  ombc_names <- c("full", "tail", "bin_tail")
   colnames(distrib_diff_mat) <- ombc_names
   colnames(outlier_bool) <- ombc_names
   colnames(labels) <- ombc_names
@@ -452,7 +452,7 @@ ombc2_gmm <- function(
 
   z <- mclust::estep(x, mnames, mclust_params)$z
 
-  track_num <- 2
+  track_num <- 2 + 1
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
   loglike <- c()
@@ -606,7 +606,7 @@ ombc2_gmm <- function(
     ) +
     ggplot2::expand_limits(y = 0)
 
-  ombc_names <- c("full", "tail")
+  ombc_names <- c("full", "tail", "bin_tail")
   colnames(distrib_diff_mat) <- ombc_names
   colnames(outlier_bool) <- ombc_names
   colnames(labels) <- ombc_names
