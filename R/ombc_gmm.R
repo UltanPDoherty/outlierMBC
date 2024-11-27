@@ -502,6 +502,12 @@ ombc2_gmm <- function(
   accept_bools <- distrib_diff_mat[, 2] < accept_num
   outlier_num[2] <- which.max(accept_bools & after_final_reject)
 
+  reject_bool2 <- distrib_diff_mat[, 3] > reject_num
+  final_reject2 <- max(which(c(TRUE, reject_bool2))) - 1
+  after_final_reject2 <- seq_len(max_out + 1) > final_reject2
+  accept_bools2 <- distrib_diff_mat[, 3] < accept_num
+  outlier_num[3] <- which.max(accept_bools2 & after_final_reject2)
+
   outlier_num <- outlier_num - 1 + gross_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
