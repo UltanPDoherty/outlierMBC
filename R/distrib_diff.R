@@ -20,12 +20,17 @@ distrib_diff_gmm <- function(
   comp_num <- ncol(z)
   track_num <- 2
 
+  bin_z_vec <- apply(z, 1, which.max)
+  bin_z_mat <- matrix(0, nrow = obs_num, ncol = comp_num)
+
   distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
   mahala_mat <- matrix(nrow = obs_num, ncol = comp_num)
   for (g in seq_len(comp_num)) {
+    bin_z_mat[, g] <- bin_z_vec == g
+
     dd_g <- distrib_diff_mahalanobis(
-      x, z[, g], mu[[g]], sigma[[g]], logdet[g], tail_prop
+      x, z[, g], mu[[g]], sigma[[g]], logdet[g], tail_prop, as.logical(bin_z_mat[, g])
     )
     distrib_diff_mat[g, ] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
@@ -69,7 +74,8 @@ distrib_diff_mahalanobis <- function(
     mu_g,
     sigma_g,
     logdet_g,
-    tail_prop) {
+    tail_prop,
+    bin_z_g) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
   stopifnot("A cluster has become too small (< 4 points).\n" = n_g > 3)
@@ -82,7 +88,7 @@ distrib_diff_mahalanobis <- function(
   mahala_ewcdf_g_func <- spatstat.univar::ewcdf(scaled_mahalas_g, z_g / n_g)
 
   tail_quant <- stats::qbeta(1 - tail_prop, param1, param2)
-  mahala_tail_prop <- 1 - mahala_ewcdf_g_func(tail_quant)
+  # mahala_tail_prop <- 1 - mahala_ewcdf_g_func(tail_quant)
 
   eps <- 1e-5
   check_seq <- seq(eps, 1, by = eps)
@@ -92,7 +98,8 @@ distrib_diff_mahalanobis <- function(
 
   distrib_diff_g_x <- c(
     mean(abs(cdf_diffs)),
-    n_g * mahala_tail_prop
+    # n_g * mahala_tail_prop
+    sum(scaled_mahalas_g[bin_z_g] > tail_quant)
   )
 
   dens_g_x <- exp(
