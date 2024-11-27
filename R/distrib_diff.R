@@ -43,7 +43,7 @@ distrib_diff_gmm <- function(
   removal_dens <- mix_dens[choice_id]
 
   distrib_diff_vec <- c()
-  distrib_diff_vec[1] <- sum(prop * distrib_diff_mat[, 1])
+  distrib_diff_vec[1] <- sqrt(sum(prop * distrib_diff_mat[, 1]^2))
   distrib_diff_vec[2] <- sum(distrib_diff_mat[, 2])
   distrib_diff_vec[3] <- sum(distrib_diff_mat[, 3])
 
