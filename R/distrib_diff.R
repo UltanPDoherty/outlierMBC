@@ -30,7 +30,8 @@ distrib_diff_gmm <- function(
     bin_z_mat[, g] <- bin_z_vec == g
 
     dd_g <- distrib_diff_mahalanobis(
-      x, z[, g], mu[[g]], sigma[[g]], logdet[g], tail_prop, as.logical(bin_z_mat[, g])
+      x, z[, g], mu[[g]], sigma[[g]], logdet[g], tail_prop,
+      as.logical(bin_z_mat[, g])
     )
     distrib_diff_mat[g, ] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
@@ -201,7 +202,9 @@ count_extremes_g <- function(
   param1 <- var_num / 2
   param2 <- (n_g - var_num - 1) / 2
 
-  mahalas_g <- stats::mahalanobis(x[bin_z_g, ], mu_g, (n_g / (n_g - 1)) * sigma_g)
+  mahalas_g <- stats::mahalanobis(
+    x[bin_z_g, ], mu_g, (n_g / (n_g - 1)) * sigma_g
+  )
   scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
 
   tail_quant <- stats::qbeta(1 - tail_prop, param1, param2)
