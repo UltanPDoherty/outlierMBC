@@ -83,6 +83,26 @@ ombc_gmm <- function(
       dist_mat = dist_mat, x = x,
       init_method = init_method, kmpp_seed = kmpp_seed
     )
+#
+#     z1 <- get_init_z(
+#       comp_num,
+#       dist_mat = dist_mat, x = x,
+#       init_method = "hc", kmpp_seed = kmpp_seed
+#     )
+#     z2 <- get_init_z(
+#       comp_num,
+#       dist_mat = dist_mat, x = x,
+#       init_method = "kmpp", kmpp_seed = kmpp_seed
+#     )
+#
+#
+#     init_mix <- list()
+#     init_mix[[1]] <- try_mixture_gpcm(x, comp_num, mnames, z1, 10, atol)
+#     init_mix[[2]] <- try_mixture_gpcm(x, comp_num, mnames, z2, 10, atol)
+#     init_ll <- vapply(init_mix, function(y) y$best_model$loglik, double(1L))
+#     z <- init_mix[[which.max(init_ll)]]$z
+#     cat(paste0("Chosen initialisation is ", which.max(init_ll), ".\n"))
+
     mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
 
     loglike[i] <- mix$best_model$loglik
@@ -233,6 +253,7 @@ ombc_gmm <- function(
   dimnames(distrib_diff_arr) <- list(
     paste0("k", seq_len(comp_num)), NULL, ombc_names
   )
+  names(mix) <- ombc_names
 
   outlier_class <- rep("normal", obs_num)
   outlier_class[outlier_bool[, 1] & outlier_bool[, 2]] <- "out_full_&_tail"
@@ -252,6 +273,7 @@ ombc_gmm <- function(
     outlier_class = outlier_class,
     curve_plot = full_curve,
     tail_curve_plot = tail_curve,
+    mix = mix,
     loglike = loglike,
     removal_dens = removal_dens,
     distrib_diff_mat = distrib_diff_mat,
@@ -1037,7 +1059,7 @@ ombc4_gmm <- function(
     x, comp_num, mnames, start = init_z
   )
 
-browser()
+
   cat(paste0(
     "mclust would have identified a further ",
     sum(mclust_out$classification == 0), " outliers.\n\n"
