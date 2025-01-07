@@ -137,8 +137,7 @@ distrib_diff_mahalanobis <- function(
 #' * choice_id
 #' * removal_dens
 count_extremes <- function(
-  x, bin_z, prop, mu, sigma, logdet, dens
-) {
+    x, bin_z, prop, mu, sigma, logdet, dens) {
   obs_num <- nrow(x)
   comp_num <- ncol(bin_z)
 

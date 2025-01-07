@@ -5,7 +5,6 @@
 #' @returns A gg object.
 #' @export
 plot_full_curve <- function(ombc_out) {
-
   gross_num <- sum(ombc_out$gross_outs)
   max_out <- max(ombc_out$outlier_rank) - 1
   outlier_num <- ombc_out$outlier_num
@@ -55,7 +54,6 @@ plot_full_curve <- function(ombc_out) {
 #' @returns A gg object.
 #' @export
 plot_tail_curve <- function(ombc_out) {
-
   gross_num <- sum(ombc_out$gross_outs)
   max_out <- max(ombc_out$outlier_rank) - 1
   outlier_num <- ombc_out$outlier_num
