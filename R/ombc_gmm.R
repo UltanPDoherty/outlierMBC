@@ -154,7 +154,6 @@ ombc_gmm <- function(
   )
   names(mix) <- ombc_names
 
-
   labels <- as.data.frame(labels)
   outlier_bool <- as.data.frame(outlier_bool)
 
@@ -163,12 +162,12 @@ ombc_gmm <- function(
     outlier_bool = outlier_bool,
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
+    gross_outs = gross_outs,
     mix = mix,
     loglike = loglike,
     removal_dens = removal_dens,
     distrib_diff_mat = distrib_diff_mat,
-    distrib_diff_arr = distrib_diff_arr,
-    gross_outs = gross_outs
+    distrib_diff_arr = distrib_diff_arr
   ))
 }
 
@@ -659,15 +658,15 @@ ombc3_gmm <- function(
   mclust_params$pro <- mclust_params$pro / sum(mclust_params$pro)
 
   mclust_out_mu <- lapply(
-    seq_len(comp_num), function(i) mclust_out$parameters$mean[,i]
+    seq_len(comp_num), function(i) mclust_out$parameters$mean[, i]
   )
   mclust_out_sigma <- lapply(
     seq_len(comp_num),
-    function(i) mclust_out$parameters$variance$sigma[, ,i]
+    function(i) mclust_out$parameters$variance$sigma[, , i]
   )
   mclust_out_logdet <- vapply(
     seq_len(comp_num),
-    function(i) log(det(mclust_out$parameters$variance$sigma[, ,i])),
+    function(i) log(det(mclust_out$parameters$variance$sigma[, , i])),
     double(1L)
   )
   mclust_out_prop <- t(mclust_params$pro)
@@ -962,15 +961,15 @@ ombc4_gmm <- function(
   mclust_params$Vinv <- NULL
 
   mclust_out_mu <- lapply(
-    seq_len(comp_num), function(i) mclust_out$parameters$mean[,i]
+    seq_len(comp_num), function(i) mclust_out$parameters$mean[, i]
   )
   mclust_out_sigma <- lapply(
     seq_len(comp_num),
-    function(i) mclust_out$parameters$variance$sigma[, ,i]
+    function(i) mclust_out$parameters$variance$sigma[, , i]
   )
   mclust_out_logdet <- vapply(
     seq_len(comp_num),
-    function(i) log(det(mclust_out$parameters$variance$sigma[, ,i])),
+    function(i) log(det(mclust_out$parameters$variance$sigma[, , i])),
     double(1L)
   )
   mclust_out_prop <- t(mclust_params$pro)

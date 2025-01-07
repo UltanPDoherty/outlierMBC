@@ -109,5 +109,3 @@ plot_tail_curve <- function(ombc_out) {
 
   return(tail_curve)
 }
-
-
