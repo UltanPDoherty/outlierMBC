@@ -1,3 +1,9 @@
+#' Plot the outlier number selection curve for the full method.
+#'
+#' @param ombc_out Output from ombc_gmm.
+#'
+#' @returns A gg object.
+#' @export
 plot_full_curve <- function(ombc_out) {
 
   gross_num <- sum(ombc_out$gross_outs)
@@ -42,7 +48,12 @@ plot_full_curve <- function(ombc_out) {
   return(full_curve)
 }
 
-
+#' Plot the outlier number selection curve for the tail method.
+#'
+#' @param ombc_out Output from ombc_gmm.
+#'
+#' @returns A gg object.
+#' @export
 plot_tail_curve <- function(ombc_out) {
 
   gross_num <- sum(ombc_out$gross_outs)
