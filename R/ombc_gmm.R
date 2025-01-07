@@ -83,25 +83,6 @@ ombc_gmm <- function(
       dist_mat = dist_mat, x = x,
       init_method = init_method, kmpp_seed = kmpp_seed
     )
-#
-#     z1 <- get_init_z(
-#       comp_num,
-#       dist_mat = dist_mat, x = x,
-#       init_method = "hc", kmpp_seed = kmpp_seed
-#     )
-#     z2 <- get_init_z(
-#       comp_num,
-#       dist_mat = dist_mat, x = x,
-#       init_method = "kmpp", kmpp_seed = kmpp_seed
-#     )
-#
-#
-#     init_mix <- list()
-#     init_mix[[1]] <- try_mixture_gpcm(x, comp_num, mnames, z1, 10, atol)
-#     init_mix[[2]] <- try_mixture_gpcm(x, comp_num, mnames, z2, 10, atol)
-#     init_ll <- vapply(init_mix, function(y) y$best_model$loglik, double(1L))
-#     z <- init_mix[[which.max(init_ll)]]$z
-#     cat(paste0("Chosen initialisation is ", which.max(init_ll), ".\n"))
 
     mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
 
