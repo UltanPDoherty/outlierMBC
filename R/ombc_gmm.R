@@ -144,88 +144,6 @@ ombc_gmm <- function(
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
-  outlier_seq <- seq(gross_num, max_out + gross_num)
-  point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
-
-  full <- minimum <- NULL
-  full_curve_df <- data.frame(
-    "outlier_seq" = outlier_seq,
-    "minimum" = outlier_num[1],
-    "full" = distrib_diff_mat[, 1]
-  )
-  full_curve <- full_curve_df |>
-    ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = full)) +
-    ggplot2::geom_line(
-      ggplot2::aes(colour = "full"),
-      show.legend = FALSE
-    ) +
-    ggplot2::geom_point(
-      ggplot2::aes(colour = "full"),
-      size = point_size, show.legend = FALSE
-    ) +
-    ggplot2::geom_vline(
-      ggplot2::aes(xintercept = minimum, colour = "minimum"),
-      linetype = "solid", linewidth = 0.75, show.legend = FALSE
-    ) +
-    ggplot2::scale_colour_manual(
-      values = c(full = "#000000", minimum = "#CC79A7")
-    ) +
-    ggplot2::labs(
-      title = paste0("outlierMBC: Number of Outliers = ", outlier_num[1]),
-      x = "Outlier Number",
-      y = "Mean Absolute CDF Difference",
-      colour = ""
-    ) +
-    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
-
-  observed <- acceptance <- expected <- choice <- NULL
-  tail_curve_df <- data.frame(
-    "outlier_seq" = outlier_seq,
-    "observed" = distrib_diff_mat[, 2],
-    "expected" = expect_num,
-    "acceptance" = accept_num,
-    "rejection" = reject_num,
-    "choice" = outlier_num[2]
-  )
-  tail_curve <- tail_curve_df |>
-    ggplot2::ggplot(ggplot2::aes(x = outlier_seq)) +
-    ggplot2::geom_line(ggplot2::aes(y = observed, colour = "observed")) +
-    ggplot2::geom_point(
-      ggplot2::aes(y = observed, colour = "observed"),
-      size = point_size
-    ) +
-    ggplot2::geom_vline(
-      ggplot2::aes(xintercept = choice, colour = "choice"),
-      linetype = "solid", linewidth = 0.75
-    ) +
-    ggplot2::geom_hline(
-      ggplot2::aes(yintercept = acceptance, colour = "acceptance"),
-      linetype = "dashed", linewidth = 0.75
-    ) +
-    ggplot2::geom_hline(
-      ggplot2::aes(yintercept = expected, colour = "expected"),
-      linetype = "dotted", linewidth = 0.75
-    ) +
-    ggplot2::scale_colour_manual(
-      values = c(
-        observed = "#000000", expected = "#0072B2", acceptance = "#009E73",
-        choice = "#CC79A7", rejection = "#D55E00"
-      )
-    ) +
-    ggplot2::labs(
-      title = paste0("outlierMBC-tail: Number of Outliers = ", outlier_num[2]),
-      x = "Outlier Number",
-      y = "Number of Extreme Points",
-      colour = ""
-    ) +
-    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
-    ggplot2::theme(
-      legend.text = ggplot2::element_text(size = 11),
-      legend.title = ggplot2::element_text(size = 11),
-      legend.position = "bottom"
-    ) +
-    ggplot2::expand_limits(y = 0)
-
   ombc_names <- c("full", "tail", "bin_tail")
   colnames(distrib_diff_mat) <- ombc_names
   colnames(outlier_bool) <- ombc_names
@@ -252,13 +170,12 @@ ombc_gmm <- function(
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
     outlier_class = outlier_class,
-    curve_plot = full_curve,
-    tail_curve_plot = tail_curve,
     mix = mix,
     loglike = loglike,
     removal_dens = removal_dens,
     distrib_diff_mat = distrib_diff_mat,
-    distrib_diff_arr = distrib_diff_arr
+    distrib_diff_arr = distrib_diff_arr,
+    gross_outs = gross_outs
   ))
 }
 
