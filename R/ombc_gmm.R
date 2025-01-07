@@ -154,12 +154,6 @@ ombc_gmm <- function(
   )
   names(mix) <- ombc_names
 
-  outlier_class <- rep("normal", obs_num)
-  outlier_class[outlier_bool[, 1] & outlier_bool[, 2]] <- "out_full_&_tail"
-  outlier_class[outlier_bool[, 1] & !outlier_bool[, 2]] <- "out_full_only"
-  outlier_class[!outlier_bool[, 1] & outlier_bool[, 2]] <- "out_tail_only"
-  outlier_class[gross_outs] <- "out_gross"
-  outlier_class <- as.factor(outlier_class)
 
   labels <- as.data.frame(labels)
   outlier_bool <- as.data.frame(outlier_bool)
@@ -169,7 +163,6 @@ ombc_gmm <- function(
     outlier_bool = outlier_bool,
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
-    outlier_class = outlier_class,
     mix = mix,
     loglike = loglike,
     removal_dens = removal_dens,
