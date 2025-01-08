@@ -67,7 +67,7 @@ ombc_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  track_num <- 2 + 1
+  track_num <- 2
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
   loglike <- c()
@@ -144,7 +144,7 @@ ombc_gmm <- function(
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
-  ombc_names <- c("full", "tail", "bin_tail")
+  ombc_names <- c("full", "tail")
   colnames(distrib_diff_mat) <- ombc_names
   colnames(outlier_bool) <- ombc_names
   colnames(labels) <- ombc_names
