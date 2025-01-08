@@ -50,6 +50,16 @@ ombc_gmm <- function(
     print_interval = Inf) {
   init_method <- match.arg(init_method)
 
+  this_call <- call(
+    "ombc_gmm",
+    "x" = substitute(x), "comp_num" = comp_num, "max_out" = max_out,
+    "gross_outs" = substitute(gross_outs), "mnames" = mnames, "nmax" = nmax,
+    "atol" = atol, "init_method" = init_method, "kmpp_seed" = kmpp_seed,
+    "print_interval" = print_interval
+  )
+
+  ombc_version <- utils::packageVersion("outlierMBC")
+
   expect_num <- 1
   accept_num <- expect_num + 1
   reject_num <- accept_num
@@ -167,7 +177,9 @@ ombc_gmm <- function(
     loglike = loglike,
     removal_dens = removal_dens,
     distrib_diff_mat = distrib_diff_mat,
-    distrib_diff_arr = distrib_diff_arr
+    distrib_diff_arr = distrib_diff_arr,
+    call = this_call,
+    version = ombc_version
   ))
 }
 
