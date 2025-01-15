@@ -337,39 +337,12 @@ ombc_z_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  set.seed(123)
-  mclust_pre <- mclust::Mclust(x, comp_num, mnames)
-
-  pre_dens <- mclust::dens(
-    data = x,
-    modelName = mclust_pre$modelName,
-    parameters = mclust_pre$parameters
+  z <- get_init_z(
+    comp_num = comp_num, dist_mat = dist_mat, x = x,
+    init_method = init_method, kmpp_seed = kmpp_seed
   )
 
-  init_noise <- pre_dens < mclust::hypvol(x, TRUE)
-
-  set.seed(123)
-  mclust_out <- mclust::Mclust(
-    data = x,
-    G = comp_num,
-    modelNames = mnames,
-    initialization = list(noise = init_noise)
-  )
-
-  cat(paste0(
-    "With ", gross_num,
-    " gross outliers removed, mclust identifies a further ",
-    sum(mclust_out$classification == 0),
-    " outliers during our initialisation process.\n\n"
-  ))
-
-  mclust_params <- mclust_out$parameters
-  mclust_params$pro <- mclust_params$pro[-(comp_num + 1)]
-  mclust_params$pro <- mclust_params$pro / sum(mclust_params$pro)
-
-  z <- mclust::estep(x, mnames, mclust_params)$z
-
-  track_num <- 2
+  track_num <- 2 + 1
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
   loglike <- c()
