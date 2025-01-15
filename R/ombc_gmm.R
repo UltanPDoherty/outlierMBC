@@ -302,6 +302,7 @@ ombc_z_gmm <- function(
     comp_num,
     max_out,
     gross_outs = rep(FALSE, nrow(x)),
+    resets = c(),
     mnames = "VVV",
     nmax = 1000,
     atol = 1e-8,
@@ -373,8 +374,16 @@ ombc_z_gmm <- function(
 
     outlier_rank_temp[!outlier_rank_temp][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
-    z <- z[-dd$choice_id, , drop = FALSE]
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
+
+    if ((i + 1) %in% resets) {
+      z <- get_init_z(
+        comp_num = comp_num, dist_mat = dist_mat, x = x,
+        init_method = init_method, kmpp_seed = kmpp_seed
+      )
+    } else {
+      z <- z[-dd$choice_id, , drop = FALSE]
+    }
   }
 
   outlier_rank <- double(length(gross_outs))
