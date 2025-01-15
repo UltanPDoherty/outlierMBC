@@ -42,7 +42,8 @@ plot_full_curve <- function(ombc_out) {
       y = "Mean Absolute CDF Difference",
       colour = ""
     ) +
-    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
+    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
+    ggplot2::expand_limits(y = 0)
 
   return(full_curve)
 }
@@ -173,7 +174,8 @@ plot_ks_curve <- function(ombc_out, alpha = 0.05) {
       y = "Kolmogorov-Smirnov Distance",
       colour = ""
     ) +
-    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
+    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
+    ggplot2::expand_limits(y = 0)
 
   return(ks_curve)
 }
