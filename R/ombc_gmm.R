@@ -77,7 +77,7 @@ ombc_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  track_num <- 2
+  track_num <- 2 + 1
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
   loglike <- c()
@@ -132,6 +132,8 @@ ombc_gmm <- function(
   accept_bools <- distrib_diff_mat[, 2] < accept_num
   outlier_num[2] <- which.max(accept_bools & after_final_reject)
 
+  outlier_num[3] <- which.min(distrib_diff_mat[, 3])
+
   outlier_num <- outlier_num - 1 + gross_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
@@ -154,7 +156,7 @@ ombc_gmm <- function(
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
-  ombc_names <- c("full", "tail")
+  ombc_names <- c("full", "tail", "ks")
   colnames(distrib_diff_mat) <- ombc_names
   colnames(outlier_bool) <- ombc_names
   colnames(labels) <- ombc_names
@@ -256,7 +258,7 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
 
 # ==============================================================================
 
-#' ombcz_gmm
+#' ombc_z_gmm
 #'
 #' @description
 #' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
@@ -417,6 +419,8 @@ ombc_z_gmm <- function(
   accept_bools <- distrib_diff_mat[, 2] < accept_num
   outlier_num[2] <- which.max(accept_bools & after_final_reject)
 
+  outlier_num[3] <- which.min(distrib_diff_mat[, 3])
+
   outlier_num <- outlier_num - 1 + gross_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
@@ -439,7 +443,7 @@ ombc_z_gmm <- function(
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
-  ombc_names <- c("full", "tail")
+  ombc_names <- c("full", "tail", "ks")
   colnames(distrib_diff_mat) <- ombc_names
   colnames(outlier_bool) <- ombc_names
   colnames(labels) <- ombc_names
