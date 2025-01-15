@@ -2,13 +2,14 @@
 % Please edit documentation in R/ombc_gmm.R
 \name{ombc_z_gmm}
 \alias{ombc_z_gmm}
-\title{ombcz_gmm}
+\title{ombc_z_gmm}
 \usage{
 ombc_z_gmm(
   x,
   comp_num,
   max_out,
   gross_outs = rep(FALSE, nrow(x)),
+  resets = c(),
   mnames = "VVV",
   nmax = 1000,
   atol = 1e-08,
@@ -25,6 +26,8 @@ ombc_z_gmm(
 \item{max_out}{Maximum number of outliers.}
 
 \item{gross_outs}{Logical vector identifying gross outliers.}
+
+\item{resets}{Vector of iteration numbers at which to reinitialise.}
 
 \item{mnames}{Model names for mixture::gpcm.}
 

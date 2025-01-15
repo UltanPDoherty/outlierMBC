@@ -4,7 +4,7 @@
 \alias{distrib_diff_mahalanobis}
 \title{distrib_diff_mahalanobis}
 \usage{
-distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g, tail_prop)
+distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g, tail_prop, bin_z_g)
 }
 \arguments{
 \item{x}{Data.}
@@ -18,6 +18,8 @@ distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g, tail_prop)
 \item{logdet_g}{Log-determinants of covariance matrix for component g.}
 
 \item{tail_prop}{.}
+
+\item{bin_z_g}{.}
 }
 \value{
 List of

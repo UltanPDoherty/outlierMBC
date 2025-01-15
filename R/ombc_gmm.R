@@ -267,6 +267,7 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
 #' @param gross_outs Logical vector identifying gross outliers.
+#' @param resets Vector of iteration numbers at which to reinitialise.
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param atol EM convergence tolerance threshold for mixture::gpcm.

@@ -122,6 +122,7 @@ plot_tail_curve <- function(ombc_out) {
 #' Plot the outlier number selection curve for the ks method.
 #'
 #' @param ombc_out Output from ombc_gmm.
+#' @param alpha .
 #'
 #' @returns A gg object.
 #' @export
@@ -136,9 +137,9 @@ plot_ks_curve <- function(ombc_out, alpha = 0.05) {
 
   obs_num <- nrow(ombc_out$labels)
 
-  ks_threshold <- sqrt(- log(alpha / 2) / (obs_num - outlier_seq))
+  ks_threshold <- sqrt(-log(alpha / 2) / (obs_num - outlier_seq))
 
-  ks <- minimum <- NULL
+  ks <- minimum <- threshold <- NULL
   ks_curve_df <- data.frame(
     "outlier_seq" = outlier_seq,
     "minimum" = as.integer(outlier_num["ks"]),
