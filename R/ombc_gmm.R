@@ -315,7 +315,8 @@ ombc_z_gmm <- function(
   this_call <- call(
     "ombc_gmm",
     "x" = substitute(x), "comp_num" = comp_num, "max_out" = max_out,
-    "gross_outs" = substitute(gross_outs), "mnames" = mnames, "nmax" = nmax,
+    "gross_outs" = substitute(gross_outs), "resets" = substitute(resets),
+    "mnames" = mnames, "nmax" = nmax,
     "atol" = atol, "init_method" = init_method, "kmpp_seed" = kmpp_seed,
     "print_interval" = print_interval
   )
