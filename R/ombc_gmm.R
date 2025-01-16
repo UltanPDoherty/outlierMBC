@@ -348,6 +348,12 @@ ombc_z_gmm <- function(
   track_num <- 2 + 1
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
+  dd_min <- Inf
+  best_z <- list()
+  compromise_dd_vals <- c()
+  compromise_z_list <- list()
+  tail_accepted <- FALSE
+
   loglike <- c()
   removal_dens <- c()
   distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
@@ -378,6 +384,24 @@ ombc_z_gmm <- function(
     x <- x[-dd$choice_id, , drop = FALSE]
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
 
+    if (dd$distrib_diff_vec[1] < dd_min) {
+      dd_min <- dd$distrib_diff_vec[1]
+      best_z[[1]] <- z
+
+      compromise_z_list <- append(compromise_z_list, best_z[[1]])
+      compromise_dd_vals <- append(compromise_dd_vals, dd_min)
+    }
+    delete_compromises <- compromise_dd_vals > 1.1 * dd_min
+    compromise_z_list[delete_compromises] <- NULL
+    compromise_dd_vals <- compromise_dd_vals[-delete_compromises]
+    if (!tail_accepted && dd$distrib_diff_vec[2] < accept_num) {
+      tail_accepted <- TRUE
+      best_z[[2]] <- z
+    } else if (tail_accepted && dd$distrib_diff_vec[2] > reject_num) {
+      tail_accepted <- FALSE
+      best_z[[2]] <- NULL
+    }
+
     if ((i + 1) %in% resets) {
       z <- get_init_z(
         comp_num = comp_num, dist_mat = dist_mat, x = x,
@@ -403,6 +427,7 @@ ombc_z_gmm <- function(
   accept_bools <- distrib_diff_mat[, 2] < accept_num
   outlier_num[2] <- which.max(accept_bools & after_final_reject)
 
+  best_z[[3]] <- compromise_z_list[[1]]
   outlier_num[3] <- which.min(distrib_diff_mat[, 3])
 
   outlier_num <- outlier_num - 1 + gross_num
@@ -413,15 +438,8 @@ ombc_z_gmm <- function(
   for (j in seq_len(track_num)) {
     outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
 
-    z <- get_init_z(
-      comp_num,
-      dist_mat = dist_mat0[!outlier_bool[, j], !outlier_bool[, j]],
-      x = x0[!outlier_bool[, j], ],
-      init_method = init_method, kmpp_seed = kmpp_seed
-    )
-
     mix[[j]] <- try_mixture_gpcm(
-      x0[!outlier_bool[, j], ], comp_num, mnames, z, nmax, atol
+      x0[!outlier_bool[, j], ], comp_num, mnames, best_z[[j]], nmax, atol
     )
 
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
