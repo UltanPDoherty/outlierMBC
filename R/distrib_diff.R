@@ -18,7 +18,7 @@ distrib_diff_gmm <- function(
     tail_prop) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
-  track_num <- 2 + 1
+  track_num <- 2
 
   bin_z <- apply(z, 1, which.max)
 
