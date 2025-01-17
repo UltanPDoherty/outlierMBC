@@ -43,7 +43,6 @@ distrib_diff_gmm <- function(
   distrib_diff_vec <- c()
   distrib_diff_vec[1] <- sqrt(sum(prop * distrib_diff_mat[, 1]^2))
   distrib_diff_vec[2] <- sum(distrib_diff_mat[, 2])
-  distrib_diff_vec[3] <- max(distrib_diff_mat[, 3])
 
   return(list(
     distrib_diff_mat = distrib_diff_mat,
@@ -95,15 +94,9 @@ distrib_diff_mahalanobis <- function(
   beta_cdf_g_vals <- stats::pbeta(check_seq, param1, param2)
   cdf_diffs <- mahala_ewcdf_g_vals - beta_cdf_g_vals
 
-  ks <- max(abs(
-    mahala_ewcdf_g_func(scaled_mahalas_g[bin_z_g])
-    - stats::pbeta(scaled_mahalas_g[bin_z_g], param1, param2)
-  ))
-
   distrib_diff_g_x <- c(
     mean(abs(cdf_diffs)),
-    n_g * mahala_tail_prop,
-    ks
+    n_g * mahala_tail_prop
   )
 
   dens_g_x <- exp(

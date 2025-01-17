@@ -77,7 +77,7 @@ ombc_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  track_num <- 2 + 1
+  track_num <- 2
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
   loglike <- c()
@@ -132,8 +132,6 @@ ombc_gmm <- function(
   accept_bools <- distrib_diff_mat[, 2] < accept_num
   outlier_num[2] <- which.max(accept_bools & after_final_reject)
 
-  outlier_num[3] <- which.min(distrib_diff_mat[, 3])
-
   outlier_num <- outlier_num - 1 + gross_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
@@ -156,7 +154,7 @@ ombc_gmm <- function(
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
-  ombc_names <- c("full", "tail", "ks")
+  ombc_names <- c("full", "tail")
   colnames(distrib_diff_mat) <- ombc_names
   colnames(outlier_bool) <- ombc_names
   colnames(labels) <- ombc_names
@@ -307,6 +305,7 @@ ombc_z_gmm <- function(
     mnames = "VVV",
     nmax = 1000,
     atol = 1e-8,
+    init_z = NULL,
     init_method = c("hc", "kmpp"),
     kmpp_seed = 123,
     print_interval = Inf) {
@@ -345,7 +344,7 @@ ombc_z_gmm <- function(
     init_method = init_method, kmpp_seed = kmpp_seed
   )
 
-  track_num <- 2 + 1
+  track_num <- 2
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
 
   dd_min <- Inf
@@ -428,7 +427,7 @@ ombc_z_gmm <- function(
   outlier_num[2] <- which.max(accept_bools & after_final_reject)
 
   best_z[[3]] <- compromise_z_list[[1]]
-  outlier_num[3] <- which.min(distrib_diff_mat[, 3])
+  outlier_num[3] <- which.max(distrib_diff_mat[, 1] < 1.1 * dd_min)
 
   outlier_num <- outlier_num - 1 + gross_num
 
@@ -445,7 +444,7 @@ ombc_z_gmm <- function(
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
   }
 
-  ombc_names <- c("full", "tail", "ks")
+  ombc_names <- c("full", "tail", "compromise")
   colnames(distrib_diff_mat) <- ombc_names
   colnames(outlier_bool) <- ombc_names
   colnames(labels) <- ombc_names
