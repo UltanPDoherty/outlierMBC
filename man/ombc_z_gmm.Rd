@@ -13,6 +13,7 @@ ombc_z_gmm(
   mnames = "VVV",
   nmax = 1000,
   atol = 1e-08,
+  init_z = NULL,
   init_method = c("hc", "kmpp"),
   kmpp_seed = 123,
   print_interval = Inf
@@ -34,6 +35,8 @@ ombc_z_gmm(
 \item{nmax}{Maximum number of iterations for mixture::gpcm.}
 
 \item{atol}{EM convergence tolerance threshold for mixture::gpcm.}
+
+\item{init_z}{Initial z matrix.}
 
 \item{init_method}{Method used to initialise each mixture model.}
 

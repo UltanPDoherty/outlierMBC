@@ -269,6 +269,7 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param atol EM convergence tolerance threshold for mixture::gpcm.
+#' @param init_z Initial z matrix.
 #' @param init_method Method used to initialise each mixture model.
 #' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
 #'                  hierarchical clustering.
@@ -339,10 +340,14 @@ ombc_z_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
-  z <- get_init_z(
-    comp_num = comp_num, dist_mat = dist_mat, x = x,
-    init_method = init_method, kmpp_seed = kmpp_seed
-  )
+  if (is.null(init_z)) {
+    z <- get_init_z(
+      comp_num = comp_num, dist_mat = dist_mat, x = x,
+      init_method = init_method, kmpp_seed = kmpp_seed
+    )
+  } else {
+    z <- init_z
+  }
 
   track_num <- 2
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
@@ -387,12 +392,12 @@ ombc_z_gmm <- function(
       dd_min <- dd$distrib_diff_vec[1]
       best_z[[1]] <- z
 
-      compromise_z_list <- append(compromise_z_list, best_z[[1]])
+      compromise_z_list <- append(compromise_z_list, best_z[1])
       compromise_dd_vals <- append(compromise_dd_vals, dd_min)
     }
-    delete_compromises <- compromise_dd_vals > 1.1 * dd_min
-    compromise_z_list[delete_compromises] <- NULL
-    compromise_dd_vals <- compromise_dd_vals[-delete_compromises]
+    keep_compromises <- which(compromise_dd_vals < 1.1 * dd_min)
+    compromise_z_list <- compromise_z_list[keep_compromises]
+    compromise_dd_vals <- compromise_dd_vals[keep_compromises]
     if (!tail_accepted && dd$distrib_diff_vec[2] < accept_num) {
       tail_accepted <- TRUE
       best_z[[2]] <- z
@@ -431,10 +436,10 @@ ombc_z_gmm <- function(
 
   outlier_num <- outlier_num - 1 + gross_num
 
-  outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
+  outlier_bool <- matrix(nrow = obs_num, ncol = track_num + 1)
   mix <- list()
-  labels <- matrix(0, nrow = obs_num, ncol = track_num)
-  for (j in seq_len(track_num)) {
+  labels <- matrix(0, nrow = obs_num, ncol = track_num + 1)
+  for (j in seq_len(track_num + 1)) {
     outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
 
     mix[[j]] <- try_mixture_gpcm(
@@ -445,12 +450,12 @@ ombc_z_gmm <- function(
   }
 
   ombc_names <- c("full", "tail", "compromise")
-  colnames(distrib_diff_mat) <- ombc_names
+  colnames(distrib_diff_mat) <- ombc_names[-3]
   colnames(outlier_bool) <- ombc_names
   colnames(labels) <- ombc_names
   names(outlier_num) <- ombc_names
   dimnames(distrib_diff_arr) <- list(
-    paste0("k", seq_len(comp_num)), NULL, ombc_names
+    paste0("k", seq_len(comp_num)), NULL, ombc_names[-3]
   )
 
   labels <- as.data.frame(labels)
