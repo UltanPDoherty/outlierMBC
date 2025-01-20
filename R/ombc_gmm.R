@@ -7,9 +7,11 @@
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
 #' @param gross_outs Logical vector identifying gross outliers.
+#' @param resets Vector of iteration numbers at which to reinitialise.
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param atol EM convergence tolerance threshold for mixture::gpcm.
+#' @param init_z Initial z matrix.
 #' @param init_method Method used to initialise each mixture model.
 #' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
 #'                  hierarchical clustering.
@@ -42,9 +44,12 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = rep(FALSE, nrow(x)),
+    resets = c(),
     mnames = "VVV",
-    nmax = 10,
+    nmax = 1000,
     atol = 1e-8,
+    init_z = NULL,
+    init_model = NULL,
     init_method = c("hc", "kmpp"),
     kmpp_seed = 123,
     print_interval = Inf) {
@@ -53,7 +58,8 @@ ombc_gmm <- function(
   this_call <- call(
     "ombc_gmm",
     "x" = substitute(x), "comp_num" = comp_num, "max_out" = max_out,
-    "gross_outs" = substitute(gross_outs), "mnames" = mnames, "nmax" = nmax,
+    "gross_outs" = substitute(gross_outs), "resets" = substitute(resets),
+    "mnames" = mnames, "nmax" = nmax,
     "atol" = atol, "init_method" = init_method, "kmpp_seed" = kmpp_seed,
     "print_interval" = print_interval
   )
@@ -77,8 +83,25 @@ ombc_gmm <- function(
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
+  if (!is.null(init_model) && !is.null(init_z)) {
+    stop("Only one of init_model and init_z may be provided.")
+  } else if (!is.null(init_z)) {
+    z <- init_z
+  } else if (!is.null(init_model)) {
+    z <- mixture::e_step(x, init_model)$z
+  } else {
+    z <- get_init_z(
+      comp_num = comp_num, dist_mat = dist_mat, x = x,
+      init_method = init_method, kmpp_seed = kmpp_seed
+    )
+  }
+
   track_num <- 2
   tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
+
+  dd_min <- Inf
+  best_z <- list()
+  tail_accepted <- FALSE
 
   loglike <- c()
   removal_dens <- c()
@@ -87,12 +110,6 @@ ombc_gmm <- function(
   outlier_rank_temp <- rep(0, obs_num - gross_num)
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
-
-    z <- get_init_z(
-      comp_num,
-      dist_mat = dist_mat, x = x,
-      init_method = init_method, kmpp_seed = kmpp_seed
-    )
 
     mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
 
@@ -115,6 +132,27 @@ ombc_gmm <- function(
     outlier_rank_temp[!outlier_rank_temp][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
+
+    if (dd$distrib_diff_vec[1] < dd_min) {
+      dd_min <- dd$distrib_diff_vec[1]
+      best_z[[1]] <- z
+    }
+    if (!tail_accepted && dd$distrib_diff_vec[2] < accept_num) {
+      tail_accepted <- TRUE
+      best_z[[2]] <- z
+    } else if (tail_accepted && dd$distrib_diff_vec[2] > reject_num) {
+      tail_accepted <- FALSE
+      best_z[[2]] <- NULL
+    }
+
+    if ((i + 1) %in% resets) {
+      z <- get_init_z(
+        comp_num = comp_num, dist_mat = dist_mat, x = x,
+        init_method = init_method, kmpp_seed = kmpp_seed
+      )
+    } else {
+      z <- z[-dd$choice_id, , drop = FALSE]
+    }
   }
 
   outlier_rank <- double(length(gross_outs))
@@ -140,15 +178,8 @@ ombc_gmm <- function(
   for (j in seq_len(track_num)) {
     outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
 
-    z <- get_init_z(
-      comp_num,
-      dist_mat = dist_mat0[!outlier_bool[, j], !outlier_bool[, j]],
-      x = x0[!outlier_bool[, j], ],
-      init_method = init_method, kmpp_seed = kmpp_seed
-    )
-
     mix[[j]] <- try_mixture_gpcm(
-      x0[!outlier_bool[, j], ], comp_num, mnames, z, nmax, atol
+      x0[!outlier_bool[, j], ], comp_num, mnames, best_z[[j]], nmax, atol
     )
 
     labels[!outlier_bool[, j], j] <- mix[[j]]$map
@@ -182,6 +213,7 @@ ombc_gmm <- function(
     version = ombc_version
   ))
 }
+
 
 # ------------------------------------------------------------------------------
 
@@ -252,227 +284,4 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
   }
 
   return(mix)
-}
-
-# ==============================================================================
-
-#' ombc_z_gmm
-#'
-#' @description
-#' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
-#'
-#' @param x Data.
-#' @param comp_num Number of components.
-#' @param max_out Maximum number of outliers.
-#' @param gross_outs Logical vector identifying gross outliers.
-#' @param resets Vector of iteration numbers at which to reinitialise.
-#' @param mnames Model names for mixture::gpcm.
-#' @param nmax Maximum number of iterations for mixture::gpcm.
-#' @param atol EM convergence tolerance threshold for mixture::gpcm.
-#' @param init_z Initial z matrix.
-#' @param init_method Method used to initialise each mixture model.
-#' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
-#'                  hierarchical clustering.
-#' @param print_interval How frequently the iteration count is printed.
-#'
-#' @return List of
-#' * distrib_diffs
-#' * distrib_diff_mat
-#' * outlier_bool
-#' * outlier_num
-#' * outlier_rank
-#' * labels
-#' * final_gmm
-#' * loglike
-#' * removal_dens
-#' @export
-#'
-#' @examples
-#'
-#' ombc_z_gmm_k3n1000o10 <- ombc_z_gmm(
-#'   gmm_k3n1000o10[, 1:2],
-#'   comp_num = 3, max_out = 20
-#' )
-#'
-#' ombc_z_gmm_k3n1000o10$plot_tail_curve
-#' ombc_z_gmm_k3n1000o10$plot_full_curve
-#'
-ombc_z_gmm <- function(
-    x,
-    comp_num,
-    max_out,
-    gross_outs = rep(FALSE, nrow(x)),
-    resets = c(),
-    mnames = "VVV",
-    nmax = 1000,
-    atol = 1e-8,
-    init_z = NULL,
-    init_method = c("hc", "kmpp"),
-    kmpp_seed = 123,
-    print_interval = Inf) {
-  init_method <- match.arg(init_method)
-
-  this_call <- call(
-    "ombc_gmm",
-    "x" = substitute(x), "comp_num" = comp_num, "max_out" = max_out,
-    "gross_outs" = substitute(gross_outs), "resets" = substitute(resets),
-    "mnames" = mnames, "nmax" = nmax,
-    "atol" = atol, "init_method" = init_method, "kmpp_seed" = kmpp_seed,
-    "print_interval" = print_interval
-  )
-
-  ombc_version <- utils::packageVersion("outlierMBC")
-
-  expect_num <- 1
-  accept_num <- expect_num + 1
-  reject_num <- accept_num
-
-  x <- as.matrix(x)
-  x0 <- x
-
-  obs_num <- nrow(x)
-
-  dist_mat0 <- as.matrix(stats::dist(x0))
-  dist_mat <- dist_mat0
-
-  gross_num <- sum(gross_outs)
-  x <- x[!gross_outs, ]
-  max_out <- max_out - gross_num
-  dist_mat <- dist_mat[!gross_outs, !gross_outs]
-
-  if (is.null(init_z)) {
-    z <- get_init_z(
-      comp_num = comp_num, dist_mat = dist_mat, x = x,
-      init_method = init_method, kmpp_seed = kmpp_seed
-    )
-  } else {
-    z <- init_z
-  }
-
-  track_num <- 2
-  tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
-
-  dd_min <- Inf
-  best_z <- list()
-  compromise_dd_vals <- c()
-  compromise_z_list <- list()
-  tail_accepted <- FALSE
-
-  loglike <- c()
-  removal_dens <- c()
-  distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
-  distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = track_num)
-  outlier_rank_temp <- rep(0, obs_num - gross_num)
-  for (i in seq_len(max_out + 1)) {
-    if (i %% print_interval == 0) cat("i = ", i, "\n")
-
-    mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
-
-    loglike[i] <- mix$best_model$loglik
-
-    dd <- distrib_diff_gmm(
-      x,
-      mix$z,
-      mix$best_model$model_obj[[1]]$pi_gs,
-      mix$best_model$model_obj[[1]]$mu,
-      mix$best_model$model_obj[[1]]$sigs,
-      mix$best_model$model_obj[[1]]$log_dets,
-      tail_props[i]
-    )
-
-    distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
-    distrib_diff_mat[i, ] <- dd$distrib_diff_vec
-    removal_dens[i] <- dd$removal_dens
-
-    outlier_rank_temp[!outlier_rank_temp][dd$choice_id] <- i
-    x <- x[-dd$choice_id, , drop = FALSE]
-    dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
-
-    if (dd$distrib_diff_vec[1] < dd_min) {
-      dd_min <- dd$distrib_diff_vec[1]
-      best_z[[1]] <- z
-
-      compromise_z_list <- append(compromise_z_list, best_z[1])
-      compromise_dd_vals <- append(compromise_dd_vals, dd_min)
-    }
-    keep_compromises <- which(compromise_dd_vals < 1.1 * dd_min)
-    compromise_z_list <- compromise_z_list[keep_compromises]
-    compromise_dd_vals <- compromise_dd_vals[keep_compromises]
-    if (!tail_accepted && dd$distrib_diff_vec[2] < accept_num) {
-      tail_accepted <- TRUE
-      best_z[[2]] <- z
-    } else if (tail_accepted && dd$distrib_diff_vec[2] > reject_num) {
-      tail_accepted <- FALSE
-      best_z[[2]] <- NULL
-    }
-
-    if ((i + 1) %in% resets) {
-      z <- get_init_z(
-        comp_num = comp_num, dist_mat = dist_mat, x = x,
-        init_method = init_method, kmpp_seed = kmpp_seed
-      )
-    } else {
-      z <- z[-dd$choice_id, , drop = FALSE]
-    }
-  }
-
-  outlier_rank <- double(length(gross_outs))
-  outlier_rank[gross_outs] <- 1
-  outlier_rank[!gross_outs] <- outlier_rank_temp +
-    gross_num * (outlier_rank_temp != 0)
-
-  outlier_num <- integer(track_num)
-
-  outlier_num[1] <- which.min(distrib_diff_mat[, 1])
-
-  reject_bool <- distrib_diff_mat[, 2] > reject_num
-  final_reject <- max(which(c(TRUE, reject_bool))) - 1
-  after_final_reject <- seq_len(max_out + 1) > final_reject
-  accept_bools <- distrib_diff_mat[, 2] < accept_num
-  outlier_num[2] <- which.max(accept_bools & after_final_reject)
-
-  best_z[[3]] <- compromise_z_list[[1]]
-  outlier_num[3] <- which.max(distrib_diff_mat[, 1] < 1.1 * dd_min)
-
-  outlier_num <- outlier_num - 1 + gross_num
-
-  outlier_bool <- matrix(nrow = obs_num, ncol = track_num + 1)
-  mix <- list()
-  labels <- matrix(0, nrow = obs_num, ncol = track_num + 1)
-  for (j in seq_len(track_num + 1)) {
-    outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
-
-    mix[[j]] <- try_mixture_gpcm(
-      x0[!outlier_bool[, j], ], comp_num, mnames, best_z[[j]], nmax, atol
-    )
-
-    labels[!outlier_bool[, j], j] <- mix[[j]]$map
-  }
-
-  ombc_names <- c("full", "tail", "compromise")
-  colnames(distrib_diff_mat) <- ombc_names[-3]
-  colnames(outlier_bool) <- ombc_names
-  colnames(labels) <- ombc_names
-  names(outlier_num) <- ombc_names
-  dimnames(distrib_diff_arr) <- list(
-    paste0("k", seq_len(comp_num)), NULL, ombc_names[-3]
-  )
-
-  labels <- as.data.frame(labels)
-  outlier_bool <- as.data.frame(outlier_bool)
-
-  return(list(
-    labels = labels,
-    outlier_bool = outlier_bool,
-    outlier_num = outlier_num,
-    outlier_rank = outlier_rank,
-    gross_outs = gross_outs,
-    mix = mix,
-    loglike = loglike,
-    removal_dens = removal_dens,
-    distrib_diff_mat = distrib_diff_mat,
-    distrib_diff_arr = distrib_diff_arr,
-    call = this_call,
-    version = ombc_version
-  ))
 }

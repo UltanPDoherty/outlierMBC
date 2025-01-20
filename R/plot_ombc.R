@@ -10,19 +10,14 @@ plot_full_curve <- function(ombc_out) {
   outlier_num <- ombc_out$outlier_num
   distrib_diff_mat <- ombc_out$distrib_diff_mat
 
-  distrib_diff_mat <- apply(distrib_diff_mat, 2, function(x) x / min(x))
-
   outlier_seq <- seq(gross_num, max_out)
   point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
 
-  compromise_num <- outlier_seq[which.max(distrib_diff_mat[, "full"] < 1.1)]
-
-  full <- minimum <- compromise <- NULL
+  full <- minimum <- NULL
   full_curve_df <- data.frame(
     "outlier_seq" = outlier_seq,
     "minimum" = as.integer(outlier_num["full"]),
-    "full" = distrib_diff_mat[, "full"],
-    "compromise" = compromise_num
+    "full" = distrib_diff_mat[, "full"]
   )
   full_curve <- full_curve_df |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = full)) +
@@ -38,24 +33,13 @@ plot_full_curve <- function(ombc_out) {
       ggplot2::aes(xintercept = minimum, colour = "minimum"),
       linetype = "solid", linewidth = 0.75, show.legend = FALSE
     ) +
-    ggplot2::geom_vline(
-      ggplot2::aes(xintercept = compromise, colour = "compromise"),
-      linetype = "dashed", linewidth = 0.75, show.legend = FALSE
-    ) +
-    ggplot2::geom_hline(
-      ggplot2::aes(yintercept = 1.1, colour = "compromise"),
-      linetype = "dashed", linewidth = 0.75, show.legend = FALSE
-    ) +
     ggplot2::scale_colour_manual(
-      values = c(full = "#000000", minimum = "#CC79A7", compromise = "#009E73")
+      values = c(full = "#000000", minimum = "#CC79A7")
     ) +
     ggplot2::labs(
-      title = paste0(
-        "outlierMBC: Number of Outliers = ", outlier_num["full"],
-        " (10% Compromise = ", compromise_num, ")"
-      ),
+      title = paste0("outlierMBC: Number of Outliers = ", outlier_num["full"]),
       x = "Outlier Number",
-      y = "Scaled Mean Absolute CDF Difference",
+      y = "Mean Absolute CDF Difference",
       colour = ""
     ) +
     ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +

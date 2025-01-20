@@ -9,9 +9,11 @@ ombc_gmm(
   comp_num,
   max_out,
   gross_outs = rep(FALSE, nrow(x)),
+  resets = c(),
   mnames = "VVV",
-  nmax = 10,
+  nmax = 1000,
   atol = 1e-08,
+  init_z = NULL,
   init_method = c("hc", "kmpp"),
   kmpp_seed = 123,
   print_interval = Inf
@@ -26,11 +28,15 @@ ombc_gmm(
 
 \item{gross_outs}{Logical vector identifying gross outliers.}
 
+\item{resets}{Vector of iteration numbers at which to reinitialise.}
+
 \item{mnames}{Model names for mixture::gpcm.}
 
 \item{nmax}{Maximum number of iterations for mixture::gpcm.}
 
 \item{atol}{EM convergence tolerance threshold for mixture::gpcm.}
+
+\item{init_z}{Initial z matrix.}
 
 \item{init_method}{Method used to initialise each mixture model.}
 
@@ -58,12 +64,12 @@ Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 }
 \examples{
 
-ombc_gmm_k3n1000o10 <- ombc_gmm(
+ombc_z_gmm_k3n1000o10 <- ombc_z_gmm(
   gmm_k3n1000o10[, 1:2],
   comp_num = 3, max_out = 20
 )
 
-ombc_gmm_k3n1000o10$plot_tail_curve
-ombc_gmm_k3n1000o10$plot_full_curve
+ombc_z_gmm_k3n1000o10$plot_tail_curve
+ombc_z_gmm_k3n1000o10$plot_full_curve
 
 }
