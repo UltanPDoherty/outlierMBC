@@ -113,12 +113,13 @@ ombc_gmm <- function(
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
     mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
+    z <- mix$z
 
     loglike[i] <- mix$best_model$loglik
 
     dd <- distrib_diff_gmm(
       x,
-      mix$z,
+      z,
       mix$best_model$model_obj[[1]]$pi_gs,
       mix$best_model$model_obj[[1]]$mu,
       mix$best_model$model_obj[[1]]$sigs,
