@@ -2,14 +2,14 @@
 % Please edit documentation in R/distrib_diff.R
 \name{count_extremes_g}
 \alias{count_extremes_g}
-\title{distrib_diff_mahalanobis}
+\title{count_extremes_g}
 \usage{
-count_extremes_g(x, bin_z_g, mu_g, sigma_g, logdet_g, tail_prop)
+count_extremes_g(x, z_g, mu_g, sigma_g, logdet_g, tail_prop)
 }
 \arguments{
 \item{x}{Data.}
 
-\item{bin_z_g}{Binary version of assignment probability vector for component
+\item{z_g}{Binary version of assignment probability vector for component
 g.}
 
 \item{mu_g}{Mean vector for component g.}
@@ -28,5 +28,5 @@ List of
 }
 }
 \description{
-distrib_diff_mahalanobis
+count_extremes_g
 }

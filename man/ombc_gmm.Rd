@@ -14,6 +14,7 @@ ombc_gmm(
   nmax = 1000,
   atol = 1e-08,
   init_z = NULL,
+  init_model = NULL,
   init_method = c("hc", "kmpp"),
   kmpp_seed = 123,
   print_interval = Inf
@@ -37,6 +38,8 @@ ombc_gmm(
 \item{atol}{EM convergence tolerance threshold for mixture::gpcm.}
 
 \item{init_z}{Initial z matrix.}
+
+\item{init_model}{mixture::gpcm best_model}
 
 \item{init_method}{Method used to initialise each mixture model.}
 
@@ -64,12 +67,12 @@ Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
 }
 \examples{
 
-ombc_z_gmm_k3n1000o10 <- ombc_z_gmm(
+ombc_gmm_k3n1000o10 <- ombc_gmm(
   gmm_k3n1000o10[, 1:2],
   comp_num = 3, max_out = 20
 )
 
-ombc_z_gmm_k3n1000o10$plot_tail_curve
-ombc_z_gmm_k3n1000o10$plot_full_curve
+ombc_gmm_k3n1000o10$plot_tail_curve
+ombc_gmm_k3n1000o10$plot_full_curve
 
 }

@@ -111,18 +111,11 @@ distrib_diff_mahalanobis <- function(
 #' distrib_diff_gmm
 #'
 #' @inheritParams ombc_gmm
-#' @param bin_z Binary version of component assignment probability matrix.
-#' @param prop Vector of component proportions.
-#' @param mu List of component mean vectors.
-#' @param sigma List of component covariance matrices.
-#' @param logdet Vector of log-determinants for covariance matrices.
-#' @param dens .
+#' @param best_model mixture::gpcm best_model
 #'
-#' @return List of
-#' * distrib_diff
-#' * distrib_diff_vec
-#' * choice_id
-#' * removal_dens
+#' @return outlier_bool
+#'
+#' @export
 count_extremes <- function(
     x, best_model) {
   estep <- mixture::e_step(x, best_model)
@@ -176,10 +169,10 @@ count_extremes <- function(
 
 # ==============================================================================
 
-#' distrib_diff_mahalanobis
+#' count_extremes_g
 #'
 #' @inheritParams distrib_diff_gmm
-#' @param bin_z_g Binary version of assignment probability vector for component
+#' @param z_g Binary version of assignment probability vector for component
 #'                g.
 #' @param mu_g Mean vector for component g.
 #' @param sigma_g Covariance matrix for component g.

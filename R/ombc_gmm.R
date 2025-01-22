@@ -12,6 +12,7 @@
 #' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param atol EM convergence tolerance threshold for mixture::gpcm.
 #' @param init_z Initial z matrix.
+#' @param init_model mixture::gpcm best_model
 #' @param init_method Method used to initialise each mixture model.
 #' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
 #'                  hierarchical clustering.

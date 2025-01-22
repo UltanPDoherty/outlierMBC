@@ -4,31 +4,15 @@
 \alias{count_extremes}
 \title{distrib_diff_gmm}
 \usage{
-count_extremes(x, bin_z, prop, mu, sigma, logdet, dens)
+count_extremes(x, best_model)
 }
 \arguments{
 \item{x}{Data.}
 
-\item{bin_z}{Binary version of component assignment probability matrix.}
-
-\item{prop}{Vector of component proportions.}
-
-\item{mu}{List of component mean vectors.}
-
-\item{sigma}{List of component covariance matrices.}
-
-\item{logdet}{Vector of log-determinants for covariance matrices.}
-
-\item{dens}{.}
+\item{best_model}{mixture::gpcm best_model}
 }
 \value{
-List of
-\itemize{
-\item distrib_diff
-\item distrib_diff_vec
-\item choice_id
-\item removal_dens
-}
+outlier_bool
 }
 \description{
 distrib_diff_gmm
