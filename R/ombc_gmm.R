@@ -7,7 +7,7 @@
 #' @param comp_num Number of components.
 #' @param max_out Maximum number of outliers.
 #' @param gross_outs Logical vector identifying gross outliers.
-#' @param resets Vector of iteration numbers at which to reinitialise.
+#' @param init_scheme Which initialisation scheme to use.
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param atol EM convergence tolerance threshold for mixture::gpcm.
@@ -45,7 +45,7 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = rep(FALSE, nrow(x)),
-    resets = c(),
+    init_scheme = c("reset", "update", "reuse"),
     mnames = "VVV",
     nmax = 1000,
     atol = 1e-8,
@@ -55,6 +55,7 @@ ombc_gmm <- function(
     kmpp_seed = 123,
     print_interval = Inf) {
   init_method <- match.arg(init_method)
+  init_scheme <- match.arg(init_scheme)
 
   this_call <- call(
     "ombc_gmm",
@@ -113,13 +114,12 @@ ombc_gmm <- function(
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
     mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
-    z <- mix$z
 
     loglike[i] <- mix$best_model$loglik
 
     dd <- distrib_diff_gmm(
       x,
-      z,
+      mix$z,
       mix$best_model$model_obj[[1]]$pi_gs,
       mix$best_model$model_obj[[1]]$mu,
       mix$best_model$model_obj[[1]]$sigs,
@@ -137,21 +137,23 @@ ombc_gmm <- function(
 
     if (dd$distrib_diff_vec[1] < dd_min) {
       dd_min <- dd$distrib_diff_vec[1]
-      best_z[[1]] <- z
+      best_z[[1]] <- mix$z
     }
     if (!tail_accepted && dd$distrib_diff_vec[2] < accept_num) {
       tail_accepted <- TRUE
-      best_z[[2]] <- z
+      best_z[[2]] <- mix$z
     } else if (tail_accepted && dd$distrib_diff_vec[2] > reject_num) {
       tail_accepted <- FALSE
       best_z[[2]] <- NULL
     }
 
-    if ((i + 1) %in% resets) {
+    if (init_scheme == "reset") {
       z <- get_init_z(
         comp_num = comp_num, dist_mat = dist_mat, x = x,
         init_method = init_method, kmpp_seed = kmpp_seed
       )
+    } else if (init_scheme == "update") {
+      z <- mix$z[-dd$choice_id, , drop = FALSE]
     } else {
       z <- z[-dd$choice_id, , drop = FALSE]
     }
@@ -215,7 +217,7 @@ ombc_gmm <- function(
     distrib_diff_arr = distrib_diff_arr,
     call = this_call,
     version = ombc_version,
-    quick_tail
+    quick_tail = quick_tail
   ))
 }
 

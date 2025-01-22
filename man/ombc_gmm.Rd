@@ -9,7 +9,7 @@ ombc_gmm(
   comp_num,
   max_out,
   gross_outs = rep(FALSE, nrow(x)),
-  resets = c(),
+  init_scheme = c("reset", "update", "reuse"),
   mnames = "VVV",
   nmax = 1000,
   atol = 1e-08,
@@ -29,7 +29,7 @@ ombc_gmm(
 
 \item{gross_outs}{Logical vector identifying gross outliers.}
 
-\item{resets}{Vector of iteration numbers at which to reinitialise.}
+\item{init_scheme}{Which initialisation scheme to use.}
 
 \item{mnames}{Model names for mixture::gpcm.}
 
