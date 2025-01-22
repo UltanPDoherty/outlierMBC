@@ -118,7 +118,7 @@ distrib_diff_mahalanobis <- function(
 #' @export
 count_extremes <- function(
     x, best_model) {
-  estep <- mixture::e_step(x, best_model)
+  estep <- mixture::e_step(as.matrix(x), best_model)
   z <- estep$z
 
   prop <- best_model$model_obj[[1]]$pi_gs
