@@ -20,15 +20,12 @@ distrib_diff_gmm <- function(
   comp_num <- ncol(z)
   track_num <- 2
 
-  bin_z <- apply(z, 1, which.max)
-
   distrib_diff_mat <- matrix(nrow = comp_num, ncol = track_num)
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
   mahala_mat <- matrix(nrow = obs_num, ncol = comp_num)
   for (g in seq_len(comp_num)) {
-    bin_z_g <- bin_z == g
     dd_g <- distrib_diff_mahalanobis(
-      x, z[, g], mu[[g]], sigma[[g]], logdet[g], tail_prop, bin_z_g
+      x, z[, g], mu[[g]], sigma[[g]], logdet[g], tail_prop
     )
     distrib_diff_mat[g, ] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
@@ -72,8 +69,7 @@ distrib_diff_mahalanobis <- function(
     mu_g,
     sigma_g,
     logdet_g,
-    tail_prop,
-    bin_z_g) {
+    tail_prop) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
   stopifnot("A cluster has become too small (< 4 points).\n" = n_g > 3)
