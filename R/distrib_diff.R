@@ -58,7 +58,6 @@ distrib_diff_gmm <- function(
 #' @param mu_g Mean vector for component g.
 #' @param sigma_g Covariance matrix for component g.
 #' @param logdet_g Log-determinants of covariance matrix for component g.
-#' @param bin_z_g .
 #'
 #' @return List of
 #' * diff
@@ -125,29 +124,44 @@ distrib_diff_mahalanobis <- function(
 #' * choice_id
 #' * removal_dens
 count_extremes <- function(
-    x, bin_z, prop, mu, sigma, logdet, dens) {
+    x, best_model) {
+  estep <- mixture::e_step(x, best_model)
+  z <- estep$z
+
+  prop <- best_model$model_obj[[1]]$pi_gs
+  mu <- best_model$model_obj[[1]]$mus
+  sigma <- best_model$model_obj[[1]]$sigs
+  logdet <- best_model$model_obj[[1]]$log_dets
+
   obs_num <- nrow(x)
-  comp_num <- ncol(bin_z)
+  comp_num <- best_model$G
 
   outlier_bool <- rep(FALSE, obs_num)
   outlier_num <- 0
 
-  sort_dens <- sort(dens)
-
   extreme_count <- Inf
-  while (extreme_count > 1) {
+  while (extreme_count > 2) {
+    dens_mat <- matrix(nrow = obs_num - outlier_num, ncol = comp_num)
     extreme_counts <- c()
 
     for (g in seq_len(comp_num)) {
-      extreme_counts[g] <- count_extremes_g(
-        x[!outlier_bool, ], bin_z[!outlier_bool, g],
-        mu[[g]], sigma[[g]], logdet[g],
+      out_g <- count_extremes_g(
+        x[!outlier_bool, ],
+        z[!outlier_bool, g],
+        mu[[g]],
+        sigma[[g]],
+        logdet[g],
         1 / (obs_num - outlier_num)
       )
+
+      extreme_counts[g] <- out_g$count
+      dens_mat[, g] <- out_g$dens
     }
     extreme_count <- sum(extreme_counts)
+    dens <- dens_mat %*% t(prop)
+    sort_dens <- sort(dens)
 
-    temp_outlier_bool <- dens < sort_dens[extreme_count]
+    temp_outlier_bool <- dens < sort_dens[round(extreme_count)]
     temp_outlier_num <- sum(temp_outlier_bool)
 
     outlier_bool[!outlier_bool][temp_outlier_bool] <- TRUE
@@ -176,27 +190,28 @@ count_extremes <- function(
 #' * dens
 count_extremes_g <- function(
     x,
-    bin_z_g,
+    z_g,
     mu_g,
     sigma_g,
     logdet_g,
     tail_prop) {
-  bin_z_g <- as.logical(bin_z_g)
-
   var_num <- ncol(x)
-  n_g <- sum(bin_z_g)
+  n_g <- sum(z_g)
+
   stopifnot("A cluster has become too small (< 4 points).\n" = n_g > 3)
+
+  mahalas_g <- stats::mahalanobis(x, mu_g, (n_g / (n_g - 1)) * sigma_g)
+  scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
 
   param1 <- var_num / 2
   param2 <- (n_g - var_num - 1) / 2
-
-  mahalas_g <- stats::mahalanobis(
-    x[bin_z_g, ], mu_g, (n_g / (n_g - 1)) * sigma_g
-  )
-  scaled_mahalas_g <- ((n_g) / (n_g - 1)^2) * mahalas_g
-
   tail_quant <- stats::qbeta(1 - tail_prop, param1, param2)
-  extreme_count_g <- sum(scaled_mahalas_g > tail_quant)
 
-  return(extreme_count_g)
+  extreme_count_g <- sum(z_g[scaled_mahalas_g > tail_quant])
+
+  dens_g_x <- exp(
+    -0.5 * (var_num * log(2 * pi) + logdet_g + mahalas_g)
+  )
+
+  return(list(count = extreme_count_g, dens = dens_g_x))
 }

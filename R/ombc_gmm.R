@@ -198,6 +198,8 @@ ombc_gmm <- function(
   labels <- as.data.frame(labels)
   outlier_bool <- as.data.frame(outlier_bool)
 
+  quick_tail <- count_extremes(x0[!gross_outs, ], mix$full$best_model)
+
   return(list(
     labels = labels,
     outlier_bool = outlier_bool,
@@ -210,7 +212,8 @@ ombc_gmm <- function(
     distrib_diff_mat = distrib_diff_mat,
     distrib_diff_arr = distrib_diff_arr,
     call = this_call,
-    version = ombc_version
+    version = ombc_version,
+    quick_tail
   ))
 }
 
