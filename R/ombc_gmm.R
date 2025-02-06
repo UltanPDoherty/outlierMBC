@@ -45,7 +45,7 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = rep(FALSE, nrow(x)),
-    init_scheme = c("reset", "update", "reuse"),
+    init_scheme = c("choice", "reinit", "update", "reuse"),
     mnames = "VVV",
     nmax = 1000,
     atol = 1e-8,
@@ -105,6 +105,7 @@ ombc_gmm <- function(
   best_z <- list()
   tail_accepted <- FALSE
 
+  z_choice <- c()
   loglike <- c()
   removal_dens <- c()
   distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
@@ -113,7 +114,31 @@ ombc_gmm <- function(
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
-    mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
+    if (init_scheme %in% c("update", "reuse")) {
+      mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
+    } else if (init_scheme == "reinit") {
+      reinit_z <- get_init_z(
+        comp_num = comp_num, dist_mat = dist_mat, x = x,
+        init_method = init_method, kmpp_seed = kmpp_seed
+      )
+      mix <- try_mixture_gpcm(x, comp_num, mnames, reinit_z, nmax, atol)
+    } else {
+      update_mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
+
+      reinit_z <- get_init_z(
+        comp_num = comp_num, dist_mat = dist_mat, x = x,
+        init_method = init_method, kmpp_seed = kmpp_seed
+      )
+      reinit_mix <- try_mixture_gpcm(x, comp_num, mnames, reinit_z, nmax, atol)
+
+      if (reinit_mix$best_model$loglik > update_mix$best_model$loglik) {
+        mix <- reinit_mix
+        z_choice[i] <- "reinit"
+      } else {
+        mix <- update_mix
+        z_choice[i] <- "update"
+      }
+    }
 
     loglike[i] <- mix$best_model$loglik
 
@@ -147,14 +172,9 @@ ombc_gmm <- function(
       best_z[[2]] <- NULL
     }
 
-    if (init_scheme == "reset") {
-      z <- get_init_z(
-        comp_num = comp_num, dist_mat = dist_mat, x = x,
-        init_method = init_method, kmpp_seed = kmpp_seed
-      )
-    } else if (init_scheme == "update") {
+    if (init_scheme %in% c("update", "choice")) {
       z <- mix$z[-dd$choice_id, , drop = FALSE]
-    } else {
+    } else if (init_scheme == "reuse") {
       z <- z[-dd$choice_id, , drop = FALSE]
     }
   }
@@ -217,7 +237,8 @@ ombc_gmm <- function(
     distrib_diff_arr = distrib_diff_arr,
     call = this_call,
     version = ombc_version,
-    quick_tail = quick_tail
+    quick_tail = quick_tail,
+    z_choice = z_choice
   ))
 }
 
