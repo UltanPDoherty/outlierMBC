@@ -106,6 +106,7 @@ ombc_gmm <- function(
   tail_accepted <- FALSE
 
   z_choice <- c()
+  conv_status <- c()
   loglike <- c()
   removal_dens <- c()
   distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
@@ -141,6 +142,7 @@ ombc_gmm <- function(
     }
 
     loglike[i] <- mix$best_model$loglik
+    conv_status[i] <- mix$best_model$status
 
     dd <- distrib_diff_gmm(
       x,
@@ -238,7 +240,8 @@ ombc_gmm <- function(
     call = this_call,
     version = ombc_version,
     quick_tail = quick_tail,
-    z_choice = z_choice
+    z_choice = z_choice,
+    conv_status = conv_status
   ))
 }
 
