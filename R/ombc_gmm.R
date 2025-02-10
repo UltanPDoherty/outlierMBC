@@ -45,7 +45,7 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = rep(FALSE, nrow(x)),
-    init_scheme = c("choice", "reinit", "update", "reuse"),
+    init_scheme = c("backup", "reinit", "update", "reuse"),
     mnames = "VVV",
     nmax = 1000,
     atol = 1e-8,
@@ -105,8 +105,9 @@ ombc_gmm <- function(
   best_z <- list()
   tail_accepted <- FALSE
 
-  z_choice <- c()
+  z_backup <- c()
   conv_status <- c()
+  last_ll <- -Inf
   loglike <- c()
   removal_dens <- c()
   distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
@@ -124,24 +125,22 @@ ombc_gmm <- function(
       )
       mix <- try_mixture_gpcm(x, comp_num, mnames, reinit_z, nmax, atol)
     } else {
-      update_mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
-
       reinit_z <- get_init_z(
         comp_num = comp_num, dist_mat = dist_mat, x = x,
         init_method = init_method, kmpp_seed = kmpp_seed
       )
-      reinit_mix <- try_mixture_gpcm(x, comp_num, mnames, reinit_z, nmax, atol)
+      mix <- try_mixture_gpcm(x, comp_num, mnames, reinit_z, nmax, atol)
 
-      if (reinit_mix$best_model$loglik > update_mix$best_model$loglik) {
-        mix <- reinit_mix
-        z_choice[i] <- "reinit"
+      if (mix$best_model$loglik < last_ll) {
+        mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
+        z_backup[i] <- TRUE
       } else {
-        mix <- update_mix
-        z_choice[i] <- "update"
+        z_backup[i] <- FALSE
       }
     }
 
     loglike[i] <- mix$best_model$loglik
+    last_ll <- loglike[i]
     conv_status[i] <- mix$best_model$status
 
     dd <- distrib_diff_gmm(
@@ -174,7 +173,7 @@ ombc_gmm <- function(
       best_z[[2]] <- NULL
     }
 
-    if (init_scheme %in% c("update", "choice")) {
+    if (init_scheme %in% c("update", "backup")) {
       z <- mix$z[-dd$choice_id, , drop = FALSE]
     } else if (init_scheme == "reuse") {
       z <- z[-dd$choice_id, , drop = FALSE]
@@ -240,7 +239,7 @@ ombc_gmm <- function(
     call = this_call,
     version = ombc_version,
     quick_tail = quick_tail,
-    z_choice = z_choice,
+    z_backup = z_backup,
     conv_status = conv_status
   ))
 }

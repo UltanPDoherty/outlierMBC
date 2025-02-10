@@ -9,7 +9,7 @@ ombc_gmm(
   comp_num,
   max_out,
   gross_outs = rep(FALSE, nrow(x)),
-  init_scheme = c("choice", "reinit", "update", "reuse"),
+  init_scheme = c("backup", "reinit", "update", "reuse"),
   mnames = "VVV",
   nmax = 1000,
   atol = 1e-08,
