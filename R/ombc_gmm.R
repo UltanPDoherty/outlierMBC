@@ -16,7 +16,8 @@
 #' @param init_method Method used to initialise each mixture model.
 #' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
 #'                  hierarchical clustering.
-#' @param retreat_alpha Decimal passed to `retreat` function.
+#' @param retreat_max_value Decimal passed to `retreat` function.
+#' @param retreat_max_step Decimal passed to `retreat` function.
 #' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return List of
@@ -54,7 +55,8 @@ ombc_gmm <- function(
     init_model = NULL,
     init_method = c("hc", "kmpp"),
     kmpp_seed = 123,
-    retreat_alpha = 0.01,
+    retreat_max_value = 0.1,
+    retreat_max_step = 0.01,
     print_interval = Inf) {
   init_method <- match.arg(init_method)
   init_scheme <- match.arg(init_scheme)
@@ -65,7 +67,8 @@ ombc_gmm <- function(
     "gross_outs" = substitute(gross_outs), "resets" = substitute(resets),
     "mnames" = mnames, "nmax" = nmax,
     "atol" = atol, "init_method" = init_method, "kmpp_seed" = kmpp_seed,
-    "retreat_alpha" = retreat_alpha,
+    "retreat_max_value" = retreat_max_value,
+    "retreat_max_step" = retreat_max_step,
     "print_interval" = print_interval
   )
 
@@ -185,7 +188,8 @@ ombc_gmm <- function(
   outlier_num <- outlier_num - 1 + gross_num
 
   if (init_scheme != "update") {
-    retreat_out <- retreat(distrib_diff_mat[, 1], retreat_alpha)
+    retreat_out <-
+      retreat(distrib_diff_mat[, 1], retreat_max_value, retreat_max_step)
     outlier_num[3] <- retreat_out$retreat$ind - 1 + gross_num
     track_num <- track_num + 1
 
@@ -245,7 +249,8 @@ ombc_gmm <- function(
     call = this_call,
     version = ombc_version,
     quick_tail = quick_tail,
-    conv_status = conv_status
+    conv_status = conv_status,
+    retreat_vals = c(retreat_max_value, retreat_max_step)
   ))
 }
 
@@ -323,18 +328,19 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
 
 # ------------------------------------------------------------------------------
 
-retreat <- function(x, alpha = 0.01) {
+retreat <- function(x, max_value = 0.1, max_step = 0.01) {
   xmin_val <- min(x)
   xmin_ind <- which.min(x)
 
-  within_alpha <- x < dplyr::lead(x) + alpha * xmin_val
+  valid_step <- x < dplyr::lead(x) + max_step * xmin_val
+  valid_value <- x < (1 + max_value) * xmin_val
 
   y <- xmin_ind
 
   keep_going <- TRUE
 
   while (keep_going && y > 1) {
-    if (within_alpha[y - 1]) {
+    if (valid_value[y - 1] && valid_step[y - 1]) {
       y <- y - 1
       keep_going <- TRUE
     } else {
