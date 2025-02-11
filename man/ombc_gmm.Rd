@@ -17,6 +17,7 @@ ombc_gmm(
   init_model = NULL,
   init_method = c("hc", "kmpp"),
   kmpp_seed = 123,
+  retreat_alpha = 0.01,
   print_interval = Inf
 )
 }
@@ -45,6 +46,8 @@ ombc_gmm(
 
 \item{kmpp_seed}{Optional seed for k-means++ initialisation. Default is
 hierarchical clustering.}
+
+\item{retreat_alpha}{Decimal passed to \code{retreat} function.}
 
 \item{print_interval}{How frequently the iteration count is printed.}
 }
