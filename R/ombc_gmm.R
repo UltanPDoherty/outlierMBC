@@ -93,8 +93,7 @@ ombc_gmm <- function(
   } else if (!is.null(init_z)) {
     z <- init_z
   } else if (!is.null(init_model)) {
-    z0 <- mixture::e_step(x, init_model)$z
-    z <- z0
+    z <- mixture::e_step(x, init_model)$z
   } else {
     z <- get_init_z(
       comp_num = comp_num, dist_mat = dist_mat, x = x,
@@ -193,7 +192,7 @@ ombc_gmm <- function(
     retreat_bool <- outlier_rank <= outlier_num[3] & outlier_rank != 0
 
     if (init_scheme == "reuse") {
-      best_z[[3]] <- z0[!retreat_bool, ]
+      best_z[[3]] <- mixture::e_step(x0[!retreat_bool, ], init_model)$z
     } else if (init_scheme == "reinit") {
       best_z[[3]] <- get_init_z(
         comp_num = comp_num,
