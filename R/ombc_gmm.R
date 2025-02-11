@@ -183,9 +183,11 @@ ombc_gmm <- function(
   accept_bools <- distrib_diff_mat[, 2] < accept_num
   outlier_num[2] <- which.max(accept_bools & after_final_reject)
 
+  outlier_num <- outlier_num - 1 + gross_num
+
   if (init_scheme != "update") {
-    retreat_out <- retreat(distrib_diff_mat[, 2], retreat_alpha)
-    outlier_num[3] <- retreat_out$retreat$ind
+    retreat_out <- retreat(distrib_diff_mat[, 1], retreat_alpha)
+    outlier_num[3] <- retreat_out$retreat$ind - 1 + gross_num
     track_num <- track_num + 1
 
     retreat_bool <- outlier_rank <= outlier_num[3] & outlier_rank != 0
@@ -201,8 +203,6 @@ ombc_gmm <- function(
       )
     }
   }
-
-  outlier_num <- outlier_num - 1 + gross_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
   mix <- list()

@@ -141,7 +141,7 @@ plot_retreat_curve <- function(ombc_out) {
   retreat_curve_df <- data.frame(
     "outlier_seq" = outlier_seq,
     "minimum" = as.integer(outlier_num["retreat"]),
-    "retreat" = distrib_diff_mat[, "retreat"]
+    "retreat" = distrib_diff_mat[, "full"]
   )
   retreat_curve <- retreat_curve_df |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = retreat)) +
