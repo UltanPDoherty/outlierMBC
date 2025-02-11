@@ -16,6 +16,7 @@
 #' @param init_method Method used to initialise each mixture model.
 #' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
 #'                  hierarchical clustering.
+#' @param retreat_alpha Decimal passed to `retreat` function.
 #' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return List of
@@ -45,7 +46,7 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = rep(FALSE, nrow(x)),
-    init_scheme = c("backup", "reinit", "update", "reuse"),
+    init_scheme = c("reinit", "update", "reuse"),
     mnames = "VVV",
     nmax = 1000,
     atol = 1e-8,
@@ -53,6 +54,7 @@ ombc_gmm <- function(
     init_model = NULL,
     init_method = c("hc", "kmpp"),
     kmpp_seed = 123,
+    retreat_alpha = 0.01,
     print_interval = Inf) {
   init_method <- match.arg(init_method)
   init_scheme <- match.arg(init_scheme)
@@ -63,6 +65,7 @@ ombc_gmm <- function(
     "gross_outs" = substitute(gross_outs), "resets" = substitute(resets),
     "mnames" = mnames, "nmax" = nmax,
     "atol" = atol, "init_method" = init_method, "kmpp_seed" = kmpp_seed,
+    "retreat_alpha" = retreat_alpha,
     "print_interval" = print_interval
   )
 
@@ -90,7 +93,8 @@ ombc_gmm <- function(
   } else if (!is.null(init_z)) {
     z <- init_z
   } else if (!is.null(init_model)) {
-    z <- mixture::e_step(x, init_model)$z
+    z0 <- mixture::e_step(x, init_model)$z
+    z <- z0
   } else {
     z <- get_init_z(
       comp_num = comp_num, dist_mat = dist_mat, x = x,
@@ -105,9 +109,7 @@ ombc_gmm <- function(
   best_z <- list()
   tail_accepted <- FALSE
 
-  z_backup <- c()
   conv_status <- c()
-  last_ll <- -Inf
   loglike <- c()
   removal_dens <- c()
   distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
@@ -118,29 +120,15 @@ ombc_gmm <- function(
 
     if (init_scheme %in% c("update", "reuse")) {
       mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
-    } else if (init_scheme == "reinit") {
-      reinit_z <- get_init_z(
-        comp_num = comp_num, dist_mat = dist_mat, x = x,
-        init_method = init_method, kmpp_seed = kmpp_seed
-      )
-      mix <- try_mixture_gpcm(x, comp_num, mnames, reinit_z, nmax, atol)
     } else {
       reinit_z <- get_init_z(
         comp_num = comp_num, dist_mat = dist_mat, x = x,
         init_method = init_method, kmpp_seed = kmpp_seed
       )
       mix <- try_mixture_gpcm(x, comp_num, mnames, reinit_z, nmax, atol)
-
-      if (mix$best_model$loglik < last_ll) {
-        mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
-        z_backup[i] <- TRUE
-      } else {
-        z_backup[i] <- FALSE
-      }
     }
 
     loglike[i] <- mix$best_model$loglik
-    last_ll <- loglike[i]
     conv_status[i] <- mix$best_model$status
 
     dd <- distrib_diff_gmm(
@@ -173,7 +161,7 @@ ombc_gmm <- function(
       best_z[[2]] <- NULL
     }
 
-    if (init_scheme %in% c("update", "backup")) {
+    if (init_scheme %in% c("update")) {
       z <- mix$z[-dd$choice_id, , drop = FALSE]
     } else if (init_scheme == "reuse") {
       z <- z[-dd$choice_id, , drop = FALSE]
@@ -195,6 +183,25 @@ ombc_gmm <- function(
   accept_bools <- distrib_diff_mat[, 2] < accept_num
   outlier_num[2] <- which.max(accept_bools & after_final_reject)
 
+  if (init_scheme != "update") {
+    retreat_out <- retreat(distrib_diff_mat[, 2], retreat_alpha)
+    outlier_num[3] <- retreat_out$retreat$ind
+    track_num <- track_num + 1
+
+    retreat_bool <- outlier_rank <= outlier_num[3] & outlier_rank != 0
+
+    if (init_scheme == "reuse") {
+      best_z[[3]] <- z0[!retreat_bool, ]
+    } else if (init_scheme == "reinit") {
+      best_z[[3]] <- get_init_z(
+        comp_num = comp_num,
+        dist_mat = dist_mat0[!retreat_bool, !retreat_bool],
+        x = x0[!retreat_bool, ],
+        init_method = init_method, kmpp_seed = kmpp_seed
+      )
+    }
+  }
+
   outlier_num <- outlier_num - 1 + gross_num
 
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
@@ -212,13 +219,13 @@ ombc_gmm <- function(
 
   ombc_names <- c("full", "tail")
   colnames(distrib_diff_mat) <- ombc_names
-  colnames(outlier_bool) <- ombc_names
-  colnames(labels) <- ombc_names
-  names(outlier_num) <- ombc_names
+  colnames(outlier_bool) <- c(ombc_names, "retreat")
+  colnames(labels) <- c(ombc_names, "retreat")
+  names(outlier_num) <- c(ombc_names, "retreat")
   dimnames(distrib_diff_arr) <- list(
     paste0("k", seq_len(comp_num)), NULL, ombc_names
   )
-  names(mix) <- ombc_names
+  names(mix) <- c(ombc_names, "retreat")
 
   labels <- as.data.frame(labels)
   outlier_bool <- as.data.frame(outlier_bool)
@@ -239,7 +246,6 @@ ombc_gmm <- function(
     call = this_call,
     version = ombc_version,
     quick_tail = quick_tail,
-    z_backup = z_backup,
     conv_status = conv_status
   ))
 }
@@ -314,4 +320,31 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
   }
 
   return(mix)
+}
+
+# ------------------------------------------------------------------------------
+
+retreat <- function(x, alpha = 0.01) {
+  xmin_val <- min(x)
+  xmin_ind <- which.min(x)
+
+  within_alpha <- x < dplyr::lead(x) + alpha * xmin_val
+
+  y <- xmin_ind
+
+  keep_going <- TRUE
+
+  while (keep_going && y > 1) {
+    if (within_alpha[y - 1]) {
+      y <- y - 1
+      keep_going <- TRUE
+    } else {
+      keep_going <- FALSE
+    }
+  }
+
+  minimum <- list("ind" = xmin_ind, "val" = xmin_val)
+  retreat <- list("ind" = y, "val" = x[y])
+
+  return(list("minimum" = minimum, "retreat" = retreat))
 }
