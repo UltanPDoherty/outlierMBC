@@ -4,7 +4,14 @@
 \alias{backtrack_gmm}
 \title{Title}
 \usage{
-backtrack_gmm(x, ombc_out, max_value = 0.1, max_step = 0.01)
+backtrack_gmm(
+  x,
+  ombc_out,
+  max_value = 0.1,
+  max_step = 0.01,
+  init_model = NULL,
+  init_z = NULL
+)
 }
 \arguments{
 \item{x}{Data.}
@@ -14,6 +21,10 @@ backtrack_gmm(x, ombc_out, max_value = 0.1, max_step = 0.01)
 \item{max_value}{Value cannot exceed minimum * (1 + max_value).}
 
 \item{max_step}{Each step must be less than minimum * (1 + max_step).}
+
+\item{init_model}{mixture::gpcm best_model}
+
+\item{init_z}{Initial z matrix.}
 }
 \value{
 List:

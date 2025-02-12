@@ -69,34 +69,61 @@ backtrack <- function(x, max_value = 0.1, max_step = 0.01) {
 #' )
 #'
 #' backtrack_gmm(gmm_k3n1000o10[, 1:2], ombc_gmm_k3n1000o10, 0.1, 0.01)
-backtrack_gmm <- function(x, ombc_out, max_value = 0.1, max_step = 0.01) {
+backtrack_gmm <- function(
+    x, ombc_out,
+    max_value = 0.1, max_step = 0.01, init_model = NULL, init_z = NULL) {
   backtrack_out <-
     backtrack(ombc_out$distrib_diff_mat[, "full"], max_value, max_step)
+
+  x0 <- as.matrix(x)
 
   outlier_num <- backtrack_out$backtrack$ind - 1 + sum(ombc_out$gross_outs)
 
   outlier_bool <-
     ombc_out$outlier_rank <= outlier_num & ombc_out$outlier_rank != 0
 
-  if (ombc_out$call$init_scheme == "reuse") {
-    best_z <-
-      mixture::e_step(x[!outlier_bool, ], ombc_out$call$init_model)$z
-  } else if (ombc_out$call$init_scheme == "reinit") {
-    dist_mat <- as.matrix(stats::dist(x))
+  init_scheme <- ombc_out$call$init_scheme
 
-    best_z <- get_init_z(
-      comp_num = ombc_out$call$comp_num,
-      dist_mat = dist_mat[!outlier_bool, !outlier_bool],
-      x = x[!outlier_bool, ],
-      init_method = ombc_out$call$init_method,
-      kmpp_seed = ombc_out$call$kmpp_seed
-    )
+  stopifnot(
+    "'update' scheme cannot be used with backtrack" = init_scheme != "update"
+  )
+
+  if (init_scheme == "update") {
+    stop("backtrack_gmm is not compatible with the 'update' init_scheme.")
+  } else if (init_scheme == "reinit") {
+    if (!is.null(init_model) && !is.null(init_z)) {
+      stop("init_model & init_z cannot be used with the 'reinit' init_scheme.")
+    } else if (!is.null(init_z)) {
+      stop("init_z cannot be used with the 'reinit' init_scheme.")
+    } else if (!is.null(init_model)) {
+      stop("init_model cannot be used with the 'reinit' init_scheme.")
+    } else {
+      z <- get_init_z(
+        comp_num = ombc_out$call$comp_num,
+        dist_mat = as.matrix(stats::dist(x0[!outlier_bool, ])),
+        x = x0[!outlier_bool, ],
+        init_method = ombc_out$call$init_method,
+        kmpp_seed = ombc_out$call$kmpp_seed
+      )
+    }
+  } else if (init_scheme == "reuse") {
+    if (!is.null(init_model) && !is.null(init_z)) {
+      stop("Only one of init_model and init_z may be provided.")
+    } else if (!is.null(init_z)) {
+      z <- init_z
+    } else if (!is.null(init_model)) {
+      z <- mixture::e_step(x0[!outlier_bool, ], init_model)$z
+    } else {
+      stop("init_model or init_z are required to use the 'reuse' init_scheme.")
+    }
+  } else {
+    stop("init_scheme must be either 'reinit' or 'reuse'.")
   }
 
   mix <- try_mixture_gpcm(
-    as.matrix(x[!outlier_bool, ]),
+    x0[!outlier_bool, ],
     ombc_out$call$comp_num, ombc_out$call$mnames,
-    best_z,
+    z,
     ombc_out$call$nmax,
     ombc_out$call$atol
   )

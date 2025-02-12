@@ -62,7 +62,8 @@ ombc_gmm <- function(
     "x" = substitute(x), "comp_num" = comp_num, "max_out" = max_out,
     "gross_outs" = substitute(gross_outs), "init_scheme" = init_scheme,
     "mnames" = mnames, "nmax" = nmax, "atol" = atol,
-    "init_z" = init_z, "init_model" = init_model, "init_method" = init_method,
+    "init_z" = substitute(init_z), "init_model" = substitute(init_model),
+    "init_method" = init_method,
     "kmpp_seed" = kmpp_seed, "print_interval" = print_interval
   )
 
