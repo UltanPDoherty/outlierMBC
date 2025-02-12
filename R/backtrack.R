@@ -145,15 +145,15 @@ backtrack_gmm <- function(
 #'
 #' @returns A gg object.
 #' @export
-plot_backtrack_curve <- function(ombc_out, max_value, max_step) {
+plot_backtrack_curve <- function(ombc_out, max_value = 0.1, max_step = 0.01) {
   gross_num <- sum(ombc_out$gross_outs)
   max_out <- max(ombc_out$outlier_rank) - 1
   outlier_num <- ombc_out$outlier_num
   distrib_diff_mat <- ombc_out$distrib_diff_mat
 
   backtrack_num <- backtrack(
-    ombc_out$distrib_diff[, "full"], max_value, max_step
-  )$backtrack$ind
+    ombc_out$distrib_diff_mat[, "full"], max_value, max_step
+  )$backtrack$ind + gross_num - 1
 
   outlier_seq <- seq(gross_num, max_out)
   point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
@@ -194,7 +194,7 @@ plot_backtrack_curve <- function(ombc_out, max_value, max_step) {
     ) +
     ggplot2::labs(
       title =
-        paste0("outlierMBC: Number of Outliers = ", outlier_num["backtrack"]),
+        paste0("outlierMBC: Number of Outliers = ", backtrack_num),
       subtitle = paste0("max_value = ", max_value, ", max_step = ", max_step),
       x = "Outlier Number",
       y = "Rescaled Mean Absolute CDF Difference",
