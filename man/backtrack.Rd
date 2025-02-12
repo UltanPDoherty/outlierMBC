@@ -2,7 +2,7 @@
 % Please edit documentation in R/backtrack.R
 \name{backtrack}
 \alias{backtrack}
-\title{Title}
+\title{Move backwards from the global minimum to a more conservative solution.}
 \usage{
 backtrack(x, max_value = 0.1, max_step = 0.01)
 }
@@ -23,7 +23,7 @@ $val
 }
 }
 \description{
-Title
+Move backwards from the global minimum to a more conservative solution.
 }
 \examples{
 

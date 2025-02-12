@@ -2,7 +2,7 @@
 % Please edit documentation in R/backtrack.R
 \name{backtrack_gmm}
 \alias{backtrack_gmm}
-\title{Title}
+\title{Fit a GMM to the backtrack solution.}
 \usage{
 backtrack_gmm(
   x,
@@ -36,7 +36,7 @@ List:
 }
 }
 \description{
-Title
+Fit a GMM to the backtrack solution.
 }
 \examples{
 

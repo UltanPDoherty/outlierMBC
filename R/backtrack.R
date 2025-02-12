@@ -1,4 +1,4 @@
-#' Title
+#' Move backwards from the global minimum to a more conservative solution.
 #'
 #' @inheritParams ombc_gmm
 #' @param max_value Value cannot exceed minimum * (1 + max_value).
@@ -47,7 +47,7 @@ backtrack <- function(x, max_value = 0.1, max_step = 0.01) {
 }
 
 
-#' Title
+#' Fit a GMM to the backtrack solution.
 #'
 #' @inheritParams ombc_gmm
 #' @inheritParams plot_full_curve
