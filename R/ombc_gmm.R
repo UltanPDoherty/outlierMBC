@@ -16,8 +16,8 @@
 #' @param init_method Method used to initialise each mixture model.
 #' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
 #'                  hierarchical clustering.
-#' @param retreat_max_value Decimal passed to `retreat` function.
-#' @param retreat_max_step Decimal passed to `retreat` function.
+#' @param backtrack_max_value Decimal passed to `backtrack` function.
+#' @param backtrack_max_step Decimal passed to `backtrack` function.
 #' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return List of
@@ -55,8 +55,8 @@ ombc_gmm <- function(
     init_model = NULL,
     init_method = c("hc", "kmpp"),
     kmpp_seed = 123,
-    retreat_max_value = 0.1,
-    retreat_max_step = 0.01,
+    backtrack_max_value = 0.1,
+    backtrack_max_step = 0.01,
     print_interval = Inf) {
   init_method <- match.arg(init_method)
   init_scheme <- match.arg(init_scheme)
@@ -67,8 +67,8 @@ ombc_gmm <- function(
     "gross_outs" = substitute(gross_outs), "resets" = substitute(resets),
     "mnames" = mnames, "nmax" = nmax,
     "atol" = atol, "init_method" = init_method, "kmpp_seed" = kmpp_seed,
-    "retreat_max_value" = retreat_max_value,
-    "retreat_max_step" = retreat_max_step,
+    "backtrack_max_value" = backtrack_max_value,
+    "backtrack_max_step" = backtrack_max_step,
     "print_interval" = print_interval
   )
 
@@ -188,20 +188,20 @@ ombc_gmm <- function(
   outlier_num <- outlier_num - 1 + gross_num
 
   if (init_scheme != "update") {
-    retreat_out <-
-      retreat(distrib_diff_mat[, 1], retreat_max_value, retreat_max_step)
-    outlier_num[3] <- retreat_out$retreat$ind - 1 + gross_num
+    backtrack_out <-
+      backtrack(distrib_diff_mat[, 1], backtrack_max_value, backtrack_max_step)
+    outlier_num[3] <- backtrack_out$backtrack$ind - 1 + gross_num
     track_num <- track_num + 1
 
-    retreat_bool <- outlier_rank <= outlier_num[3] & outlier_rank != 0
+    backtrack_bool <- outlier_rank <= outlier_num[3] & outlier_rank != 0
 
     if (init_scheme == "reuse") {
-      best_z[[3]] <- mixture::e_step(x0[!retreat_bool, ], init_model)$z
+      best_z[[3]] <- mixture::e_step(x0[!backtrack_bool, ], init_model)$z
     } else if (init_scheme == "reinit") {
       best_z[[3]] <- get_init_z(
         comp_num = comp_num,
-        dist_mat = dist_mat0[!retreat_bool, !retreat_bool],
-        x = x0[!retreat_bool, ],
+        dist_mat = dist_mat0[!backtrack_bool, !backtrack_bool],
+        x = x0[!backtrack_bool, ],
         init_method = init_method, kmpp_seed = kmpp_seed
       )
     }
@@ -222,13 +222,13 @@ ombc_gmm <- function(
 
   ombc_names <- c("full", "tail")
   colnames(distrib_diff_mat) <- ombc_names
-  colnames(outlier_bool) <- c(ombc_names, "retreat")
-  colnames(labels) <- c(ombc_names, "retreat")
-  names(outlier_num) <- c(ombc_names, "retreat")
+  colnames(outlier_bool) <- c(ombc_names, "backtrack")
+  colnames(labels) <- c(ombc_names, "backtrack")
+  names(outlier_num) <- c(ombc_names, "backtrack")
   dimnames(distrib_diff_arr) <- list(
     paste0("k", seq_len(comp_num)), NULL, ombc_names
   )
-  names(mix) <- c(ombc_names, "retreat")
+  names(mix) <- c(ombc_names, "backtrack")
 
   labels <- as.data.frame(labels)
   outlier_bool <- as.data.frame(outlier_bool)
@@ -250,7 +250,7 @@ ombc_gmm <- function(
     version = ombc_version,
     quick_tail = quick_tail,
     conv_status = conv_status,
-    retreat_vals = c(retreat_max_value, retreat_max_step)
+    backtrack_vals = c(backtrack_max_value, backtrack_max_step)
   ))
 }
 
@@ -324,32 +324,4 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
   }
 
   return(mix)
-}
-
-# ------------------------------------------------------------------------------
-
-retreat <- function(x, max_value = 0.1, max_step = 0.01) {
-  xmin_val <- min(x)
-  xmin_ind <- which.min(x)
-
-  valid_step <- x < dplyr::lead(x) + max_step * xmin_val
-  valid_value <- x < (1 + max_value) * xmin_val
-
-  y <- xmin_ind
-
-  keep_going <- TRUE
-
-  while (keep_going && y > 1) {
-    if (valid_value[y - 1] && valid_step[y - 1]) {
-      y <- y - 1
-      keep_going <- TRUE
-    } else {
-      keep_going <- FALSE
-    }
-  }
-
-  minimum <- list("ind" = xmin_ind, "val" = xmin_val)
-  retreat <- list("ind" = y, "val" = x[y])
-
-  return(list("minimum" = minimum, "retreat" = retreat))
 }
