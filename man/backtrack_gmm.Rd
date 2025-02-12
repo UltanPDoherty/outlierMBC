@@ -7,8 +7,8 @@
 backtrack_gmm(
   x,
   ombc_out,
-  max_value = 0.1,
-  max_step = 0.01,
+  max_total_rise = 0.1,
+  max_step_rise = 0.01,
   init_model = NULL,
   init_z = NULL
 )
@@ -18,9 +18,9 @@ backtrack_gmm(
 
 \item{ombc_out}{Output from ombc_gmm.}
 
-\item{max_value}{Value cannot exceed minimum * (1 + max_value).}
+\item{max_total_rise}{Value cannot exceed minimum * (1 + max_total_rise).}
 
-\item{max_step}{Each step must be less than minimum * (1 + max_step).}
+\item{max_step_rise}{Each step must be less than minimum * (1 + max_step_rise).}
 
 \item{init_model}{mixture::gpcm best_model}
 

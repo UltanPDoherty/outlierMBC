@@ -4,14 +4,14 @@
 \alias{backtrack}
 \title{Move backwards from the global minimum to a more conservative solution.}
 \usage{
-backtrack(x, max_value = 0.1, max_step = 0.01)
+backtrack(x, max_total_rise = 0.1, max_step_rise = 0.01)
 }
 \arguments{
 \item{x}{Data.}
 
-\item{max_value}{Value cannot exceed minimum * (1 + max_value).}
+\item{max_total_rise}{Value cannot exceed minimum * (1 + max_total_rise).}
 
-\item{max_step}{Each step must be less than minimum * (1 + max_step).}
+\item{max_step_rise}{Each step must be less than minimum * (1 + max_step_rise).}
 }
 \value{
 List of two lists:

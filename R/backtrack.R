@@ -1,8 +1,8 @@
 #' Move backwards from the global minimum to a more conservative solution.
 #'
 #' @inheritParams ombc_gmm
-#' @param max_value Value cannot exceed minimum * (1 + max_value).
-#' @param max_step Each step must be less than minimum * (1 + max_step).
+#' @param max_total_rise Value cannot exceed minimum * (1 + max_total_rise).
+#' @param max_step_rise Each step must be less than minimum * (1 + max_step_rise).
 #'
 #' @returns List of two lists:
 #' * minimum: $ind
@@ -20,12 +20,12 @@
 #'
 #' backtrack(ombc_gmm_k3n1000o10$distrib_diff_mat[, "full"])
 #'
-backtrack <- function(x, max_value = 0.1, max_step = 0.01) {
+backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.01) {
   xmin_val <- min(x)
   xmin_ind <- which.min(x)
 
-  valid_step <- x < dplyr::lead(x) + max_step * xmin_val
-  valid_value <- x < (1 + max_value) * xmin_val
+  valid_step <- x < dplyr::lead(x) + max_step_rise * xmin_val
+  valid_value <- x < (1 + max_total_rise) * xmin_val
 
   y <- xmin_ind
 
@@ -71,9 +71,9 @@ backtrack <- function(x, max_value = 0.1, max_step = 0.01) {
 #' backtrack_gmm(gmm_k3n1000o10[, 1:2], ombc_gmm_k3n1000o10, 0.1, 0.01)
 backtrack_gmm <- function(
     x, ombc_out,
-    max_value = 0.1, max_step = 0.01, init_model = NULL, init_z = NULL) {
+    max_total_rise = 0.1, max_step_rise = 0.01, init_model = NULL, init_z = NULL) {
   backtrack_out <-
-    backtrack(ombc_out$distrib_diff_mat[, "full"], max_value, max_step)
+    backtrack(ombc_out$distrib_diff_mat[, "full"], max_total_rise, max_step_rise)
 
   x0 <- as.matrix(x)
 
@@ -145,14 +145,14 @@ backtrack_gmm <- function(
 #'
 #' @returns A gg object.
 #' @export
-plot_backtrack_curve <- function(ombc_out, max_value = 0.1, max_step = 0.01) {
+plot_backtrack_curve <- function(ombc_out, max_total_rise = 0.1, max_step_rise = 0.01) {
   gross_num <- sum(ombc_out$gross_outs)
   max_out <- max(ombc_out$outlier_rank) - 1
   outlier_num <- ombc_out$outlier_num
   distrib_diff_mat <- ombc_out$distrib_diff_mat
 
   backtrack_num <- backtrack(
-    ombc_out$distrib_diff_mat[, "full"], max_value, max_step
+    ombc_out$distrib_diff_mat[, "full"], max_total_rise, max_step_rise
   )$backtrack$ind + gross_num - 1
 
   outlier_seq <- seq(gross_num, max_out)
@@ -185,7 +185,7 @@ plot_backtrack_curve <- function(ombc_out, max_value = 0.1, max_step = 0.01) {
     ) +
     ggplot2::geom_hline(
       ggplot2::aes(
-        yintercept = min(backtrack) * (1 + max_value), colour = "minimum"
+        yintercept = min(backtrack) * (1 + max_total_rise), colour = "minimum"
       ),
       linetype = "dashed", linewidth = 0.75, show.legend = FALSE
     ) +
@@ -195,7 +195,7 @@ plot_backtrack_curve <- function(ombc_out, max_value = 0.1, max_step = 0.01) {
     ggplot2::labs(
       title =
         paste0("outlierMBC: Number of Outliers = ", backtrack_num),
-      subtitle = paste0("max_value = ", max_value, ", max_step = ", max_step),
+      subtitle = paste0("max_total_rise = ", max_total_rise, ", max_step_rise = ", max_step_rise),
       x = "Outlier Number",
       y = "Rescaled Mean Absolute CDF Difference",
       colour = ""

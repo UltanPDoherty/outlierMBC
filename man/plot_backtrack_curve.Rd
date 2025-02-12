@@ -4,14 +4,14 @@
 \alias{plot_backtrack_curve}
 \title{Plot the outlier number selection curve for the backtrack method.}
 \usage{
-plot_backtrack_curve(ombc_out, max_value, max_step)
+plot_backtrack_curve(ombc_out, max_total_rise = 0.1, max_step_rise = 0.01)
 }
 \arguments{
 \item{ombc_out}{Output from ombc_gmm.}
 
-\item{max_value}{Value cannot exceed minimum * (1 + max_value).}
+\item{max_total_rise}{Value cannot exceed minimum * (1 + max_total_rise).}
 
-\item{max_step}{Each step must be less than minimum * (1 + max_step).}
+\item{max_step_rise}{Each step must be less than minimum * (1 + max_step_rise).}
 }
 \value{
 A gg object.
