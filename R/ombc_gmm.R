@@ -16,8 +16,6 @@
 #' @param init_method Method used to initialise each mixture model.
 #' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
 #'                  hierarchical clustering.
-#' @param backtrack_max_value Decimal passed to `backtrack` function.
-#' @param backtrack_max_step Decimal passed to `backtrack` function.
 #' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return List of
@@ -55,8 +53,6 @@ ombc_gmm <- function(
     init_model = NULL,
     init_method = c("hc", "kmpp"),
     kmpp_seed = 123,
-    backtrack_max_value = 0.1,
-    backtrack_max_step = 0.01,
     print_interval = Inf) {
   init_method <- match.arg(init_method)
   init_scheme <- match.arg(init_scheme)
@@ -64,12 +60,10 @@ ombc_gmm <- function(
   this_call <- call(
     "ombc_gmm",
     "x" = substitute(x), "comp_num" = comp_num, "max_out" = max_out,
-    "gross_outs" = substitute(gross_outs), "resets" = substitute(resets),
-    "mnames" = mnames, "nmax" = nmax,
-    "atol" = atol, "init_method" = init_method, "kmpp_seed" = kmpp_seed,
-    "backtrack_max_value" = backtrack_max_value,
-    "backtrack_max_step" = backtrack_max_step,
-    "print_interval" = print_interval
+    "gross_outs" = substitute(gross_outs), "init_scheme" = init_scheme,
+    "mnames" = mnames, "nmax" = nmax, "atol" = atol,
+    "init_z" = init_z, "init_model" = init_model, "init_method" = init_method,
+    "kmpp_seed" = kmpp_seed, "print_interval" = print_interval
   )
 
   ombc_version <- utils::packageVersion("outlierMBC")
@@ -187,26 +181,6 @@ ombc_gmm <- function(
 
   outlier_num <- outlier_num - 1 + gross_num
 
-  if (init_scheme != "update") {
-    backtrack_out <-
-      backtrack(distrib_diff_mat[, 1], backtrack_max_value, backtrack_max_step)
-    outlier_num[3] <- backtrack_out$backtrack$ind - 1 + gross_num
-    track_num <- track_num + 1
-
-    backtrack_bool <- outlier_rank <= outlier_num[3] & outlier_rank != 0
-
-    if (init_scheme == "reuse") {
-      best_z[[3]] <- mixture::e_step(x0[!backtrack_bool, ], init_model)$z
-    } else if (init_scheme == "reinit") {
-      best_z[[3]] <- get_init_z(
-        comp_num = comp_num,
-        dist_mat = dist_mat0[!backtrack_bool, !backtrack_bool],
-        x = x0[!backtrack_bool, ],
-        init_method = init_method, kmpp_seed = kmpp_seed
-      )
-    }
-  }
-
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
   mix <- list()
   labels <- matrix(0, nrow = obs_num, ncol = track_num)
@@ -222,13 +196,13 @@ ombc_gmm <- function(
 
   ombc_names <- c("full", "tail")
   colnames(distrib_diff_mat) <- ombc_names
-  colnames(outlier_bool) <- c(ombc_names, "backtrack")
-  colnames(labels) <- c(ombc_names, "backtrack")
-  names(outlier_num) <- c(ombc_names, "backtrack")
+  colnames(outlier_bool) <- ombc_names
+  colnames(labels) <- ombc_names
+  names(outlier_num) <- ombc_names
   dimnames(distrib_diff_arr) <- list(
     paste0("k", seq_len(comp_num)), NULL, ombc_names
   )
-  names(mix) <- c(ombc_names, "backtrack")
+  names(mix) <- ombc_names
 
   labels <- as.data.frame(labels)
   outlier_bool <- as.data.frame(outlier_bool)
@@ -249,11 +223,9 @@ ombc_gmm <- function(
     call = this_call,
     version = ombc_version,
     quick_tail = quick_tail,
-    conv_status = conv_status,
-    backtrack_vals = c(backtrack_max_value, backtrack_max_step)
+    conv_status = conv_status
   ))
 }
-
 
 # ------------------------------------------------------------------------------
 
