@@ -8,7 +8,7 @@ backtrack_gmm(
   x,
   ombc_out,
   max_total_rise = 0.1,
-  max_step_rise = 0.01,
+  max_step_rise = 0.05,
   init_model = NULL,
   init_z = NULL
 )

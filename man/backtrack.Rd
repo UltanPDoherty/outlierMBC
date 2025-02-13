@@ -4,7 +4,7 @@
 \alias{backtrack}
 \title{Move backwards from the global minimum to a more conservative solution.}
 \usage{
-backtrack(x, max_total_rise = 0.1, max_step_rise = 0.01)
+backtrack(x, max_total_rise = 0.1, max_step_rise = 0.05)
 }
 \arguments{
 \item{x}{Data.}

@@ -4,7 +4,7 @@
 \alias{plot_backtrack_curve}
 \title{Plot the outlier number selection curve for the backtrack method.}
 \usage{
-plot_backtrack_curve(ombc_out, max_total_rise = 0.1, max_step_rise = 0.01)
+plot_backtrack_curve(ombc_out, max_total_rise = 0.1, max_step_rise = 0.05)
 }
 \arguments{
 \item{ombc_out}{Output from ombc_gmm.}
