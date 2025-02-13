@@ -20,7 +20,7 @@
 #'
 #' backtrack(ombc_gmm_k3n1000o10$distrib_diff_mat[, "full"])
 #'
-backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.01) {
+backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.05) {
   xmin_val <- min(x)
   xmin_ind <- which.min(x)
 
@@ -71,7 +71,7 @@ backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.01) {
 #' backtrack_gmm(gmm_k3n1000o10[, 1:2], ombc_gmm_k3n1000o10, 0.1, 0.01)
 backtrack_gmm <- function(
     x, ombc_out,
-    max_total_rise = 0.1, max_step_rise = 0.01, init_model = NULL, init_z = NULL) {
+    max_total_rise = 0.1, max_step_rise = 0.05, init_model = NULL, init_z = NULL) {
   backtrack_out <-
     backtrack(ombc_out$distrib_diff_mat[, "full"], max_total_rise, max_step_rise)
 
@@ -145,7 +145,7 @@ backtrack_gmm <- function(
 #'
 #' @returns A gg object.
 #' @export
-plot_backtrack_curve <- function(ombc_out, max_total_rise = 0.1, max_step_rise = 0.01) {
+plot_backtrack_curve <- function(ombc_out, max_total_rise = 0.1, max_step_rise = 0.05) {
   gross_num <- sum(ombc_out$gross_outs)
   max_out <- max(ombc_out$outlier_rank) - 1
   outlier_num <- ombc_out$outlier_num
