@@ -182,6 +182,8 @@ ombc_gmm <- function(
 
   outlier_num <- outlier_num - 1 + gross_num
 
+  track_num <- track_num - !tail_accepted
+
   outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
   mix <- list()
   labels <- matrix(0, nrow = obs_num, ncol = track_num)
@@ -197,18 +199,20 @@ ombc_gmm <- function(
 
   ombc_names <- c("full", "tail")
   colnames(distrib_diff_mat) <- ombc_names
-  colnames(outlier_bool) <- ombc_names
-  colnames(labels) <- ombc_names
   names(outlier_num) <- ombc_names
   dimnames(distrib_diff_arr) <- list(
     paste0("k", seq_len(comp_num)), NULL, ombc_names
   )
+
+  if (!tail_accepted) {
+    ombc_names <- "full"
+  }
+  colnames(outlier_bool) <- ombc_names
+  colnames(labels) <- ombc_names
   names(mix) <- ombc_names
 
   labels <- as.data.frame(labels)
   outlier_bool <- as.data.frame(outlier_bool)
-
-  quick_tail <- count_extremes(x0[!gross_outs, ], mix$full$best_model)
 
   return(list(
     labels = labels,
@@ -223,7 +227,6 @@ ombc_gmm <- function(
     distrib_diff_arr = distrib_diff_arr,
     call = this_call,
     version = ombc_version,
-    quick_tail = quick_tail,
     conv_status = conv_status
   ))
 }
