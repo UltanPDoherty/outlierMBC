@@ -151,6 +151,13 @@ backtrack_gmm <- function(
     ombc_out$distrib_diff_mat[, "full"], max_total_rise, max_step_rise
   )
 
+  this_call <- call(
+    "backtrack_gmm",
+    "x" = substitute(x), "ombc_out" = substitute(ombc_out),
+    "max_total_rise" = max_total_rise, "max_step_rise" = max_step_rise,
+    "init_z" = substitute(init_z), "init_model" = substitute(init_model)
+  )
+
   x0 <- as.matrix(x)
 
   outlier_num <- backtrack_out$backtrack$ind - 1 + sum(ombc_out$gross_outs)
@@ -160,56 +167,102 @@ backtrack_gmm <- function(
 
   init_scheme <- ombc_out$call$init_scheme
 
-  stopifnot(
-    "'update' scheme cannot be used with backtrack" = init_scheme != "update"
-  )
+  if ((init_scheme == "reinit") && (!is.null(init_model) || !is.null(init_z))) {
+    stop("init_model & init_z cannot be used with the 'reinit' init_scheme.")
+  } else if (!is.null(init_model) && !is.null(init_z)) {
+    stop("Only one of init_model and init_z may be provided.")
+  }
 
-  if (init_scheme == "update") {
-    stop("backtrack_gmm is not compatible with the 'update' init_scheme.")
-  } else if (init_scheme == "reinit") {
-    if (!is.null(init_model) && !is.null(init_z)) {
-      stop("init_model & init_z cannot be used with the 'reinit' init_scheme.")
-    } else if (!is.null(init_z)) {
-      stop("init_z cannot be used with the 'reinit' init_scheme.")
-    } else if (!is.null(init_model)) {
-      stop("init_model cannot be used with the 'reinit' init_scheme.")
-    } else {
-      z <- get_init_z(
-        comp_num = ombc_out$call$comp_num,
-        dist_mat = as.matrix(stats::dist(x0[!outlier_bool, ])),
-        x = x0[!outlier_bool, ],
-        init_method = ombc_out$call$init_method,
-        kmpp_seed = ombc_out$call$kmpp_seed
-      )
-    }
+  if (init_scheme == "reinit") {
+    z <- get_init_z(
+      comp_num = ombc_out$call$comp_num,
+      dist_mat = as.matrix(stats::dist(x0[!outlier_bool, ])),
+      x = x0[!outlier_bool, ],
+      init_method = ombc_out$call$init_method,
+      kmpp_seed = ombc_out$call$kmpp_seed
+    )
+
+    mix <- try_mixture_gpcm(
+      x0[!outlier_bool, ],
+      ombc_out$call$comp_num, ombc_out$call$mnames,
+      z,
+      ombc_out$call$nmax,
+      ombc_out$call$atol
+    )
   } else if (init_scheme == "reuse") {
-    if (!is.null(init_model) && !is.null(init_z)) {
-      stop("Only one of init_model and init_z may be provided.")
-    } else if (!is.null(init_z)) {
+    if (!is.null(init_z)) {
       z <- init_z
     } else if (!is.null(init_model)) {
       z <- mixture::e_step(x0[!outlier_bool, ], init_model)$z
     } else {
-      stop("init_model or init_z are required to use the 'reuse' init_scheme.")
+      z <- get_init_z(
+        comp_num = ombc_out$call$comp_num,
+        dist_mat = as.matrix(stats::dist(x0[!ombc_out$gross_outs, ])),
+        x = x0[!ombc_out$gross_outs, ],
+        init_method = ombc_out$call$init_method,
+        kmpp_seed = ombc_out$call$kmpp_seed
+      )
+
+      short_outlier_bool <- outlier_bool[!ombc_out$gross_outs]
+      z <- z[!short_outlier_bool, !short_outlier_bool]
+    }
+
+    mix <- try_mixture_gpcm(
+      x0[!outlier_bool, ],
+      ombc_out$call$comp_num, ombc_out$call$mnames,
+      z,
+      ombc_out$call$nmax,
+      ombc_out$call$atol
+    )
+  } else if (init_scheme == "update") {
+    if (!is.null(init_z)) {
+      z0 <- init_z
+    } else if (!is.null(init_model)) {
+      z0 <- mixture::e_step(x0[!ombc_out$gross_outs, ], init_model)$z
+    } else {
+      z0 <- get_init_z(
+        comp_num = ombc_out$call$comp_num,
+        dist_mat = as.matrix(stats::dist(x0[!ombc_out$gross_outs, ])),
+        x = x0[!ombc_out$gross_outs, ],
+        init_method = ombc_out$call$init_method,
+        kmpp_seed = ombc_out$call$kmpp_seed
+      )
+    }
+
+    x <- x0[!ombc_out$gross_outs, ]
+    z <- z0
+
+    gross_num <- sum(ombc_out$gross_outs)
+
+    temp_outlier_rank <- ombc_out$outlier_rank[!ombc_out$gross_outs]
+
+    for (i in seq(gross_num, outlier_num + 1)) {
+      cat(paste0(i, "\n"))
+      mix <- try_mixture_gpcm(
+        x,
+        ombc_out$call$comp_num, ombc_out$call$mnames,
+        z,
+        ombc_out$call$nmax,
+        ombc_out$call$atol
+      )
+
+      next_removal <- which(temp_outlier_rank == i + 1)
+      x <- x[-next_removal, ]
+      z <- mix$z[-next_removal, -next_removal]
     }
   } else {
-    stop("init_scheme must be either 'reinit' or 'reuse'.")
+    stop("init_scheme must be 'update' or 'reinit' or 'reuse'.")
   }
 
-  mix <- try_mixture_gpcm(
-    x0[!outlier_bool, ],
-    ombc_out$call$comp_num, ombc_out$call$mnames,
-    z,
-    ombc_out$call$nmax,
-    ombc_out$call$atol
-  )
-
-  labels <- mix$map
+  labels <- integer(nrow(x))
+  labels[outlier_bool] <- 0
+  labels[!outlier_bool] <- mix$map
 
   return(list(
     "labels" = labels,
     "outlier_bool" = outlier_bool,
     "outlier_num" = outlier_num,
-    "mix" = mix
+    "mix" = mix,
+    "call" = this_call
   ))
 }

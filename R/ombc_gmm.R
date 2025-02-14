@@ -45,7 +45,7 @@ ombc_gmm <- function(
     comp_num,
     max_out,
     gross_outs = rep(FALSE, nrow(x)),
-    init_scheme = c("reinit", "update", "reuse"),
+    init_scheme = c("update", "reinit", "reuse"),
     mnames = "VVV",
     nmax = 1000,
     atol = 1e-8,
