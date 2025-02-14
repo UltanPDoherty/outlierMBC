@@ -106,8 +106,8 @@ plot_backtrack_curve <- function(
       title =
         paste0("outlierMBC: Number of Outliers = ", backtrack_num),
       subtitle = paste0(
-        "max_total_rise = ", max_total_rise, ",
-        max_step_rise = ", max_step_rise
+        "max_total_rise = ", max_total_rise,
+        ", max_step_rise = ", max_step_rise
       ),
       x = "Outlier Number",
       y = "Rescaled Mean Absolute CDF Difference",
