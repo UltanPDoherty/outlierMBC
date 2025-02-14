@@ -19,7 +19,7 @@
 #'   comp_num = 3, max_out = 20
 #' )
 #'
-#' backtrack(ombc_gmm_k3n1000o10$distrib_diff_mat[, "full"])
+#' backtrack(ombc_gmm_k3n1000o10$distrib_diff_vec)
 #'
 backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.05) {
   xmin_val <- min(x)
@@ -49,20 +49,20 @@ backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.05) {
 
 #' Plot the outlier number selection curve for the backtrack method.
 #'
-#' @inheritParams plot_full_curve
+#' @inheritParams plot_curve
 #' @inheritParams backtrack
 #'
 #' @returns A gg object.
 #' @export
-plot_backtrack_curve <- function(
+plot_backtrack <- function(
     ombc_out, max_total_rise = 0.1, max_step_rise = 0.05) {
   gross_num <- sum(ombc_out$gross_outs)
   max_out <- max(ombc_out$outlier_rank) - 1
   outlier_num <- ombc_out$outlier_num
-  distrib_diff_mat <- ombc_out$distrib_diff_mat
+  distrib_diff_vec <- ombc_out$distrib_diff_vec
 
   backtrack_num <- backtrack(
-    ombc_out$distrib_diff_mat[, "full"], max_total_rise, max_step_rise
+    distrib_diff_vec, max_total_rise, max_step_rise
   )$backtrack$ind + gross_num - 1
 
   outlier_seq <- seq(gross_num, max_out)
@@ -71,9 +71,9 @@ plot_backtrack_curve <- function(
   backtrack <- minimum <- choice <- NULL
   backtrack_curve_df <- data.frame(
     "outlier_seq" = outlier_seq,
-    "minimum" = as.integer(outlier_num["full"]),
+    "minimum" = as.integer(outlier_num),
     "choice" = as.integer(backtrack_num),
-    "backtrack" = distrib_diff_mat[, "full"] / min(distrib_diff_mat[, "full"])
+    "backtrack" = distrib_diff_vec / min(distrib_diff_vec)
   )
   backtrack_curve <- backtrack_curve_df |>
     ggplot2::ggplot(ggplot2::aes(x = outlier_seq, y = backtrack)) +
@@ -124,7 +124,7 @@ plot_backtrack_curve <- function(
 #' Fit a GMM to the backtrack solution.
 #'
 #' @inheritParams ombc_gmm
-#' @inheritParams plot_full_curve
+#' @inheritParams plot_curve
 #' @inheritParams backtrack
 #'
 #' @returns List:
@@ -148,7 +148,7 @@ backtrack_gmm <- function(
     max_total_rise = 0.1, max_step_rise = 0.05,
     init_model = NULL, init_z = NULL) {
   backtrack_out <- backtrack(
-    ombc_out$distrib_diff_mat[, "full"], max_total_rise, max_step_rise
+    ombc_out$distrib_diff_vec, max_total_rise, max_step_rise
   )
 
   this_call <- call(
@@ -167,10 +167,32 @@ backtrack_gmm <- function(
 
   init_scheme <- ombc_out$call$init_scheme
 
-  if ((init_scheme == "reinit") && (!is.null(init_model) || !is.null(init_z))) {
-    stop("init_model & init_z cannot be used with the 'reinit' init_scheme.")
-  } else if (!is.null(init_model) && !is.null(init_z)) {
+  stopifnot(
+    "init_model & init_z cannot be used with the 'reinit' init_scheme." = (
+      (init_scheme != "reinit") || (is.null(init_model) && is.null(init_z))
+    )
+  )
+
+  stopifnot(
+    "init_scheme must be 'update' or 'reinit' or 'reuse'." = (
+      init_scheme %in% c("update", "reinit", "reuse")
+    )
+  )
+
+  if (!is.null(init_model) && !is.null(init_z)) {
     stop("Only one of init_model and init_z may be provided.")
+  } else if (!is.null(init_z)) {
+    z0 <- init_z
+  } else if (!is.null(init_model)) {
+    z0 <- mixture::e_step(x0[!ombc_out$gross_outs, ], init_model)$z
+  } else if (init_scheme != "reinit") {
+    z0 <- get_init_z(
+      comp_num = ombc_out$call$comp_num,
+      dist_mat = as.matrix(stats::dist(x0[!ombc_out$gross_outs, ])),
+      x = x0[!ombc_out$gross_outs, ],
+      init_method = ombc_out$call$init_method,
+      kmpp_seed = ombc_out$call$kmpp_seed
+    )
   }
 
   if (init_scheme == "reinit") {
@@ -190,22 +212,8 @@ backtrack_gmm <- function(
       ombc_out$call$atol
     )
   } else if (init_scheme == "reuse") {
-    if (!is.null(init_z)) {
-      z <- init_z
-    } else if (!is.null(init_model)) {
-      z <- mixture::e_step(x0[!outlier_bool, ], init_model)$z
-    } else {
-      z <- get_init_z(
-        comp_num = ombc_out$call$comp_num,
-        dist_mat = as.matrix(stats::dist(x0[!ombc_out$gross_outs, ])),
-        x = x0[!ombc_out$gross_outs, ],
-        init_method = ombc_out$call$init_method,
-        kmpp_seed = ombc_out$call$kmpp_seed
-      )
-
-      short_outlier_bool <- outlier_bool[!ombc_out$gross_outs]
-      z <- z[!short_outlier_bool, !short_outlier_bool]
-    }
+    short_outlier_bool <- outlier_bool[!ombc_out$gross_outs]
+    z <- z0[!short_outlier_bool, !short_outlier_bool]
 
     mix <- try_mixture_gpcm(
       x0[!outlier_bool, ],
@@ -214,21 +222,7 @@ backtrack_gmm <- function(
       ombc_out$call$nmax,
       ombc_out$call$atol
     )
-  } else if (init_scheme == "update") {
-    if (!is.null(init_z)) {
-      z0 <- init_z
-    } else if (!is.null(init_model)) {
-      z0 <- mixture::e_step(x0[!ombc_out$gross_outs, ], init_model)$z
-    } else {
-      z0 <- get_init_z(
-        comp_num = ombc_out$call$comp_num,
-        dist_mat = as.matrix(stats::dist(x0[!ombc_out$gross_outs, ])),
-        x = x0[!ombc_out$gross_outs, ],
-        init_method = ombc_out$call$init_method,
-        kmpp_seed = ombc_out$call$kmpp_seed
-      )
-    }
-
+  } else {
     x <- x0[!ombc_out$gross_outs, ]
     z <- z0
 
@@ -259,8 +253,6 @@ backtrack_gmm <- function(
       temp_outlier_rank <- temp_outlier_rank[-next_removal]
     }
     close(prog_bar)
-  } else {
-    stop("init_scheme must be 'update' or 'reinit' or 'reuse'.")
   }
 
   labels <- integer(nrow(x))

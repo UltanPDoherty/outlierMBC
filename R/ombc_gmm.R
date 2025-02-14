@@ -20,7 +20,7 @@
 #'
 #' @return List of
 #' * distrib_diffs
-#' * distrib_diff_mat
+#' * distrib_diff_vec
 #' * outlier_bool
 #' * outlier_num
 #' * outlier_rank
@@ -37,8 +37,7 @@
 #'   comp_num = 3, max_out = 20
 #' )
 #'
-#' ombc_gmm_k3n1000o10$plot_tail_curve
-#' ombc_gmm_k3n1000o10$plot_full_curve
+#' plot_curve(ombc_gmm_k3n1000o10)
 #'
 ombc_gmm <- function(
     x,
@@ -69,10 +68,6 @@ ombc_gmm <- function(
 
   ombc_version <- utils::packageVersion("outlierMBC")
 
-  expect_num <- 1
-  accept_num <- expect_num + 1
-  reject_num <- accept_num
-
   x <- as.matrix(x)
   x0 <- x
 
@@ -99,18 +94,13 @@ ombc_gmm <- function(
     )
   }
 
-  track_num <- 2
-  tail_props <- expect_num / (seq(obs_num, obs_num - max_out) - gross_num)
-
   dd_min <- Inf
-  best_z <- list()
-  tail_accepted <- FALSE
 
   conv_status <- c()
   loglike <- c()
   removal_dens <- c()
-  distrib_diff_arr <- array(dim = c(comp_num, max_out + 1, track_num))
-  distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = track_num)
+  distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = comp_num)
+  distrib_diff_vec <- double(max_out + 1)
   outlier_rank_temp <- rep(0, obs_num - gross_num)
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
@@ -134,28 +124,20 @@ ombc_gmm <- function(
       mix$best_model$model_obj[[1]]$pi_gs,
       mix$best_model$model_obj[[1]]$mu,
       mix$best_model$model_obj[[1]]$sigs,
-      mix$best_model$model_obj[[1]]$log_dets,
-      tail_props[i]
+      mix$best_model$model_obj[[1]]$log_dets
     )
 
-    distrib_diff_arr[, i, ] <- dd$distrib_diff_mat
     distrib_diff_mat[i, ] <- dd$distrib_diff_vec
+    distrib_diff_vec[i] <- dd$distrib_diff
     removal_dens[i] <- dd$removal_dens
 
     outlier_rank_temp[!outlier_rank_temp][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
 
-    if (dd$distrib_diff_vec[1] < dd_min) {
-      dd_min <- dd$distrib_diff_vec[1]
-      best_z[[1]] <- mix$z
-    }
-    if (!tail_accepted && dd$distrib_diff_vec[2] < accept_num) {
-      tail_accepted <- TRUE
-      best_z[[2]] <- mix$z
-    } else if (tail_accepted && dd$distrib_diff_vec[2] > reject_num) {
-      tail_accepted <- FALSE
-      best_z[[2]] <- NULL
+    if (dd$distrib_diff < dd_min) {
+      dd_min <- dd$distrib_diff
+      best_z <- mix$z
     }
 
     if (init_scheme %in% c("update")) {
@@ -170,46 +152,21 @@ ombc_gmm <- function(
   outlier_rank[!gross_outs] <- outlier_rank_temp +
     gross_num * (outlier_rank_temp != 0)
 
-  outlier_num <- integer(track_num)
-
-  outlier_num[1] <- which.min(distrib_diff_mat[, 1])
-
-  reject_bool <- distrib_diff_mat[, 2] > reject_num
-  final_reject <- max(which(c(TRUE, reject_bool))) - 1
-  after_final_reject <- seq_len(max_out + 1) > final_reject
-  accept_bools <- distrib_diff_mat[, 2] < accept_num
-  outlier_num[2] <- which.max(accept_bools & after_final_reject)
-
+  outlier_num <- which.min(distrib_diff_vec)
   outlier_num <- outlier_num - 1 + gross_num
 
-  track_num <- track_num - !tail_accepted
+  outlier_bool <- logical(obs_num)
+  labels <- integer(obs_num)
 
-  outlier_bool <- matrix(nrow = obs_num, ncol = track_num)
-  mix <- list()
-  labels <- matrix(0, nrow = obs_num, ncol = track_num)
-  for (j in seq_len(track_num)) {
-    outlier_bool[, j] <- outlier_rank <= outlier_num[j] & outlier_rank != 0
+  outlier_bool <- outlier_rank <= outlier_num & outlier_rank != 0
 
-    mix[[j]] <- try_mixture_gpcm(
-      x0[!outlier_bool[, j], ], comp_num, mnames, best_z[[j]], nmax, atol
-    )
-
-    labels[!outlier_bool[, j], j] <- mix[[j]]$map
-  }
-
-  ombc_names <- c("full", "tail")
-  colnames(distrib_diff_mat) <- ombc_names
-  names(outlier_num) <- ombc_names
-  dimnames(distrib_diff_arr) <- list(
-    paste0("k", seq_len(comp_num)), NULL, ombc_names
+  mix <- try_mixture_gpcm(
+    x0[!outlier_bool, ], comp_num, mnames, best_z, nmax, atol
   )
 
-  if (!tail_accepted) {
-    ombc_names <- "full"
-  }
-  colnames(outlier_bool) <- ombc_names
-  colnames(labels) <- ombc_names
-  names(mix) <- ombc_names
+  labels[!outlier_bool] <- mix$map
+
+  colnames(distrib_diff_mat) <- paste0("k", seq_len(comp_num))
 
   labels <- as.data.frame(labels)
   outlier_bool <- as.data.frame(outlier_bool)
@@ -223,8 +180,8 @@ ombc_gmm <- function(
     mix = mix,
     loglike = loglike,
     removal_dens = removal_dens,
+    distrib_diff_vec = distrib_diff_vec,
     distrib_diff_mat = distrib_diff_mat,
-    distrib_diff_arr = distrib_diff_arr,
     call = this_call,
     version = ombc_version,
     conv_status = conv_status

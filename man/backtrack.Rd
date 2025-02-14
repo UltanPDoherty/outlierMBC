@@ -32,6 +32,6 @@ ombc_gmm_k3n1000o10 <- ombc_gmm(
   comp_num = 3, max_out = 20
 )
 
-backtrack(ombc_gmm_k3n1000o10$distrib_diff_mat[, "full"])
+backtrack(ombc_gmm_k3n1000o10$distrib_diff_vec)
 
 }

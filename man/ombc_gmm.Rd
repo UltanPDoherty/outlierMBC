@@ -52,7 +52,7 @@ hierarchical clustering.}
 List of
 \itemize{
 \item distrib_diffs
-\item distrib_diff_mat
+\item distrib_diff_vec
 \item outlier_bool
 \item outlier_num
 \item outlier_rank
@@ -72,7 +72,6 @@ ombc_gmm_k3n1000o10 <- ombc_gmm(
   comp_num = 3, max_out = 20
 )
 
-ombc_gmm_k3n1000o10$plot_tail_curve
-ombc_gmm_k3n1000o10$plot_full_curve
+plot_curve(ombc_gmm_k3n1000o10)
 
 }

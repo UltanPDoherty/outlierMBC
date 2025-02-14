@@ -1,6 +1,6 @@
 Package: outlierMBC
 Title: Iterative Detection & Identification of Outliers for Model-Based Clustering
-Version: 0.0.0.0027
+Version: 0.0.0.0028
 Authors@R: 
     person("Ultán", "Doherty", , "dohertyu@tcd.ie", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-1791-395X"))
