@@ -237,12 +237,13 @@ backtrack_gmm <- function(
     temp_outlier_rank <- ombc_out$outlier_rank[!ombc_out$gross_outs]
 
     cat("Fitting backtrack model:\n")
-    prog_bar <- txtProgressBar(
-      gross_num, outlier_num, style = 3, title = "backtrack_gmm"
+    prog_bar <- utils::txtProgressBar(
+      gross_num, outlier_num,
+      style = 3, title = "backtrack_gmm"
     )
     removals <- c()
     for (i in seq(gross_num, outlier_num)) {
-      setTxtProgressBar(prog_bar,i)
+      utils::setTxtProgressBar(prog_bar, i)
       mix <- try_mixture_gpcm(
         x,
         ombc_out$call$comp_num, ombc_out$call$mnames,
