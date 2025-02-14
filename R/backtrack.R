@@ -236,8 +236,13 @@ backtrack_gmm <- function(
 
     temp_outlier_rank <- ombc_out$outlier_rank[!ombc_out$gross_outs]
 
-    for (i in seq(gross_num, outlier_num + 1)) {
-      cat(paste0(i, "\n"))
+    cat("Fitting backtrack model:\n")
+    prog_bar <- txtProgressBar(
+      gross_num, outlier_num, style = 3, title = "backtrack_gmm"
+    )
+    removals <- c()
+    for (i in seq(gross_num, outlier_num)) {
+      setTxtProgressBar(prog_bar,i)
       mix <- try_mixture_gpcm(
         x,
         ombc_out$call$comp_num, ombc_out$call$mnames,
@@ -247,9 +252,12 @@ backtrack_gmm <- function(
       )
 
       next_removal <- which(temp_outlier_rank == i + 1)
+      removals <- append(removals, next_removal)
       x <- x[-next_removal, ]
       z <- mix$z[-next_removal, -next_removal]
+      temp_outlier_rank <- temp_outlier_rank[-next_removal]
     }
+    close(prog_bar)
   } else {
     stop("init_scheme must be 'update' or 'reinit' or 'reuse'.")
   }
