@@ -168,9 +168,6 @@ ombc_gmm <- function(
 
   colnames(distrib_diff_mat) <- paste0("k", seq_len(comp_num))
 
-  labels <- as.data.frame(labels)
-  outlier_bool <- as.data.frame(outlier_bool)
-
   return(list(
     labels = labels,
     outlier_bool = outlier_bool,
