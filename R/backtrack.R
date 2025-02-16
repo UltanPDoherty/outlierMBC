@@ -147,9 +147,6 @@ backtrack_gmm <- function(
     x, ombc_out,
     max_total_rise = 0.1, max_step_rise = 0.05,
     init_model = NULL, init_z = NULL) {
-  backtrack_out <- backtrack(
-    ombc_out$distrib_diff_vec, max_total_rise, max_step_rise
-  )
 
   this_call <- call(
     "backtrack_gmm",
@@ -158,9 +155,26 @@ backtrack_gmm <- function(
     "init_z" = substitute(init_z), "init_model" = substitute(init_model)
   )
 
+  backtrack_out <- backtrack(
+    ombc_out$distrib_diff_vec, max_total_rise, max_step_rise
+  )
+
+  if (backtrack_out$backtrack$ind == backtrack_out$minimum$ind) {
+    message("backtrack_gmm obtained the same result as ombc_gmm.")
+
+    return(list(
+      "labels" = ombc_out$labels,
+      "outlier_bool" = ombc_out$outlier_bool,
+      "outlier_num" = ombc_out$outlier_num,
+      "mix" = ombc_out$mix,
+      "call" = this_call
+    ))
+  }
+
   x0 <- as.matrix(x)
 
-  outlier_num <- backtrack_out$backtrack$ind - 1 + sum(ombc_out$gross_outs)
+  gross_num <- sum(ombc_out$gross_outs)
+  outlier_num <- backtrack_out$backtrack$ind - 1 + gross_num
 
   outlier_bool <-
     ombc_out$outlier_rank <= outlier_num & ombc_out$outlier_rank != 0
@@ -225,8 +239,6 @@ backtrack_gmm <- function(
   } else {
     x <- x0[!ombc_out$gross_outs, ]
     z <- z0
-
-    gross_num <- sum(ombc_out$gross_outs)
 
     temp_outlier_rank <- ombc_out$outlier_rank[!ombc_out$gross_outs]
 
