@@ -160,7 +160,7 @@ backtrack_gmm <- function(
   )
 
   if (backtrack_out$backtrack$ind == backtrack_out$minimum$ind) {
-    message("backtrack_gmm obtained the same result as ombc_gmm.")
+    cat("backtrack_gmm obtained the same result as ombc_gmm.\n")
 
     return(list(
       "labels" = ombc_out$labels,
