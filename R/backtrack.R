@@ -278,6 +278,7 @@ backtrack_gmm <- function(
         ombc_out$call$atol
       )
     }
+    cat("backtrack model fitted.\n")
   }
 
   labels <- integer(nrow(x))
