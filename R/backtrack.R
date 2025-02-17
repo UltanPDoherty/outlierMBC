@@ -243,16 +243,33 @@ backtrack_gmm <- function(
     x <- x0[!ombc_out$gross_outs, ]
     z <- z0
 
-    temp_outlier_rank <- ombc_out$outlier_rank[!ombc_out$gross_outs]
-
     cat("Fitting backtrack model:\n")
-    prog_bar <- utils::txtProgressBar(
-      gross_num, outlier_num,
-      style = 3, title = "backtrack_gmm"
-    )
-    removals <- c()
-    for (i in seq(gross_num, outlier_num)) {
-      utils::setTxtProgressBar(prog_bar, i)
+    if (outlier_num > gross_num) {
+      temp_outlier_rank <- ombc_out$outlier_rank[!ombc_out$gross_outs]
+
+      prog_bar <- utils::txtProgressBar(
+        gross_num, outlier_num,
+        style = 3
+      )
+      removals <- c()
+      for (i in seq(gross_num, outlier_num)) {
+        utils::setTxtProgressBar(prog_bar, i)
+        mix <- try_mixture_gpcm(
+          x,
+          ombc_out$call$comp_num, ombc_out$call$mnames,
+          z,
+          ombc_out$call$nmax,
+          ombc_out$call$atol
+        )
+
+        next_removal <- which(temp_outlier_rank == i + 1)
+        removals <- append(removals, next_removal)
+        x <- x[-next_removal, ]
+        z <- mix$z[-next_removal, -next_removal]
+        temp_outlier_rank <- temp_outlier_rank[-next_removal]
+      }
+      close(prog_bar)
+    } else {
       mix <- try_mixture_gpcm(
         x,
         ombc_out$call$comp_num, ombc_out$call$mnames,
@@ -260,14 +277,7 @@ backtrack_gmm <- function(
         ombc_out$call$nmax,
         ombc_out$call$atol
       )
-
-      next_removal <- which(temp_outlier_rank == i + 1)
-      removals <- append(removals, next_removal)
-      x <- x[-next_removal, ]
-      z <- mix$z[-next_removal, -next_removal]
-      temp_outlier_rank <- temp_outlier_rank[-next_removal]
     }
-    close(prog_bar)
   }
 
   labels <- integer(nrow(x))
