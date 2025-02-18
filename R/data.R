@@ -42,3 +42,33 @@
 #'   \item{G}{Component label: 0 for outliers; 1, 2, or 3 for true points.}
 #' }
 "gmm_k3n4000o40"
+
+#' @title Data set from `simulate_lcwm`. 2 components, 1000 true observations,
+#' 10 hybrid outliers.
+#'
+#' @description
+#' Simulated data set with 1000 observations from 2 Gaussian components with
+#' linear responses.
+#'
+#' @format ## `lcwm_k2n1000oxy10`
+#' A data frame with 1010 rows and 3 columns:
+#' \describe{
+#'   \item{X1, Y}{Continuous variables.}
+#'   \item{G}{Component label: 0 for outliers; 1 or 2 for true points.}
+#' }
+"lcwm_k2n1000oxy10"
+
+#' @title Data set from `simulate_lcwm`. 2 components, 2000 true observations,
+#' 50 hybrid outliers.
+#'
+#' @description
+#' Simulated data set with 2000 observations from 2 Gaussian components with
+#' linear responses.
+#'
+#' @format ## `lcwm_k2n2000oxy50`
+#' A data frame with 2050 rows and 3 columns:
+#' \describe{
+#'   \item{X1, Y}{Continuous variables.}
+#'   \item{G}{Component label: 0 for outliers; 1 or 2 for true points.}
+#' }
+"lcwm_k2n2000oxy50"

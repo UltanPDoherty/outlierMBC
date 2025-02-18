@@ -147,7 +147,6 @@ backtrack_gmm <- function(
     x, ombc_out,
     max_total_rise = 0.1, max_step_rise = 0.05,
     init_model = NULL, init_z = NULL) {
-
   this_call <- call(
     "backtrack_gmm",
     "x" = substitute(x), "ombc_out" = substitute(ombc_out),
