@@ -85,6 +85,7 @@ ombc_lcwm <- function(
   dist_mat <- dist_mat0
 
   gross_num <- sum(gross_outs)
+  xy <- xy[!gross_outs, , drop = FALSE]
   x <- x[!gross_outs, , drop = FALSE]
   max_out <- max_out - gross_num
   dist_mat <- dist_mat[!gross_outs, !gross_outs]
@@ -95,7 +96,7 @@ ombc_lcwm <- function(
     z <- init_z
   } else {
     z <- get_init_z(
-      comp_num = comp_num, dist_mat = dist_mat, x = x,
+      comp_num = comp_num, dist_mat = dist_mat, x = xy,
       init_method = init_method, kmpp_seed = kmpp_seed
     )
   }
@@ -126,7 +127,7 @@ ombc_lcwm <- function(
       )))
     } else {
       reinit_z <- get_init_z(
-        comp_num = comp_num, dist_mat = dist_mat, x = x,
+        comp_num = comp_num, dist_mat = dist_mat, x = xy,
         init_method = init_method, kmpp_seed = kmpp_seed
       )
       invisible(utils::capture.output(lcwm <- flexCWM::cwm(
@@ -206,7 +207,8 @@ ombc_lcwm <- function(
     initialization = "manual",
     start.z = best_z,
     iter.max = nmax,
-    threshold = atol
+    threshold = atol,
+    pwarning = TRUE
   )))
 
   labels[!outlier_bool] <- lcwm$models[[1]]$cluster
@@ -282,8 +284,7 @@ distrib_diff_lcwm <- function(
 
   removal_dens <- mix_dens[choice_id]
 
-  distrib_diff <- sum(prop * distrib_diff_vec)
-
+  distrib_diff <- sqrt(sum(prop * distrib_diff_vec^2))
   return(list(
     distrib_diff = distrib_diff,
     distrib_diff_vec = distrib_diff_vec,
@@ -643,7 +644,6 @@ test_outlier_ombc <- function(
 
   return(all(checks))
 }
-
 
 # ==============================================================================
 
