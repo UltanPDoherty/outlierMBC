@@ -204,7 +204,7 @@ backtrack_gmm <- function(
   } else if (init_scheme != "reinit") {
     z0 <- get_init_z(
       comp_num = ombc_out$call$comp_num,
-      dist_mat = as.matrix(stats::dist(x0[!ombc_out$gross_outs, ])),
+      dist_mat = as.matrix(stats::dist(scale(x0)[!ombc_out$gross_outs, ])),
       x = x0[!ombc_out$gross_outs, ],
       init_method = ombc_out$call$init_method,
       kmpp_seed = ombc_out$call$kmpp_seed
@@ -214,7 +214,7 @@ backtrack_gmm <- function(
   if (init_scheme == "reinit") {
     z <- get_init_z(
       comp_num = ombc_out$call$comp_num,
-      dist_mat = as.matrix(stats::dist(x0[!outlier_bool, ])),
+      dist_mat = as.matrix(stats::dist(scale(x0)[!outlier_bool, ])),
       x = x0[!outlier_bool, ],
       init_method = ombc_out$call$init_method,
       kmpp_seed = ombc_out$call$kmpp_seed
