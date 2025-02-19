@@ -8,8 +8,8 @@
 #' @param xy `data.frame` containing covariates and response.
 #' @param x Covariate data only.
 #' @param y_formula Regression formula.
-#' @param alpha Factor to control relative importance of covariate and response.
-#' @param outlier_type Combined, covariate, or response outliers.
+#' @param dd_weight .
+#' @param dens_power .
 #'
 #' @return List of
 #' *labels = labels,
@@ -55,8 +55,8 @@ ombc_lcwm <- function(
     init_method = c("hc", "kmpp"),
     kmpp_seed = 123,
     print_interval = Inf,
-    alpha = 0.5,
-    outlier_type = c("x_and_y", "x_only", "y_only", "hybrid")) {
+    dd_weight = 0.5,
+    dens_power = 0.5) {
   init_method <- match.arg(init_method)
   init_scheme <- match.arg(init_scheme)
   init_model <- NULL
@@ -70,7 +70,7 @@ ombc_lcwm <- function(
     "init_z" = substitute(init_z),
     "init_method" = init_method,
     "kmpp_seed" = kmpp_seed, "print_interval" = print_interval,
-    "alpha" = alpha, "outlier_type" = outlier_type
+    "dd_weight" = dd_weight, "dens_power" = dens_power
   )
 
   ombc_version <- utils::packageVersion("outlierMBC")
@@ -106,6 +106,7 @@ ombc_lcwm <- function(
   conv_status <- c()
   loglike <- c()
   removal_dens <- c()
+  distrib_diff_arr <- array(dim = c(max_out + 1, comp_num, 2))
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = comp_num)
   distrib_diff_vec <- double(max_out + 1)
   outlier_rank_temp <- rep(0, obs_num - gross_num)
@@ -159,10 +160,11 @@ ombc_lcwm <- function(
       lcwm$models[[1]]$concomitant$normal.Sigma,
       mod_list,
       y_sigma,
-      alpha,
-      outlier_type
+      dd_weight,
+      dens_power
     )
 
+    distrib_diff_arr[i, , ] <- dd$distrib_diff_mat
     distrib_diff_mat[i, ] <- dd$distrib_diff_vec
     distrib_diff_vec[i] <- dd$distrib_diff
     removal_dens[i] <- dd$removal_dens
@@ -226,6 +228,7 @@ ombc_lcwm <- function(
     removal_dens = removal_dens,
     distrib_diff_vec = distrib_diff_vec,
     distrib_diff_mat = distrib_diff_mat,
+    distrib_diff_arr = distrib_diff_arr,
     call = this_call,
     version = ombc_version,
     conv_status = conv_status
@@ -255,13 +258,13 @@ distrib_diff_lcwm <- function(
     sigma,
     mod_list,
     y_sigma,
-    alpha = 0.5,
-    outlier_type = c("x_and_y", "x_only", "y_only", "hybrid")) {
-  outlier_type <- match.arg(outlier_type)
-
+    dd_weight = 0.5,
+    dens_power = 0.5) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
 
+  dens_arr <- array(dim = c(obs_num, comp_num, 2))
+  distrib_diff_mat <- matrix(nrow = comp_num, ncol = 2)
   distrib_diff_vec <- c()
   dens_mat <- matrix(nrow = obs_num, ncol = comp_num)
   for (g in seq_len(comp_num)) {
@@ -271,11 +274,15 @@ distrib_diff_lcwm <- function(
       as.matrix(sigma[, , g]),
       mod_list[[g]],
       y_sigma[g],
-      alpha,
-      outlier_type
+      dd_weight,
+      dens_power
     )
     distrib_diff_vec[g] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
+
+    distrib_diff_mat[g, ] <- c(dd_g$diff_x, dd_g$diff_y)
+    dens_arr[, g, 1] <- dd_g$dens_x
+    dens_arr[, g, 2] <- dd_g$dens_y
   }
 
   mix_dens <- dens_mat %*% prop
@@ -285,11 +292,13 @@ distrib_diff_lcwm <- function(
   removal_dens <- mix_dens[choice_id]
 
   distrib_diff <- sqrt(sum(prop * distrib_diff_vec^2))
+
   return(list(
     distrib_diff = distrib_diff,
     distrib_diff_vec = distrib_diff_vec,
     choice_id = choice_id,
-    removal_dens = removal_dens
+    removal_dens = removal_dens,
+    distrib_diff_mat = distrib_diff_mat
   ))
 }
 
@@ -314,37 +323,36 @@ distrib_diff_lcwm_g <- function(
     sigma_g,
     mod_g,
     y_sigma_g,
-    alpha = 0.5,
-    outlier_type = c("x_and_y", "x_only", "y_only", "hybrid")) {
-  outlier_type <- match.arg(outlier_type)
-
-  if (outlier_type == "x_and_y") {
-    dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
-    dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
-
-    diff_g <- sqrt(alpha * dd_g_x$diff^2 + (1 - alpha) * dd_g_y$diff^2)
-    dens_g <- dd_g_x$dens * dd_g_y$dens
-  } else if (outlier_type == "x_only") {
-    dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
-
-    diff_g <- dd_g_x$diff
-    dens_g <- dd_g_x$dens
-  } else if (outlier_type == "y_only") {
-    dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
-
-    diff_g <- dd_g_y$diff
-    dens_g <- dd_g_y$dens
+    dd_weight = 0.5,
+    dens_power = 0.5) {
+  if (dd_weight == 0 && dens_power == 0) {
+    diff_g_x <- 0
+    dens_g_x <- 1
   } else {
     dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
-    dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
-
-    diff_g <- dd_g_x$diff
-    dens_g <- dd_g_x$dens * dd_g_y$dens
+    diff_g_x <- dd_g_x$diff
+    dens_g_x <- dd_g_x$dens
   }
+
+  if (dd_weight == 1 && dens_power == 1) {
+    diff_g_y <- 0
+    dens_g_y <- 1
+  } else {
+    dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
+    diff_g_y <- dd_g_y$diff
+    dens_g_y <- dd_g_y$dens
+  }
+
+  diff_g <- dd_weight * dd_g_x$diff + (1 - dd_weight) * dd_g_y$diff
+  dens_g <- dens_g_x^dens_power * dens_g_y^(1 - dens_power)
 
   return(list(
     diff = diff_g,
-    dens = dens_g
+    dens = dens_g,
+    diff_x = diff_g_x,
+    diff_y = diff_g_y,
+    dens_x = dens_g_x,
+    dens_y = dens_g_y
   ))
 }
 

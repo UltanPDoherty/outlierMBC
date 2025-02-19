@@ -12,8 +12,8 @@ distrib_diff_lcwm(
   sigma,
   mod_list,
   y_sigma,
-  alpha = 0.5,
-  outlier_type = c("x_and_y", "x_only", "y_only", "hybrid")
+  dd_weight = 0.5,
+  dens_power = 0.5
 )
 }
 \arguments{
@@ -31,9 +31,9 @@ distrib_diff_lcwm(
 
 \item{y_sigma}{Vector of component regression standard deviations.}
 
-\item{alpha}{Factor to control relative importance of covariate and response.}
+\item{dd_weight}{.}
 
-\item{outlier_type}{Combined, covariate, or response outliers.}
+\item{dens_power}{.}
 }
 \value{
 List of

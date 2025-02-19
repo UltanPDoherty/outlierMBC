@@ -19,8 +19,8 @@ ombc_lcwm(
   init_method = c("hc", "kmpp"),
   kmpp_seed = 123,
   print_interval = Inf,
-  alpha = 0.5,
-  outlier_type = c("x_and_y", "x_only", "y_only", "hybrid")
+  dd_weight = 0.5,
+  dens_power = 0.5
 )
 }
 \arguments{
@@ -53,9 +53,9 @@ hierarchical clustering.}
 
 \item{print_interval}{How frequently the iteration count is printed.}
 
-\item{alpha}{Factor to control relative importance of covariate and response.}
+\item{dd_weight}{.}
 
-\item{outlier_type}{Combined, covariate, or response outliers.}
+\item{dens_power}{.}
 }
 \value{
 List of
