@@ -81,7 +81,7 @@ ombc_lcwm <- function(
 
   obs_num <- nrow(x)
 
-  dist_mat0 <- as.matrix(stats::dist(x0))
+  dist_mat0 <- as.matrix(stats::dist(scale(xy0)))
   dist_mat <- dist_mat0
 
   gross_num <- sum(gross_outs)
@@ -751,7 +751,9 @@ backtrack_lcwm <- function(
   } else if (init_scheme != "reinit") {
     z0 <- get_init_z(
       comp_num = ombc_lcwm_out$call$comp_num,
-      dist_mat = as.matrix(stats::dist(x0[!ombc_lcwm_out$gross_outs, ])),
+      dist_mat = as.matrix(
+        stats::dist(scale(xy0)[!ombc_lcwm_out$gross_outs, ])
+      ),
       x = x0[!ombc_lcwm_out$gross_outs, , drop = FALSE],
       init_method = ombc_lcwm_out$call$init_method,
       kmpp_seed = ombc_lcwm_out$call$kmpp_seed
@@ -761,8 +763,10 @@ backtrack_lcwm <- function(
   if (init_scheme == "reinit") {
     z <- get_init_z(
       comp_num = ombc_lcwm_out$call$comp_num,
-      dist_mat = as.matrix(stats::dist(x0[!outlier_bool, , drop = FALSE])),
-      x = x0[!outlier_bool, , drop = FALSE],
+      dist_mat = as.matrix(
+        stats::dist(scale(xy0)[!outlier_bool, , drop = FALSE])
+      ),
+      x = xy0[!outlier_bool, , drop = FALSE],
       init_method = ombc_lcwm_out$call$init_method,
       kmpp_seed = ombc_lcwm_out$call$kmpp_seed
     )
