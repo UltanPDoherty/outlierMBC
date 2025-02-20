@@ -146,7 +146,7 @@ ombc_lcwm <- function(
       )))
     }
 
-    loglike[i] <- lcwm$models[[1]]$loglik
+    loglike[i] <- lcwm$models[[1]]$logLik
     conv_status[i] <- lcwm$models[[1]]$converged
 
     mod_list <- lapply(lcwm$models[[1]]$GLModel, function(x) x$model)
@@ -344,7 +344,7 @@ distrib_diff_lcwm_g <- function(
     dens_g_y <- dd_g_y$dens
   }
 
-  diff_g <- dd_weight * dd_g_x$diff + (1 - dd_weight) * dd_g_y$diff
+  diff_g <- sqrt(dd_weight * diff_g_x^2 + (1 - dd_weight) * diff_g_y^2)
   dens_g <- dens_g_x^dens_power * dens_g_y^(1 - dens_power)
 
   return(list(
@@ -371,26 +371,32 @@ distrib_diff_residual <- function(
     z_g,
     mod_g,
     y_sigma_g) {
-  var_num <- ncol(x)
+  # Let rss_zg = sqrt(sum(z_g * (mod_g$residuals^2)))
+  # flexCWM uses y_sigma_g = rss_zg / sqrt(n_g)
+  # stats::sigma uses rss_zg / sqrt(nrow(x) - 2))
+
   n_g <- sum(z_g)
 
-  eps <- 0.001
-  check_seq <- seq(eps, 1 - eps, eps)
+  var_num <- ncol(x)
+  reg_param_num <- var_num + 1
+  df_g <- n_g - reg_param_num
 
-  df_g <- round(n_g) - (var_num + 1)
+  param1 <- 1 / 2
+  param2 <- (df_g - 1) / 2
 
   hat_g <- stats::hatvalues(mod_g)
 
   student_resids_g <- mod_g$residuals / (y_sigma_g * sqrt(1 - hat_g))
   scsqst_res_g <- student_resids_g^2 / df_g
+  scsqst_res_ewcdf_g_func <- spatstat.univar::ewcdf(scsqst_res_g, z_g / n_g)
 
-  checkpoints_y <- stats::qbeta(check_seq, 1 / 2, (df_g - 1) / 2)
+  eps <- 1e-5
+  check_seq <- seq(eps, 1, by = eps)
+  scsqst_res_ewcdf_g_vals <- scsqst_res_ewcdf_g_func(check_seq)
+  beta_cdf_g_vals <- stats::pbeta(check_seq, param1, param2)
+  cdf_diffs <- scsqst_res_ewcdf_g_vals - beta_cdf_g_vals
 
-  scsqst_res_ecdf_g_func <- spatstat.univar::ewcdf(scsqst_res_g, z_g / n_g)
-
-  scsqst_res_ecdf_g <- scsqst_res_ecdf_g_func(checkpoints_y)
-  beta_cdf_g_y <- stats::pbeta(checkpoints_y, 1 / 2, (df_g - 1) / 2)
-  distrib_diff_g_y <- mean(abs(scsqst_res_ecdf_g - beta_cdf_g_y))
+  distrib_diff_g_y <- mean(abs(cdf_diffs))
 
   dens_g_y <- stats::dnorm(mod_g$residuals, mean = 0, sd = y_sigma_g)
 
@@ -723,7 +729,8 @@ backtrack_lcwm <- function(
     ))
   }
 
-  x0 <- as.matrix(x)
+  x <- as.matrix(x)
+  x0 <- x
   xy0 <- xy
 
   gross_num <- sum(ombc_lcwm_out$gross_outs)
