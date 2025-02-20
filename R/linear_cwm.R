@@ -29,16 +29,17 @@
 #'
 #' @examples
 #'
-#' ombc_lcwm_k2n1000oxy10 <- ombc_lcwm(
-#'   xy = lcwm_k2n1000oxy10[, c("X1", "Y")],
-#'   x = lcwm_k2n1000oxy10$X1,
-#'   y_formula = Y ~ X1,
-#'   comp_num = 2,
-#'   max_out = 20,
-#'   mnames = "V"
-#' )
+#' gross_lcwm_k3n1000o10 <- find_gross(lcwm_k3n1000o10, 20)
 #'
-#' plot_curve(ombc_lcwm_k2n1000oxy10)
+#' ombc_lcwm_k3n1000o10 <- ombc_lcwm(
+#'   xy = lcwm_k3n1000o10[, c("X1", "Y")],
+#'   x = lcwm_k3n1000o10$X1,
+#'   y_formula = Y ~ X1,
+#'   comp_num = 3,
+#'   max_out = 20,
+#'   mnames = "V",
+#'   gross_outs = gross_lcwm_k3n1000o10$gross_bool
+#' )
 #'
 ombc_lcwm <- function(
     xy,
@@ -427,23 +428,23 @@ distrib_diff_residual <- function(
 #' @export
 #'
 #' @examples
-#' lcwm_k2n1000oxy10 <- simulate_lcwm(
-#'   n = c(1000, 1000),
-#'   mu = list(c(-1), c(+1)),
-#'   sigma = list(as.matrix(0.2), as.matrix(0.2)),
-#'   beta = list(c(1, 0), c(1, 3)),
-#'   error_sd = c(1, 1),
-#'   outlier_num = c(25, 25),
+#' lcwm_k3n1000o10 <- simulate_lcwm(
+#'   n = c(300, 300, 400),
+#'   mu = list(c(3), c(6), c(3)),
+#'   sigma = list(as.matrix(1), as.matrix(0.1), as.matrix(1)),
+#'   beta = list(c(0, 0), c(-75, 15), c(0, 5)),
+#'   error_sd = c(1, 1, 1),
+#'   outlier_num = c(3, 3, 4),
 #'   outlier_type = "x_and_y",
 #'   seed = 123,
 #'   crit_val = 0.9999,
-#'   range_multipliers = c(1.5, 2)
+#'   range_multipliers = c(1, 2)
 #' )
 #'
 #' plot(
-#'   lcwm_k2n1000oxy10[, c("X1", "Y")],
-#'   col = lcwm_k2n1000oxy10$G + 1,
-#'   pch = lcwm_k2n1000oxy10$G + 1
+#'   lcwm_k3n1000o10[, c("X1", "Y")],
+#'   col = lcwm_k3n1000o10$G + 1,
+#'   pch = lcwm_k3n1000o10$G + 1
 #' )
 simulate_lcwm <- function(
     n,
@@ -672,19 +673,22 @@ test_outlier_ombc <- function(
 #'
 #' @examples
 #'
-#' ombc_lcwm_k2n1000oxy10 <- ombc_lcwm(
-#'   xy = lcwm_k2n1000oxy10[, c("X1", "Y")],
-#'   x = lcwm_k2n1000oxy10$X1,
+#' gross_lcwm_k3n1000o10 <- find_gross(lcwm_k3n1000o10, 20)
+#'
+#' ombc_lcwm_k3n1000o10 <- ombc_lcwm(
+#'   xy = lcwm_k3n1000o10[, c("X1", "Y")],
+#'   x = lcwm_k3n1000o10$X1,
 #'   y_formula = Y ~ X1,
 #'   comp_num = 2,
 #'   max_out = 20,
-#'   mnames = "V"
+#'   mnames = "V",
+#'   gross_outs = gross_lcwm_k3n1000o10$gross_bool
 #' )
 #'
-#' backtrack_lcwm_k2n1000oxy10 <- backtrack_lcwm(
-#'   xy = lcwm_k2n1000oxy10[, c("X1", "Y")],
-#'   x = lcwm_k2n1000oxy10$X1,
-#'   ombc_lcwm_out = ombc_lcwm_k2n1000oxy10
+#' backtrack_lcwm_k3n1000o10 <- backtrack_lcwm(
+#'   xy = lcwm_k3n1000o10[, c("X1", "Y")],
+#'   x = lcwm_k3n1000o10$X1,
+#'   ombc_lcwm_out = ombc_lcwm_k3n1000o10
 #' )
 backtrack_lcwm <- function(
     xy, x, ombc_lcwm_out,

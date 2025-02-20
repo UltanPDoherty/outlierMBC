@@ -81,15 +81,16 @@ Cluster-Weighted Model
 }
 \examples{
 
-ombc_lcwm_k2n1000oxy10 <- ombc_lcwm(
-  xy = lcwm_k2n1000oxy10[, c("X1", "Y")],
-  x = lcwm_k2n1000oxy10$X1,
-  y_formula = Y ~ X1,
-  comp_num = 2,
-  max_out = 20,
-  mnames = "V"
-)
+gross_lcwm_k3n1000o10 <- find_gross(lcwm_k3n1000o10, 20)
 
-plot_curve(ombc_lcwm_k2n1000oxy10)
+ombc_lcwm_k3n1000o10 <- ombc_lcwm(
+  xy = lcwm_k3n1000o10[, c("X1", "Y")],
+  x = lcwm_k3n1000o10$X1,
+  y_formula = Y ~ X1,
+  comp_num = 3,
+  max_out = 20,
+  mnames = "V",
+  gross_outs = gross_lcwm_k3n1000o10$gross_bool
+)
 
 }

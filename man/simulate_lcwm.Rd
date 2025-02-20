@@ -54,22 +54,22 @@ simulate_lcwm(
 Simulate a multiple linear regression model with response variable outliers.
 }
 \examples{
-lcwm_k2n1000oxy10 <- simulate_lcwm(
-  n = c(1000, 1000),
-  mu = list(c(-1), c(+1)),
-  sigma = list(as.matrix(0.2), as.matrix(0.2)),
-  beta = list(c(1, 0), c(1, 3)),
-  error_sd = c(1, 1),
-  outlier_num = c(25, 25),
+lcwm_k3n1000o10 <- simulate_lcwm(
+  n = c(300, 300, 400),
+  mu = list(c(3), c(6), c(3)),
+  sigma = list(as.matrix(1), as.matrix(0.1), as.matrix(1)),
+  beta = list(c(0, 0), c(-75, 15), c(0, 5)),
+  error_sd = c(1, 1, 1),
+  outlier_num = c(3, 3, 4),
   outlier_type = "x_and_y",
   seed = 123,
   crit_val = 0.9999,
-  range_multipliers = c(1.5, 2)
+  range_multipliers = c(1, 2)
 )
 
 plot(
-  lcwm_k2n1000oxy10[, c("X1", "Y")],
-  col = lcwm_k2n1000oxy10$G + 1,
-  pch = lcwm_k2n1000oxy10$G + 1
+  lcwm_k3n1000o10[, c("X1", "Y")],
+  col = lcwm_k3n1000o10$G + 1,
+  pch = lcwm_k3n1000o10$G + 1
 )
 }

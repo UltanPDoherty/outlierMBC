@@ -43,32 +43,47 @@
 #' }
 "gmm_k3n4000o40"
 
-#' @title Data set from `simulate_lcwm`. 2 components, 1000 true observations,
-#' 10 hybrid outliers.
+#' @title Data set from `simulate_lcwm`. 3 components, 1000 true observations,
+#' 10 outliers.
 #'
 #' @description
-#' Simulated data set with 1000 observations from 2 Gaussian components with
-#' linear responses.
+#' Simulated data set with 1000 observations from 3 Gaussian components and 10
+#' outliers.
 #'
-#' @format ## `lcwm_k2n1000oxy10`
+#' @format ## `lcwm_k3n1000o10`
 #' A data frame with 1010 rows and 3 columns:
 #' \describe{
 #'   \item{X1, Y}{Continuous variables.}
-#'   \item{G}{Component label: 0 for outliers; 1 or 2 for true points.}
+#'   \item{G}{Component label: 0 for outliers; 1, 2, or 3 for true points.}
 #' }
-"lcwm_k2n1000oxy10"
+"lcwm_k3n1000o10"
 
-#' @title Data set from `simulate_lcwm`. 2 components, 2000 true observations,
-#' 50 hybrid outliers.
+#' @title Data set from `simulate_lcwm`. 3 components, 2000 true observations,
+#' 20 outliers.
 #'
 #' @description
-#' Simulated data set with 2000 observations from 2 Gaussian components with
-#' linear responses.
+#' Simulated data set with 2000 observations from 3 Gaussian components and 20
+#' outliers.
 #'
-#' @format ## `lcwm_k2n2000oxy50`
-#' A data frame with 2050 rows and 3 columns:
+#' @format ## `lcwm_k3n2000o20`
+#' A data frame with 1010 rows and 3 columns:
 #' \describe{
 #'   \item{X1, Y}{Continuous variables.}
-#'   \item{G}{Component label: 0 for outliers; 1 or 2 for true points.}
+#'   \item{G}{Component label: 0 for outliers; 1, 2, or 3 for true points.}
 #' }
-"lcwm_k2n2000oxy50"
+"lcwm_k3n2000o20"
+
+#' @title Data set from `simulate_lcwm`. 3 components, 4000 true observations,
+#' 40 outliers.
+#'
+#' @description
+#' Simulated data set with 4000 observations from 3 Gaussian components and 40
+#' outliers.
+#'
+#' @format ## `lcwm_k3n4000o40`
+#' A data frame with 4040 rows and 3 columns:
+#' \describe{
+#'   \item{X1, Y}{Continuous variables.}
+#'   \item{G}{Component label: 0 for outliers; 1, 2, or 3 for true points.}
+#' }
+"lcwm_k3n4000o40"

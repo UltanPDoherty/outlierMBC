@@ -41,18 +41,21 @@ Fit a LCWM to the backtrack solution.
 }
 \examples{
 
-ombc_lcwm_k2n1000oxy10 <- ombc_lcwm(
-  xy = lcwm_k2n1000oxy10[, c("X1", "Y")],
-  x = lcwm_k2n1000oxy10$X1,
+gross_lcwm_k3n1000o10 <- find_gross(lcwm_k3n1000o10, 20)
+
+ombc_lcwm_k3n1000o10 <- ombc_lcwm(
+  xy = lcwm_k3n1000o10[, c("X1", "Y")],
+  x = lcwm_k3n1000o10$X1,
   y_formula = Y ~ X1,
   comp_num = 2,
   max_out = 20,
-  mnames = "V"
+  mnames = "V",
+  gross_outs = gross_lcwm_k3n1000o10$gross_bool
 )
 
-backtrack_lcwm_k2n1000oxy10 <- backtrack_lcwm(
-  xy = lcwm_k2n1000oxy10[, c("X1", "Y")],
-  x = lcwm_k2n1000oxy10$X1,
-  ombc_lcwm_out = ombc_lcwm_k2n1000oxy10
+backtrack_lcwm_k3n1000o10 <- backtrack_lcwm(
+  xy = lcwm_k3n1000o10[, c("X1", "Y")],
+  x = lcwm_k3n1000o10$X1,
+  ombc_lcwm_out = ombc_lcwm_k3n1000o10
 )
 }
