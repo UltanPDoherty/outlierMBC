@@ -39,7 +39,7 @@ plot_curve <- function(ombc_out) {
     ggplot2::labs(
       title = paste0("outlierMBC: Number of Outliers = ", outlier_num),
       x = "Outlier Number",
-      y = "Mean Absolute CDF Difference",
+      y = "Dissimilarity",
       colour = ""
     ) +
     ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +

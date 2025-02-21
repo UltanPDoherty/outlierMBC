@@ -110,7 +110,7 @@ plot_backtrack <- function(
         ", max_step_rise = ", max_step_rise
       ),
       x = "Outlier Number",
-      y = "Rescaled Mean Absolute CDF Difference",
+      y = "Rescaled Dissimilarity",
       colour = ""
     ) +
     ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
