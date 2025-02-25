@@ -126,7 +126,7 @@ plot_backtrack <- function(
 #' @inheritParams ombc_gmm
 #' @inheritParams plot_curve
 #' @inheritParams backtrack
-#' @param manual_outlier_num description
+#' @param manual_outlier_num User-specified number of outliers.
 #'
 #' @returns List:
 #' * labels

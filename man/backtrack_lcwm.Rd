@@ -10,7 +10,8 @@ backtrack_lcwm(
   ombc_lcwm_out,
   max_total_rise = 0.1,
   max_step_rise = 0.05,
-  init_z = NULL
+  init_z = NULL,
+  manual_outlier_num = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ backtrack_lcwm(
 \item{max_step_rise}{Each step must be less than minimum * (1 + max_step_rise).}
 
 \item{init_z}{Initial z matrix.}
+
+\item{manual_outlier_num}{User-specified number of outliers.}
 }
 \value{
 List:

@@ -666,6 +666,7 @@ test_outlier_ombc <- function(
 #'
 #' @inheritParams ombc_lcwm
 #' @inheritParams backtrack
+#' @inheritParams backtrack_gmm
 #' @param ombc_lcwm_out Output from ombc_lcwm.
 #'
 #' @returns List:
@@ -699,7 +700,7 @@ test_outlier_ombc <- function(
 backtrack_lcwm <- function(
     xy, x, ombc_lcwm_out,
     max_total_rise = 0.1, max_step_rise = 0.05,
-    init_z = NULL) {
+    init_z = NULL, manual_outlier_num = NULL) {
   this_call <- call(
     "backtrack_lcwm",
     "xy" = substitute(xy), "x" = substitute(x),
@@ -708,31 +709,36 @@ backtrack_lcwm <- function(
     "init_z" = substitute(init_z)
   )
 
-  backtrack_out <- backtrack(
-    ombc_lcwm_out$distrib_diff_vec, max_total_rise, max_step_rise
-  )
-
-  if (backtrack_out$backtrack$ind == backtrack_out$minimum$ind) {
-    cat(paste0(
-      "backtrack stayed at the minimum.",
-      "backtrack_lcwm will return ombc_lcwm results directly.\n"
-    ))
-
-    return(list(
-      "labels" = ombc_lcwm_out$labels,
-      "outlier_bool" = ombc_lcwm_out$outlier_bool,
-      "outlier_num" = ombc_lcwm_out$outlier_num,
-      "lcwm" = ombc_lcwm_out$lcwm,
-      "call" = this_call
-    ))
-  }
-
   x <- as.matrix(x)
   x0 <- x
   xy0 <- xy
 
   gross_num <- sum(ombc_lcwm_out$gross_outs)
-  outlier_num <- backtrack_out$backtrack$ind - 1 + gross_num
+
+  if (is.null(manual_outlier_num)) {
+    backtrack_out <- backtrack(
+      ombc_lcwm_out$distrib_diff_vec, max_total_rise, max_step_rise
+    )
+
+    if (backtrack_out$backtrack$ind == backtrack_out$minimum$ind) {
+      cat(paste0(
+        "backtrack stayed at the minimum.",
+        "backtrack_lcwm will return ombc_lcwm results directly.\n"
+      ))
+
+      return(list(
+        "labels" = ombc_lcwm_out$labels,
+        "outlier_bool" = ombc_lcwm_out$outlier_bool,
+        "outlier_num" = ombc_lcwm_out$outlier_num,
+        "lcwm" = ombc_lcwm_out$lcwm,
+        "call" = this_call
+      ))
+    }
+
+    outlier_num <- backtrack_out$backtrack$ind - 1 + gross_num
+  } else {
+    outlier_num <- manual_outlier_num
+  }
 
   outlier_bool <-
     ombc_lcwm_out$outlier_rank <= outlier_num & ombc_lcwm_out$outlier_rank != 0

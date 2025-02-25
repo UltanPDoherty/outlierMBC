@@ -27,7 +27,7 @@ backtrack_gmm(
 
 \item{init_z}{Initial z matrix.}
 
-\item{manual_outlier_num}{description}
+\item{manual_outlier_num}{User-specified number of outliers.}
 }
 \value{
 List:
