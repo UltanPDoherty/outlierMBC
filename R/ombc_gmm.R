@@ -73,7 +73,7 @@ ombc_gmm <- function(
 
   obs_num <- nrow(x)
 
-  dist_mat0 <- as.matrix(stats::dist(scale(x0)))
+  dist_mat0 <- as.matrix(stats::dist(x0))
   dist_mat <- dist_mat0
 
   gross_num <- sum(gross_outs)
