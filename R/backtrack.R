@@ -166,7 +166,7 @@ backtrack_gmm <- function(
     if (backtrack_out$backtrack$ind == backtrack_out$minimum$ind) {
       cat(paste0(
         "backtrack stayed at the minimum.",
-        "backtrack_gmm will return ombc_gmm results directly.\n"
+        " backtrack_gmm will return ombc_gmm results directly.\n"
       ))
 
       return(list(
