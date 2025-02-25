@@ -700,8 +700,6 @@ backtrack_lcwm <- function(
     xy, x, ombc_lcwm_out,
     max_total_rise = 0.1, max_step_rise = 0.05,
     init_z = NULL) {
-  init_model <- NULL
-
   this_call <- call(
     "backtrack_lcwm",
     "xy" = substitute(xy), "x" = substitute(x),
@@ -742,23 +740,18 @@ backtrack_lcwm <- function(
   init_scheme <- ombc_lcwm_out$call$init_scheme
 
   stopifnot(
-    "init_model & init_z cannot be used with the 'reinit' init_scheme." = (
-      (init_scheme != "reinit") || (is.null(init_model) && is.null(init_z))
-    )
-  )
-
-  stopifnot(
     "init_scheme must be 'update' or 'reinit' or 'reuse'." = (
       init_scheme %in% c("update", "reinit", "reuse")
     )
   )
+  stopifnot(
+    "init_z cannot be used with the 'reinit' init_scheme." = (
+      (init_scheme != "reinit") || is.null(init_z)
+    )
+  )
 
-  if (!is.null(init_model) && !is.null(init_z)) {
-    stop("Only one of init_model and init_z may be provided.")
-  } else if (!is.null(init_z)) {
+  if (!is.null(init_z)) {
     z0 <- init_z
-  } else if (!is.null(init_model)) {
-    z0 <- mixture::e_step(x0[!ombc_lcwm_out$gross_outs, ], init_model)$z
   } else if (init_scheme != "reinit") {
     z0 <- get_init_z(
       comp_num = ombc_lcwm_out$call$comp_num,

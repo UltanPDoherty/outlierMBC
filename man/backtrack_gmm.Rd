@@ -10,7 +10,8 @@ backtrack_gmm(
   max_total_rise = 0.1,
   max_step_rise = 0.05,
   init_model = NULL,
-  init_z = NULL
+  init_z = NULL,
+  manual_outlier_num = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ backtrack_gmm(
 \item{init_model}{mixture::gpcm best_model}
 
 \item{init_z}{Initial z matrix.}
+
+\item{manual_outlier_num}{description}
 }
 \value{
 List:
