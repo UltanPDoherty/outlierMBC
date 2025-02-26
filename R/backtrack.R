@@ -187,6 +187,7 @@ backtrack_gmm <- function(
     ombc_out$outlier_rank <= outlier_num & ombc_out$outlier_rank != 0
 
   init_scheme <- ombc_out$call$init_scheme
+  init_scaling <- ombc_out$call$init_scaling
 
   stopifnot(
     "init_scheme must be 'update' or 'reinit' or 'reuse'." = (
@@ -208,9 +209,10 @@ backtrack_gmm <- function(
   } else if (!is.null(init_model)) {
     z0 <- mixture::e_step(x0[!ombc_out$gross_outs, ], init_model)$z
   } else if (init_scheme != "reinit") {
+    x1 <- scale(x0, center = init_scaling, scale = init_scaling)
     z0 <- get_init_z(
       comp_num = ombc_out$call$comp_num,
-      dist_mat = as.matrix(stats::dist(scale(x0)[!ombc_out$gross_outs, ])),
+      dist_mat = as.matrix(stats::dist(x1[!ombc_out$gross_outs, ])),
       x = x0[!ombc_out$gross_outs, ],
       init_method = ombc_out$call$init_method,
       kmpp_seed = ombc_out$call$kmpp_seed
@@ -219,9 +221,10 @@ backtrack_gmm <- function(
 
   cat("Fitting backtrack model:\n")
   if (init_scheme == "reinit") {
+    x1 <- scale(x0, center = init_scaling, scale = init_scaling)
     z <- get_init_z(
       comp_num = ombc_out$call$comp_num,
-      dist_mat = as.matrix(stats::dist(scale(x0)[!outlier_bool, ])),
+      dist_mat = as.matrix(stats::dist(x1[!outlier_bool, ])),
       x = x0[!outlier_bool, ],
       init_method = ombc_out$call$init_method,
       kmpp_seed = ombc_out$call$kmpp_seed

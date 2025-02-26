@@ -54,6 +54,7 @@ ombc_lcwm <- function(
     atol = 1e-8,
     init_z = NULL,
     init_method = c("hc", "kmpp"),
+    init_scaling = TRUE,
     kmpp_seed = 123,
     print_interval = Inf,
     dd_weight = 0.5,
@@ -82,7 +83,8 @@ ombc_lcwm <- function(
 
   obs_num <- nrow(x)
 
-  dist_mat0 <- as.matrix(stats::dist(scale(xy0)))
+  xy1 <- scale(xy0, center = init_scaling, scale = init_scaling)
+  dist_mat0 <- as.matrix(stats::dist(xy1))
   dist_mat <- dist_mat0
 
   gross_num <- sum(gross_outs)
@@ -744,6 +746,7 @@ backtrack_lcwm <- function(
     ombc_lcwm_out$outlier_rank <= outlier_num & ombc_lcwm_out$outlier_rank != 0
 
   init_scheme <- ombc_lcwm_out$call$init_scheme
+  init_scaling <- ombc_lcwm_out$call$init_scaling
 
   stopifnot(
     "init_scheme must be 'update' or 'reinit' or 'reuse'." = (
@@ -759,10 +762,11 @@ backtrack_lcwm <- function(
   if (!is.null(init_z)) {
     z0 <- init_z
   } else if (init_scheme != "reinit") {
+    xy1 <- scale(xy0, center = init_scaling, scale = init_scaling)
     z0 <- get_init_z(
       comp_num = ombc_lcwm_out$call$comp_num,
       dist_mat = as.matrix(
-        stats::dist(scale(xy0)[!ombc_lcwm_out$gross_outs, ])
+        stats::dist(xy1[!ombc_lcwm_out$gross_outs, ])
       ),
       x = x0[!ombc_lcwm_out$gross_outs, , drop = FALSE],
       init_method = ombc_lcwm_out$call$init_method,
@@ -771,10 +775,11 @@ backtrack_lcwm <- function(
   }
 
   if (init_scheme == "reinit") {
+    xy1 <- scale(xy0, center = init_scaling, scale = init_scaling)
     z <- get_init_z(
       comp_num = ombc_lcwm_out$call$comp_num,
       dist_mat = as.matrix(
-        stats::dist(scale(xy0)[!outlier_bool, , drop = FALSE])
+        stats::dist(xy1[!outlier_bool, , drop = FALSE])
       ),
       x = xy0[!outlier_bool, , drop = FALSE],
       init_method = ombc_lcwm_out$call$init_method,

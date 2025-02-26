@@ -14,6 +14,8 @@
 #' @param init_z Initial z matrix.
 #' @param init_model mixture::gpcm best_model
 #' @param init_method Method used to initialise each mixture model.
+#' @param init_scaling Logical: whether the data should be scaled for
+#'                     initialisation.
 #' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
 #'                  hierarchical clustering.
 #' @param print_interval How frequently the iteration count is printed.
@@ -51,6 +53,7 @@ ombc_gmm <- function(
     init_z = NULL,
     init_model = NULL,
     init_method = c("hc", "kmpp"),
+    init_scaling = FALSE,
     kmpp_seed = 123,
     print_interval = Inf) {
   init_method <- match.arg(init_method)
@@ -62,7 +65,7 @@ ombc_gmm <- function(
     "gross_outs" = substitute(gross_outs), "init_scheme" = init_scheme,
     "mnames" = mnames, "nmax" = nmax, "atol" = atol,
     "init_z" = substitute(init_z), "init_model" = substitute(init_model),
-    "init_method" = init_method,
+    "init_method" = init_method, "init_scaling" = init_scaling,
     "kmpp_seed" = kmpp_seed, "print_interval" = print_interval
   )
 
@@ -73,7 +76,8 @@ ombc_gmm <- function(
 
   obs_num <- nrow(x)
 
-  dist_mat0 <- as.matrix(stats::dist(x0))
+  x1 <- scale(x0, center = init_scaling, scale = init_scaling)
+  dist_mat0 <- as.matrix(stats::dist(x1))
   dist_mat <- dist_mat0
 
   gross_num <- sum(gross_outs)

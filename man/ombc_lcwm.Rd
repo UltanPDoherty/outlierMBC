@@ -17,6 +17,7 @@ ombc_lcwm(
   atol = 1e-08,
   init_z = NULL,
   init_method = c("hc", "kmpp"),
+  init_scaling = TRUE,
   kmpp_seed = 123,
   print_interval = Inf,
   dd_weight = 0.5,
@@ -47,6 +48,9 @@ ombc_lcwm(
 \item{init_z}{Initial z matrix.}
 
 \item{init_method}{Method used to initialise each mixture model.}
+
+\item{init_scaling}{Logical: whether the data should be scaled for
+initialisation.}
 
 \item{kmpp_seed}{Optional seed for k-means++ initialisation. Default is
 hierarchical clustering.}
