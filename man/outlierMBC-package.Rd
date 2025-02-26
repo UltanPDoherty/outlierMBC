@@ -8,14 +8,19 @@
 \description{
 Exported Functions:
 \itemize{
-\item \code{ombc_gmm} - Identify multivariate outliers while clustering the data with
-a Gaussian mixture model.
-\item \code{ombc_mlr} - Identify response variable outliers while fitting a multiple
-linear regression model to the data.
-\item \code{simulate_noisy_gmm} - Simulate data from a Gaussian mixture model with
-multivariate outliers.
-\item \code{simulate_noisy_mlr} - Simulate data from a multiple linear regression
-model with response variable outliers.
+\item \code{ombc_gmm} - Identify outliers while clustering the data by fitting a
+Gaussian mixture model.
+\item \code{ombc_lcwm} - Identify outliers while performing regression and clustering
+by fitting a linear cluster-weighted model to the data.
+\item \code{simulate_gmm} - Simulate data from a Gaussian mixture model with outliers.
+\item \code{simulate_lcwm} - Simulate data from a linear cluster-weighted model with
+outliers.
+\item \code{find_gross} -
+\item \code{backtrack} -
+\item \code{backtrack_gmm} -
+\item \code{backtrack_lcwm} -
+\item \code{plot_curve} -
+\item \code{plot_backtrack} -
 }
 }
 \author{

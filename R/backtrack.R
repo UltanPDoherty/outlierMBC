@@ -25,7 +25,7 @@ backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.05) {
   xmin_val <- min(x)
   xmin_ind <- which.min(x)
 
-  valid_step <- x < dplyr::lead(x) + max_step_rise * xmin_val
+  valid_step <- x < c(x[-1], NA) + max_step_rise * xmin_val
   valid_value <- x < (1 + max_total_rise) * xmin_val
 
   y <- xmin_ind

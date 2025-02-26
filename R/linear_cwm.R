@@ -517,8 +517,6 @@ simulate_lcwm <- function(
 #'
 #' @return `matrix`: minimum and maximum columns, rows for each covariate and
 #'                   one for the response errors.
-#'
-#' @export
 uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
   ranges_x <- apply(covariates_g, 2, range)
   centres_x <- colMeans(ranges_x)
@@ -546,8 +544,6 @@ uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
 #' @param uniform_spans Covariate and response error spans.
 #'
 #' @return Vector consisting of covariate values, response value, and label 0.
-#'
-#' @export
 uniform_outlier_ombc <- function(
     outlier_type,
     mu, sigma, beta, error_sd, g,
@@ -586,8 +582,6 @@ uniform_outlier_ombc <- function(
 #' @return List:
 #' * x = Covariate sample
 #' * y = Response sample
-#'
-#' @export
 uniform_sample_lcwm <- function(
     outlier_type, mu_g, sigma_g, beta_g, error_sd_g, uniform_spans_g) {
   var_num <- length(beta_g) - 1
@@ -627,8 +621,6 @@ uniform_sample_lcwm <- function(
 #' @param y_sample New response sample.
 #'
 #' @return Logical: TRUE if the new sample is an outlier for each component.
-#'
-#' @export
 test_outlier_ombc <- function(
     outlier_type,
     mu, sigma, beta, error_sd,
