@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_ombc.R
 \name{plot_comparison}
 \alias{plot_comparison}
-\title{Plot the outlier number selection curve.}
+\title{Plot multiple dissimilarity curves.}
 \usage{
 plot_comparison(ombc_list)
 }
@@ -13,5 +13,5 @@ plot_comparison(ombc_list)
 A gg object.
 }
 \description{
-Plot the outlier number selection curve.
+Plot multiple dissimilarity curves.
 }

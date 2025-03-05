@@ -50,7 +50,7 @@ plot_curve <- function(ombc_out) {
 
 # ==============================================================================
 
-#' Plot the outlier number selection curve.
+#' Plot dissimilarity values for multiple solutions.
 #'
 #' @param ombc_list A list of outputs from ombc_gmm.
 #' @param x_axis The quantity to be plotted on the x axis.
@@ -129,7 +129,7 @@ plot_selection <- function(
 
 # ==============================================================================
 
-#' Plot the outlier number selection curve.
+#' Plot multiple dissimilarity curves.
 #'
 #' @inheritParams plot_selection
 #'

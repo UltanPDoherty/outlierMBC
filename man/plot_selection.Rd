@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_ombc.R
 \name{plot_selection}
 \alias{plot_selection}
-\title{Plot the outlier number selection curve.}
+\title{Plot dissimilarity values for multiple solutions.}
 \usage{
 plot_selection(ombc_list, x_axis = c("comp_num", "outlier_num", "param_num"))
 }
@@ -15,5 +15,5 @@ plot_selection(ombc_list, x_axis = c("comp_num", "outlier_num", "param_num"))
 A gg object.
 }
 \description{
-Plot the outlier number selection curve.
+Plot dissimilarity values for multiple solutions.
 }
