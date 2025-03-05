@@ -47,3 +47,148 @@ plot_curve <- function(ombc_out) {
 
   return(curve)
 }
+
+# ==============================================================================
+
+#' Plot the outlier number selection curve.
+#'
+#' @param ombc_list A list of outputs from ombc_gmm.
+#' @param x_axis The quantity to be plotted on the x axis.
+#'
+#' @returns A gg object.
+#' @export
+plot_selection <- function(
+    ombc_list, x_axis = c("comp_num", "outlier_num", "param_num")) {
+  x_axis <- match.arg(x_axis)
+  x_label <- switch(x_axis,
+    comp_num = "Number of Components",
+    outlier_num = "Number of Outliers",
+    param_num = "Number of Parameters"
+  )
+
+  ombc_calls <- sapply(ombc_list, \(x) x$call[1])
+  stopifnot(
+    "ombc_list must all be ombc_gmm output or all be ombc_lcwm output." =
+      length(unique(ombc_calls)) == 1
+  )
+
+  backtrack_list <- lapply(ombc_list, \(x) backtrack(x$distrib_diff_vec))
+
+  if (all(ombc_calls == "ombc_gmm()")) {
+    df <- data.frame(
+      "model_num" = seq_along(ombc_list),
+      "model" = sapply(ombc_list, \(x) x$mix$best_model$cov_type),
+      "minimum" = sapply(ombc_list, \(x) min(x$distrib_diff_vec)),
+      "backtrack" = sapply(backtrack_list, \(x) x$backtrack$val),
+      "comp_num" = sapply(ombc_list, \(x) x$call$comp_num),
+      "outlier_num" = sapply(ombc_list, \(x) x$outlier_num),
+      "param_num" = sapply(ombc_list, \(x) x$mix$best_model$nparam)
+    )
+    df$model_comp <- paste(df$model, df$comp_num, sep = "-")
+    df2 <- stats::reshape(
+      data = df,
+      direction = "long",
+      varying = c("minimum", "backtrack"),
+      times = c("minimum", "backtrack"),
+      timevar = "solution", v.names = "dissimilarity", idvar = "model_num"
+    )
+    df2$row_names <- rownames(df2)
+    df3 <- stats::reshape(
+      data = df2,
+      idvar = "row_names", ids = df2$row_names,
+      direction = "long",
+      varying = c("comp_num", "outlier_num", "param_num"),
+      times = c("comp_num", "outlier_num", "param_num"),
+      timevar = "x_names", v.names = "x_values"
+    )
+  } else {
+    stop("plot_selection is currently only available for ombc_gmm.")
+  }
+
+  ggokabeito_palette <- c(
+    "#E69F00", "#56B4E9", "#009E73", "#F0E442",
+    "#0072B2", "#D55E00", "#CC79A7", "#000000"
+  )
+  x_values <- dissimilarity <- solution <- model_comp <- NULL
+  gg <- df3[df3$x_names == x_axis, ] |>
+    ggplot2::ggplot(ggplot2::aes(
+      x = x_values, y = dissimilarity,
+      colour = model_comp, shape = solution
+    )) +
+    ggplot2::geom_point() +
+    ggplot2::labs(
+      title = "Model Selection for outlierMBC",
+      x = x_label, y = "Dissimilarity",
+      colour = "Model", shape = "Solution"
+    ) +
+    ggplot2::scale_colour_manual(values = ggokabeito_palette) +
+    ggplot2::expand_limits(y = 0)
+
+  return(gg)
+}
+
+# ==============================================================================
+
+#' Plot the outlier number selection curve.
+#'
+#' @inheritParams plot_selection
+#'
+#' @returns A gg object.
+#' @export
+plot_comparison <- function(ombc_list) {
+  gross_num <- sum(ombc_list[[1]]$gross_outs)
+  max_out <- max(ombc_list[[1]]$outlier_rank) - 1
+  outlier_seq <- seq(gross_num, max_out)
+  point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
+
+  ombc_calls <- sapply(ombc_list, \(x) x$call[1])
+  stopifnot(
+    "ombc_list must all be ombc_gmm output or all be ombc_lcwm output." =
+      length(unique(ombc_calls)) == 1
+  )
+
+  if (all(ombc_calls == "ombc_gmm()")) {
+    df_list <- lapply(
+      ombc_list,
+      function(x) {
+        data.frame(
+          "model" = x$mix$best_model$cov_type,
+          "comp_num" = x$call$comp_num,
+          "model_comp" = paste(
+            x$mix$best_model$cov_type, x$call$comp_num,
+            sep = "-"
+          ),
+          "outlier_seq" = outlier_seq,
+          "dissimilarity" = x$distrib_diff_vec
+        )
+      }
+    )
+
+    df <- Reduce(rbind, df_list)
+  } else {
+    stop("plot_selection is currently only available for ombc_gmm.")
+  }
+
+  ggokabeito_palette <- c(
+    "#E69F00", "#56B4E9", "#009E73", "#F0E442",
+    "#0072B2", "#D55E00", "#CC79A7", "#000000"
+  )
+  dissimilarity <- model_comp <- NULL
+  gg <- df |>
+    ggplot2::ggplot(ggplot2::aes(
+      x = outlier_seq, y = dissimilarity,
+      colour = model_comp
+    )) +
+    ggplot2::geom_line() +
+    ggplot2::geom_point(size = point_size) +
+    ggplot2::labs(
+      title = "Model Comparison for outlierMBC",
+      x = "Outlier Number", y = "Dissimilarity",
+      colour = "Model"
+    ) +
+    ggplot2::scale_colour_manual(values = ggokabeito_palette) +
+    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
+    ggplot2::expand_limits(y = 0)
+
+  return(gg)
+}
