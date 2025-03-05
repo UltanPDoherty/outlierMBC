@@ -115,9 +115,8 @@ ombc_lcwm <- function(
   outlier_rank_temp <- rep(0, obs_num - gross_num)
   for (i in seq_len(max_out + 1)) {
     if (i %% print_interval == 0) cat("i = ", i, "\n")
-
     if (init_scheme %in% c("update", "reuse")) {
-      invisible(utils::capture.output(lcwm <- flexCWM::cwm(
+      suppressWarnings(invisible(utils::capture.output(lcwm <- flexCWM::cwm(
         formulaY = y_formula,
         familyY = stats::gaussian(link = "identity"),
         data = xy,
@@ -128,13 +127,13 @@ ombc_lcwm <- function(
         start.z = z,
         iter.max = nmax,
         threshold = atol
-      )))
+      ))))
     } else {
       reinit_z <- get_init_z(
         comp_num = comp_num, dist_mat = dist_mat, x = xy,
         init_method = init_method, kmpp_seed = kmpp_seed
       )
-      invisible(utils::capture.output(lcwm <- flexCWM::cwm(
+      suppressWarnings(invisible(utils::capture.output(lcwm <- flexCWM::cwm(
         formulaY = y_formula,
         familyY = stats::gaussian(link = "identity"),
         data = xy,
@@ -145,7 +144,7 @@ ombc_lcwm <- function(
         start.z = reinit_z,
         iter.max = nmax,
         threshold = atol
-      )))
+      ))))
     }
 
     loglike[i] <- lcwm$models[[1]]$logLik
