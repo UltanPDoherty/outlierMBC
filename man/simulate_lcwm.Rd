@@ -63,7 +63,7 @@ lcwm_k3n1000o10 <- simulate_lcwm(
   outlier_num = c(3, 3, 4),
   outlier_type = "x_and_y",
   seed = 123,
-  crit_val = 0.9999,
+  crit_val = 1 - 1e-6,
   range_multipliers = c(1, 2)
 )
 
