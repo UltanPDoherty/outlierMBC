@@ -70,7 +70,7 @@ ombc_lcwm <- function(
     "gross_outs" = substitute(gross_outs), "init_scheme" = init_scheme,
     "mnames" = mnames, "nmax" = nmax, "atol" = atol,
     "init_z" = substitute(init_z),
-    "init_method" = init_method,
+    "init_method" = init_method, "init_scaling" = init_scaling,
     "kmpp_seed" = kmpp_seed, "print_interval" = print_interval,
     "dd_weight" = dd_weight, "dens_power" = dens_power
   )
