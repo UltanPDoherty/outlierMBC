@@ -124,7 +124,7 @@ plot_selection <- function(
     ggplot2::scale_colour_manual(values = ggokabeito_palette) +
     ggplot2::expand_limits(y = 0)
 
-  return(gg)
+  gg
 }
 
 # ==============================================================================

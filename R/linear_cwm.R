@@ -219,7 +219,7 @@ ombc_lcwm <- function(
 
   colnames(distrib_diff_mat) <- paste0("k", seq_len(comp_num))
 
-  return(list(
+  list(
     labels = labels,
     outlier_bool = outlier_bool,
     outlier_num = outlier_num,
@@ -234,7 +234,7 @@ ombc_lcwm <- function(
     call = this_call,
     version = ombc_version,
     conv_status = conv_status
-  ))
+  )
 }
 
 # ==============================================================================
