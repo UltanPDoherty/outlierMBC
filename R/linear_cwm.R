@@ -401,10 +401,10 @@ distrib_diff_residual <- function(
 
   dens_g_y <- stats::dnorm(mod_g$residuals, mean = 0, sd = y_sigma_g)
 
-  return(list(
+  list(
     diff = distrib_diff_g_y,
     dens = dens_g_y
-  ))
+  )
 }
 
 # ==============================================================================
@@ -529,9 +529,7 @@ uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
   min_err <- centre_err - (range_multipliers[2] / 2) * width_err
   max_err <- centre_err + (range_multipliers[2] / 2) * width_err
 
-  spans <- cbind(c(mins_x, min_err), c(maxs_x, max_err))
-
-  return(spans)
+  cbind(c(mins_x, min_err), c(maxs_x, max_err))
 }
 
 # ------------------------------------------------------------------------------
@@ -564,7 +562,7 @@ uniform_outlier_ombc <- function(
     )
   }
 
-  return(c(uniform_sample$x, uniform_sample$y, 0))
+  c(uniform_sample$x, uniform_sample$y, 0)
 }
 
 # ------------------------------------------------------------------------------
@@ -608,7 +606,7 @@ uniform_sample_lcwm <- function(
 
   outlier_y_g <- outlier_fitted + outlier_err
 
-  return(list(x = outlier_x_g, y = outlier_y_g))
+  list(x = outlier_x_g, y = outlier_y_g)
 }
 
 # ------------------------------------------------------------------------------
@@ -650,7 +648,7 @@ test_outlier_ombc <- function(
     )
   }
 
-  return(all(checks))
+  all(checks)
 }
 
 # ==============================================================================
@@ -864,11 +862,11 @@ backtrack_lcwm <- function(
   labels[outlier_bool] <- 0
   labels[!outlier_bool] <- lcwm$models[[1]]$cluster
 
-  return(list(
+  list(
     "labels" = labels,
     "outlier_bool" = outlier_bool,
     "outlier_num" = outlier_num,
     "lcwm" = lcwm,
     "call" = this_call
-  ))
+  )
 }

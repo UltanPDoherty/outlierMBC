@@ -257,5 +257,5 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
     }
   }
 
-  return(mix)
+  mix
 }

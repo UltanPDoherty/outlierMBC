@@ -36,12 +36,12 @@ distrib_diff_gmm <- function(
 
   distrib_diff <- sqrt(sum(prop * distrib_diff_vec^2))
 
-  return(list(
+  list(
     distrib_diff_vec = distrib_diff_vec,
     distrib_diff = distrib_diff,
     choice_id = choice_id,
     removal_dens = removal_dens
-  ))
+  )
 }
 
 # ==============================================================================
@@ -86,9 +86,9 @@ distrib_diff_mahalanobis <- function(
     -0.5 * (var_num * log(2 * pi) + logdet_g + mahalas_g)
   )
 
-  return(list(
+  list(
     diff = distrib_diff_g_x,
     dens = dens_g_x,
     mahalas = scaled_mahalas_g
-  ))
+  )
 }

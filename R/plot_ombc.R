@@ -45,7 +45,7 @@ plot_curve <- function(ombc_out) {
     ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
     ggplot2::expand_limits(y = 0)
 
-  return(curve)
+  curve
 }
 
 # ==============================================================================
@@ -190,5 +190,5 @@ plot_comparison <- function(ombc_list) {
     ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
     ggplot2::expand_limits(y = 0)
 
-  return(gg)
+  gg
 }
