@@ -29,9 +29,10 @@ find_gross(
 \value{
 List:
 \itemize{
-\item $choice: a numeric value indicating the elbow's location.
-\item $bool: a logical vector identifying the gross outliers.
-\item $plot
+\item $gross_choice: a numeric value indicating the elbow's location.
+\item $gross_bool: a logical vector identifying the gross outliers.
+\item $gross_curve:
+\item $gross_scatter:
 }
 }
 \description{

@@ -17,9 +17,10 @@
 #' @param scale Logical
 #'
 #' @return List:
-#' * $choice: a numeric value indicating the elbow's location.
-#' * $bool: a logical vector identifying the gross outliers.
-#' * $plot
+#' * $gross_choice: a numeric value indicating the elbow's location.
+#' * $gross_bool: a logical vector identifying the gross outliers.
+#' * $gross_curve:
+#' * $gross_scatter:
 #'
 #' @export
 find_gross <- function(
@@ -63,6 +64,13 @@ find_gross <- function(
     ) +
     ggplot2::geom_hline(yintercept = gross_threshold, colour = "#E69F00") +
     ggplot2::labs(
+      title = paste0(
+        "No. of Gross Outliers = ", gross_choice,
+        " (max_out = ", max_out, ", multiplier = ", multiplier, ")"
+      ),
+      subtitle = paste0(
+        2 * max_out, " largest kNN distances (k = ", k_neighbours, ")"
+      ),
       x = "kNN Distance Order",
       y = paste0("kNN Distance (k = ", k_neighbours, ")"),
       colour = "Outlier Number Choices:"
@@ -93,6 +101,13 @@ find_gross <- function(
     ) +
     ggplot2::geom_hline(yintercept = gross_threshold, colour = "#E69F00") +
     ggplot2::labs(
+      title = paste0(
+        "No. of Gross Outliers = ", gross_choice,
+        " (max_out = ", max_out, ", multiplier = ", multiplier, ")"
+      ),
+      subtitle = paste0(
+        "All kNN distances (k = ", k_neighbours, ")"
+      ),
       x = "Index",
       y = paste0("kNN Distance (k = ", k_neighbours, ")")
     ) +
@@ -104,19 +119,10 @@ find_gross <- function(
       ggplot2::geom_hline(yintercept = knndist_benchmark, linetype = "dashed")
   }
 
-  plot <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(curve, scatter, nrow = 1, ncol = 2),
-    top = paste0(
-      "No. of Gross Outliers = ", gross_choice,
-      " (max_out = ", max_out, ", multiplier = ", multiplier, ")"
-    )
-  ) + ggpubr::bgcolor("white") + ggpubr::border("white")
-
-  output <- list(
+  return(list(
     gross_choice = gross_choice,
     gross_bool = gross_bool,
-    plot = plot
-  )
-
-  return(output)
+    gross_curve = curve,
+    gross_scatter = scatter
+  ))
 }
