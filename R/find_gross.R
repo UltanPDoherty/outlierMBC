@@ -119,10 +119,10 @@ find_gross <- function(
       ggplot2::geom_hline(yintercept = knndist_benchmark, linetype = "dashed")
   }
 
-  return(list(
+  list(
     gross_choice = gross_choice,
     gross_bool = gross_bool,
     gross_curve = curve,
     gross_scatter = scatter
-  ))
+  )
 }

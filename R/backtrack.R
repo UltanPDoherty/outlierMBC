@@ -44,7 +44,7 @@ backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.05) {
   minimum <- list("ind" = xmin_ind, "val" = xmin_val)
   backtrack <- list("ind" = y, "val" = x[y])
 
-  return(list("minimum" = minimum, "backtrack" = backtrack))
+  list("minimum" = minimum, "backtrack" = backtrack)
 }
 
 #' Plot the outlier number selection curve for the backtrack method.
@@ -115,7 +115,7 @@ plot_backtrack <- function(
     ggplot2::expand_limits(y = 0) +
     ggplot2::theme(legend.position = "bottom")
 
-  return(backtrack_curve)
+  backtrack_curve
 }
 
 # ------------------------------------------------------------------------------
@@ -292,11 +292,11 @@ backtrack_gmm <- function(
   labels[outlier_bool] <- 0
   labels[!outlier_bool] <- mix$map
 
-  return(list(
+  list(
     "labels" = labels,
     "outlier_bool" = outlier_bool,
     "outlier_num" = outlier_num,
     "mix" = mix,
     "call" = this_call
-  ))
+  )
 }

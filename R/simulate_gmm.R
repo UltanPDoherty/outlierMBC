@@ -99,10 +99,8 @@ simulate_gmm <- function(
   labels <- rep(seq_len(comp_num), n)
   labels <- c(labels, rep(0, outlier_num))
 
-  df <- data.frame(
+  data.frame(
     rbind(samp, unif_samp),
     G = labels
   )
-
-  return(df)
 }

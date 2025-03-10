@@ -295,13 +295,13 @@ distrib_diff_lcwm <- function(
 
   distrib_diff <- sqrt(sum(prop * distrib_diff_vec^2))
 
-  return(list(
+  list(
     distrib_diff = distrib_diff,
     distrib_diff_vec = distrib_diff_vec,
     choice_id = choice_id,
     removal_dens = removal_dens,
     distrib_diff_mat = distrib_diff_mat
-  ))
+  )
 }
 
 # ------------------------------------------------------------------------------
@@ -348,14 +348,14 @@ distrib_diff_lcwm_g <- function(
   diff_g <- sqrt(dd_weight * diff_g_x^2 + (1 - dd_weight) * diff_g_y^2)
   dens_g <- dens_g_x^dens_power * dens_g_y^(1 - dens_power)
 
-  return(list(
+  list(
     diff = diff_g,
     dens = dens_g,
     diff_x = diff_g_x,
     diff_y = diff_g_y,
     dens_x = dens_g_x,
     dens_y = dens_g_y
-  ))
+  )
 }
 
 # ------------------------------------------------------------------------------
@@ -503,7 +503,7 @@ simulate_lcwm <- function(
   ))
   colnames(lcwm) <- c(paste0("X", seq_len(var_num)), "Y", "G")
 
-  return(lcwm)
+  lcwm
 }
 
 # ------------------------------------------------------------------------------
