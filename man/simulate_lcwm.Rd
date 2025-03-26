@@ -13,7 +13,7 @@ simulate_lcwm(
   outlier_num,
   outlier_type = c("x_and_y", "x_only", "y_only"),
   seed = 123,
-  prob_range = c(1e-12, 1e-06),
+  prob_range = c(1e-08, 1e-06),
   range_multipliers = c(3, 3),
   print_interval = Inf,
   print_prob_g = FALSE
@@ -67,7 +67,7 @@ lcwm_k3n1000o10 <- simulate_lcwm(
   outlier_num = c(3, 3, 4),
   outlier_type = "x_and_y",
   seed = 123,
-  prob_range = c(1e-12, 1e-6),
+  prob_range = c(1e-8, 1e-6),
   range_multipliers = c(1, 2)
 )
 
