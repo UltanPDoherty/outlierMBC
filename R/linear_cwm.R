@@ -446,7 +446,7 @@ distrib_diff_residual <- function(
 #'   outlier_num = c(3, 3, 4),
 #'   outlier_type = "x_and_y",
 #'   seed = 123,
-#'   prob_range = c(1e-12, 1e-6),
+#'   prob_range = c(1e-8, 1e-6),
 #'   range_multipliers = c(1, 2)
 #' )
 #'
@@ -464,7 +464,7 @@ simulate_lcwm <- function(
     outlier_num,
     outlier_type = c("x_and_y", "x_only", "y_only"),
     seed = 123,
-    prob_range = c(1e-12, 1e-6),
+    prob_range = c(1e-8, 1e-6),
     range_multipliers = c(3, 3),
     print_interval = Inf,
     print_prob_g = FALSE) {
