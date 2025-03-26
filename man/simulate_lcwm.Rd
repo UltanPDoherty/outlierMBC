@@ -13,9 +13,10 @@ simulate_lcwm(
   outlier_num,
   outlier_type = c("x_and_y", "x_only", "y_only"),
   seed = 123,
-  crit_val = 0.9999,
-  range_multipliers = c(1.5, 1.5),
-  print_interval = Inf
+  prob_range = c(1e-12, 1e-06),
+  range_multipliers = c(3, 3),
+  print_interval = Inf,
+  print_prob_g = FALSE
 )
 }
 \arguments{
@@ -35,11 +36,14 @@ simulate_lcwm(
 
 \item{seed}{Seed.}
 
-\item{crit_val}{Critical value for uniform sample rejection.}
+\item{prob_range}{Values for uniform sample rejection.}
 
 \item{range_multipliers}{.}
 
 \item{print_interval}{How frequently the iteration count is printed.}
+
+\item{print_prob_g}{Print how likely a more extreme value would be for each
+simulated outlier.}
 }
 \value{
 \code{data.frame}:
@@ -63,7 +67,7 @@ lcwm_k3n1000o10 <- simulate_lcwm(
   outlier_num = c(3, 3, 4),
   outlier_type = "x_and_y",
   seed = 123,
-  crit_val = 1 - 1e-6,
+  prob_range = c(1e-12, 1e-6),
   range_multipliers = c(1, 2)
 )
 

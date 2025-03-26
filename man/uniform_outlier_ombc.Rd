@@ -12,7 +12,7 @@ uniform_outlier_ombc(
   error_sd,
   g,
   uniform_spans,
-  crit_val
+  prob_range
 )
 }
 \arguments{
@@ -30,7 +30,7 @@ uniform_outlier_ombc(
 
 \item{uniform_spans}{Covariate and response error spans.}
 
-\item{crit_val}{Critical value for uniform sample rejection.}
+\item{prob_range}{Values for uniform sample rejection.}
 }
 \value{
 Vector consisting of covariate values, response value, and label 0.

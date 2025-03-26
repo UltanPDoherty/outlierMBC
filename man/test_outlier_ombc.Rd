@@ -12,7 +12,8 @@ test_outlier_ombc(
   error_sd,
   x_sample,
   y_sample,
-  crit_val
+  prob_range,
+  g
 )
 }
 \arguments{
@@ -30,7 +31,9 @@ test_outlier_ombc(
 
 \item{y_sample}{New response sample.}
 
-\item{crit_val}{Critical value for uniform sample rejection.}
+\item{prob_range}{Values for uniform sample rejection.}
+
+\item{g}{Component number.}
 }
 \value{
 Logical: TRUE if the new sample is an outlier for each component.

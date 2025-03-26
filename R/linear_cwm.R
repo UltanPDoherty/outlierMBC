@@ -422,9 +422,11 @@ distrib_diff_residual <- function(
 #' @param outlier_num Desired number of outliers.
 #' @param outlier_type .
 #' @param seed Seed.
-#' @param crit_val Critical value for uniform sample rejection.
+#' @param prob_range Values for uniform sample rejection.
 #' @param range_multipliers .
 #' @param print_interval How frequently the iteration count is printed.
+#' @param print_prob_g Print how likely a more extreme value would be for each
+#'                     simulated outlier.
 #'
 #' @return `data.frame`:
 #' * $X1: first covariate
@@ -444,7 +446,7 @@ distrib_diff_residual <- function(
 #'   outlier_num = c(3, 3, 4),
 #'   outlier_type = "x_and_y",
 #'   seed = 123,
-#'   crit_val = 1 - 1e-6,
+#'   prob_range = c(1e-12, 1e-6),
 #'   range_multipliers = c(1, 2)
 #' )
 #'
@@ -462,9 +464,10 @@ simulate_lcwm <- function(
     outlier_num,
     outlier_type = c("x_and_y", "x_only", "y_only"),
     seed = 123,
-    crit_val = 0.9999,
-    range_multipliers = c(1.5, 1.5),
-    print_interval = Inf) {
+    prob_range = c(1e-12, 1e-6),
+    range_multipliers = c(3, 3),
+    print_interval = Inf,
+    print_prob_g = FALSE) {
   outlier_type <- match.arg(outlier_type)
 
   var_num <- length(mu[[1]])
@@ -472,6 +475,7 @@ simulate_lcwm <- function(
 
   set.seed(seed)
   observations <- covariates <- errors <- responses <- uniform_spans <- list()
+  inner_contour <- outer_contour <- list()
   for (g in seq_len(comp_num)) {
     covariates[[g]] <- mvtnorm::rmvnorm(n[g], mu[[g]], sigma[[g]])
 
@@ -491,9 +495,17 @@ simulate_lcwm <- function(
   outliers <- lapply(outlier_num, function(x) matrix(NA, x, var_num + 2))
   for (g in seq_len(comp_num)) {
     for (j in seq_len(outlier_num[g])) {
-      outliers[[g]][j, ] <- uniform_outlier_ombc(
-        outlier_type, mu, sigma, beta, error_sd, g, uniform_spans, crit_val
+      out <- uniform_outlier_ombc(
+        outlier_type, mu, sigma, beta, error_sd, g, uniform_spans, prob_range
       )
+      outliers[[g]][j, ] <- out[1:3]
+      if (print_prob_g) {
+        cat(paste0(
+          "g = ", g, ", Outlier No.: ", j, ", prob_g = ", out[4], "\n"
+        ))
+      } else if (j %% print_interval == 0) {
+        cat(paste0("g = ", g, ", Outlier No.: ", j, "\n"))
+      }
     }
   }
 
@@ -544,7 +556,7 @@ uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
 uniform_outlier_ombc <- function(
     outlier_type,
     mu, sigma, beta, error_sd, g,
-    uniform_spans, crit_val) {
+    uniform_spans, prob_range) {
   test <- FALSE
 
   while (!test) {
@@ -558,11 +570,13 @@ uniform_outlier_ombc <- function(
     test <- test_outlier_ombc(
       outlier_type,
       mu, sigma, beta, error_sd,
-      uniform_sample$x, uniform_sample$y, crit_val
+      uniform_sample$x, uniform_sample$y, prob_range, g
     )
+    prob_g <- test[2]
+    test <- test[1]
   }
 
-  c(uniform_sample$x, uniform_sample$y, 0)
+  c(uniform_sample$x, uniform_sample$y, 0, prob_g)
 }
 
 # ------------------------------------------------------------------------------
@@ -616,12 +630,13 @@ uniform_sample_lcwm <- function(
 #' @inheritParams simulate_lcwm
 #' @param x_sample New covariate sample.
 #' @param y_sample New response sample.
+#' @param g Component number.
 #'
 #' @return Logical: TRUE if the new sample is an outlier for each component.
 test_outlier_ombc <- function(
     outlier_type,
     mu, sigma, beta, error_sd,
-    x_sample, y_sample, crit_val) {
+    x_sample, y_sample, prob_range, g) {
   comp_num <- length(mu)
   var_num <- length(mu[[1]])
 
@@ -642,13 +657,27 @@ test_outlier_ombc <- function(
     )
 
     checks[h] <- switch(outlier_type,
-      x_and_y = (prob_x[h] * prob_y[h]) < 1 - crit_val,
-      x_only = prob_x[h] < 1 - crit_val,
-      y_only = prob_y[h] < 1 - crit_val
+      x_and_y = (prob_x[h] * prob_y[h]) < prob_range[2],
+      x_only = prob_x[h] < prob_range[2],
+      y_only = prob_y[h] < prob_range[2]
     )
   }
 
-  all(checks)
+  check2 <- switch(
+    outlier_type,
+    x_and_y = (prob_x[g] * prob_y[g]) > prob_range[1],
+    x_only = prob_x[g] > prob_range[1],
+    y_only = prob_y[g] > prob_range[1]
+  )
+
+  prob_g <- switch(
+    outlier_type,
+    x_and_y = min(prob_x[g] * prob_y[g]),
+    x_only = min(prob_x[g]),
+    y_only = min(prob_y[g])
+  )
+
+  c(all(checks) && check2, prob_g)
 }
 
 # ==============================================================================
