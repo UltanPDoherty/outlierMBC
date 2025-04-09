@@ -31,7 +31,7 @@ ombc_lcwm(
 
 \item{y_formula}{Regression formula.}
 
-\item{comp_num}{Number of components.}
+\item{comp_num}{Number of mixture components.}
 
 \item{max_out}{Maximum number of outliers.}
 
@@ -56,7 +56,8 @@ scaled for initialisation.}
 
 \item{print_interval}{How frequently the iteration count is printed.}
 
-\item{dd_weight}{.}
+\item{dd_weight}{A value between \code{0} and \code{1} which controls the weighting of
+the response and covariate dissimilarities when aggregating.}
 
 \item{dens_power}{.}
 }
@@ -79,8 +80,26 @@ List of
 }
 }
 \description{
-Iterative Detection & Identification of Outliers for a Linear
-Cluster-Weighted Model
+This function performs model-based clustering, clusterwise regression, and
+outlier identification. It does so by iteratively fitting a linear
+cluster-weighted model and removing the observation that is least likely
+under the model. Its procedure is summarised below:
+\enumerate{
+\item Fit a linear cluster-weighted model to the data.
+\item Compute a dissimilarity between the theoretical and observed distributions
+of the scaled squared sample Mahalanobis distances for each mixture
+component.
+\item Compute a dissimilarity between the theoretical and observed distributions
+of the scaled squared studentised residuals for each mixture component.
+\item Aggregate these two dissimilarities to obtain one dissimilarity value
+for each component.
+\item Aggregate across the components to obtain a single dissimilarity value.
+\item Remove the observation  with the lowest mixture density.
+\item Repeat Steps 1-6 until \code{max_out} observations have been removed.
+\item Identify the number of outliers which minimised the aggregated
+dissimilarity, remove only those observations, and fit a linear
+cluster-weighted model to the remaining data.
+}
 }
 \examples{
 

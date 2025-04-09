@@ -32,7 +32,8 @@ distrib_diff_lcwm(
 
 \item{y_sigma}{Vector of component regression standard deviations.}
 
-\item{dd_weight}{.}
+\item{dd_weight}{A value between \code{0} and \code{1} which controls the weighting of
+the response and covariate dissimilarities when aggregating.}
 
 \item{dens_power}{.}
 }

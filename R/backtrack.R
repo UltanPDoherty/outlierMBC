@@ -163,7 +163,8 @@ plot_backtrack <- function(
 #' @returns
 #' `backtrack_gmm` returns a list with the following elements:
 #' \describe{
-#'   \item{`labels`}{Vector of component labels with outliers denoted by 0.}
+#'   \item{`labels`}{Vector of mixture component labels with outliers denoted by
+#'                   0.}
 #'   \item{`outlier_bool`}{Logical vector indicating if an observation has been
 #'                         classified as an outlier.}
 #'   \item{`outlier_num`}{Number of observations classified as outliers.}

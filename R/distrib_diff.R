@@ -16,9 +16,9 @@
 #' @returns List of
 #' `distrib_diff_gmm` returns a list with the following elements:
 #' \describe{
+#'   \item{`distrib_diff`}{Aggregated dissimilarity across components.}
 #'   \item{`distrib_diff_vec`}{Vector containing dissimilarity value for each
 #'                             component.}
-#'   \item{`distrib_diff`}{Aggregated dissimilarity across components.}
 #'   \item{`choice_id`}{Index of observation with lowest mixture density.}
 #'   \item{`removal_dens`}{Value of the lowest mixture density.}
 #' }
@@ -47,8 +47,8 @@ distrib_diff_gmm <- function(
   distrib_diff <- sqrt(sum(prop * distrib_diff_vec^2))
 
   list(
-    distrib_diff_vec = distrib_diff_vec,
     distrib_diff = distrib_diff,
+    distrib_diff_vec = distrib_diff_vec,
     choice_id = choice_id,
     removal_dens = removal_dens
   )

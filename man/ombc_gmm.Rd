@@ -24,7 +24,7 @@ ombc_gmm(
 \arguments{
 \item{x}{Data.}
 
-\item{comp_num}{Number of components.}
+\item{comp_num}{Number of mixture components.}
 
 \item{max_out}{Maximum number of outliers.}
 
@@ -52,21 +52,58 @@ scaled for initialisation.}
 \item{print_interval}{How frequently the iteration count is printed.}
 }
 \value{
-List of
-\itemize{
-\item distrib_diffs
-\item distrib_diff_vec
-\item outlier_bool
-\item outlier_num
-\item outlier_rank
-\item labels
-\item final_gmm
-\item loglike
-\item removal_dens
+\code{ombc_gmm} returns a list with the following elements:
+\describe{
+\item{\code{labels}}{Vector of mixture component labels with outliers denoted by
+0.}
+\item{\code{outlier_bool}}{Logical vector indicating if an observation has been
+classified as an outlier.}
+\item{\code{outlier_num}}{Number of observations classified as outliers.}
+\item{\code{outlier_rank}}{Order in which observations are removed from the data
+set. Observations which were provisionally removed,
+including those that were eventually not classified
+as outliers, are ranked from \code{1} to \code{max_out}. All
+gross outliers have rank \code{1}. If there are \code{gross_num}
+gross outliers, then the observations removed during
+the main algorithm itself will be numbered from
+\code{gross_num + 1} to \code{max_out}. Observations that were
+never removed have rank \code{0}.}
+\item{\code{gross_outs}}{Logical vector identifying the gross outliers. This is
+identical to the \code{gross_outs} vector passed to this
+function as an argument / input.}
+\item{\code{mix}}{Output from mixture::gpcm fitted to the non-outlier
+observations.}
+\item{\code{loglike}}{Vector of log-likelihood values for each iteration.}
+\item{\code{removal_dens}}{Vector of mixture densities for the removed
+observations. These are the lowest mixture densities
+at each iteration.}
+\item{\code{distrib_diff_vec}}{Vector of aggregated cross-component
+dissimilarity values for each iteration.}
+\item{\code{distrib_diff_mat}}{Matrix of component-specific dissimilarity values
+for each iteration.}
+\item{\code{call}}{Arguments / parameter values used in this function call.}
+\item{\code{version}}{Version of \code{outlierMBC} used in this function call.}
+\item{\code{conv_status}}{Logical vector indicating which iterations' mixture
+models reached convergence during model-fitting.}
 }
 }
 \description{
-Iterative Detection & Identification of Outliers for a Gaussian Mixture Model
+This function performs model-based clustering and outlier identification. It
+does so by iteratively fitting a Gaussian mixture model and removing the
+observation that is least likely under the model. Its procedure is summarised
+below:
+\enumerate{
+\item Fit a Gaussian mixture model to the data.
+\item Compute a dissimilarity between the theoretical and observed distributions
+of the scaled squared sample Mahalanobis distances for each mixture
+component.
+\item Aggregate across the components to obtain a single dissimilarity value.
+\item Remove the observation  with the lowest mixture density.
+\item Repeat Steps 1-4 until \code{max_out} observations have been removed.
+\item Identify the number of outliers which minimised the aggregated
+dissimilarity, remove only those observations, and fit a Gaussian mixture
+model to the remaining data.
+}
 }
 \examples{
 

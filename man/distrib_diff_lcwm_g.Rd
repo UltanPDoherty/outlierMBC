@@ -28,7 +28,8 @@ distrib_diff_lcwm_g(
 
 \item{y_sigma_g}{Component regression standard deviation for the response.}
 
-\item{dd_weight}{.}
+\item{dd_weight}{A value between \code{0} and \code{1} which controls the weighting of
+the response and covariate dissimilarities when aggregating.}
 
 \item{dens_power}{.}
 }

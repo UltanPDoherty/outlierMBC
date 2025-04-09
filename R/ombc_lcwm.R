@@ -1,14 +1,32 @@
 #' Sequentially identify outliers while fitting a linear cluster-weighted model.
 #'
 #' @description
-#' Iterative Detection & Identification of Outliers for a Linear
-#' Cluster-Weighted Model
+#' This function performs model-based clustering, clusterwise regression, and
+#' outlier identification. It does so by iteratively fitting a linear
+#' cluster-weighted model and removing the observation that is least likely
+#' under the model. Its procedure is summarised below:
+#'
+#' 1. Fit a linear cluster-weighted model to the data.
+#' 2. Compute a dissimilarity between the theoretical and observed distributions
+#'    of the scaled squared sample Mahalanobis distances for each mixture
+#'    component.
+#' 3. Compute a dissimilarity between the theoretical and observed distributions
+#'    of the scaled squared studentised residuals for each mixture component.
+#' 4. Aggregate these two dissimilarities to obtain one dissimilarity value
+#'    for each component.
+#' 5. Aggregate across the components to obtain a single dissimilarity value.
+#' 6. Remove the observation  with the lowest mixture density.
+#' 7. Repeat Steps 1-6 until `max_out` observations have been removed.
+#' 8. Identify the number of outliers which minimised the aggregated
+#'    dissimilarity, remove only those observations, and fit a linear
+#'    cluster-weighted model to the remaining data.
 #'
 #' @inheritParams ombc_gmm
 #' @param xy `data.frame` containing covariates and response.
 #' @param x Covariate data only.
 #' @param y_formula Regression formula.
-#' @param dd_weight .
+#' @param dd_weight A value between `0` and `1` which controls the weighting of
+#'                  the response and covariate dissimilarities when aggregating.
 #' @param dens_power .
 #'
 #' @return List of
