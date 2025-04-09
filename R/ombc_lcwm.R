@@ -1,4 +1,4 @@
-#' ombc_lcwm
+#' Sequentially identify outliers while fitting a linear cluster-weighted model.
 #'
 #' @description
 #' Iterative Detection & Identification of Outliers for a Linear
@@ -12,19 +12,19 @@
 #' @param dens_power .
 #'
 #' @return List of
-#' *labels = labels,
-#' * outlier_bool = outlier_bool,
-#' * outlier_num = outlier_num,
-#' * outlier_rank = outlier_rank,
-#' * gross_outs = gross_outs,
-#' * lcwm = lcwm,
-#' * loglike = loglike,
-#' * removal_dens = removal_dens,
-#' * distrib_diff_vec = distrib_diff_vec,
-#' * distrib_diff_mat = distrib_diff_mat,
-#' * call = this_call,
-#' * version = ombc_version,
-#' * conv_status = conv_status
+#' * labels
+#' * outlier_bool
+#' * outlier_num
+#' * outlier_rank
+#' * gross_outs
+#' * lcwm = lcwm
+#' * loglike
+#' * removal_dens
+#' * distrib_diff_vec
+#' * distrib_diff_mat
+#' * call
+#' * version
+#' * conv_status
 #' @export
 #'
 #' @examples

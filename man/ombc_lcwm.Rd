@@ -2,7 +2,7 @@
 % Please edit documentation in R/ombc_lcwm.R
 \name{ombc_lcwm}
 \alias{ombc_lcwm}
-\title{ombc_lcwm}
+\title{Sequentially identify outliers while fitting a linear cluster-weighted model.}
 \usage{
 ombc_lcwm(
   xy,
@@ -63,20 +63,20 @@ hierarchical clustering.}
 }
 \value{
 List of
-*labels = labels,
 \itemize{
-\item outlier_bool = outlier_bool,
-\item outlier_num = outlier_num,
-\item outlier_rank = outlier_rank,
-\item gross_outs = gross_outs,
-\item lcwm = lcwm,
-\item loglike = loglike,
-\item removal_dens = removal_dens,
-\item distrib_diff_vec = distrib_diff_vec,
-\item distrib_diff_mat = distrib_diff_mat,
-\item call = this_call,
-\item version = ombc_version,
-\item conv_status = conv_status
+\item labels
+\item outlier_bool
+\item outlier_num
+\item outlier_rank
+\item gross_outs
+\item lcwm = lcwm
+\item loglike
+\item removal_dens
+\item distrib_diff_vec
+\item distrib_diff_mat
+\item call
+\item version
+\item conv_status
 }
 }
 \description{

@@ -1,4 +1,4 @@
-#' ombc_gmm
+#' Sequentially identify outliers while fitting a Gaussian mixture model.
 #'
 #' @description
 #' Iterative Detection & Identification of Outliers for a Gaussian Mixture Model

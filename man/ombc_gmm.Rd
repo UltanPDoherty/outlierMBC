@@ -2,7 +2,7 @@
 % Please edit documentation in R/ombc_gmm.R
 \name{ombc_gmm}
 \alias{ombc_gmm}
-\title{ombc_gmm}
+\title{Sequentially identify outliers while fitting a Gaussian mixture model.}
 \usage{
 ombc_gmm(
   x,
