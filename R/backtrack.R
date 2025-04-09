@@ -59,6 +59,8 @@ backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.05) {
   list("minimum" = minimum, "backtrack" = backtrack)
 }
 
+# ==============================================================================
+
 #' Plot the dissimilarity curve for the backtrack method.
 #'
 #' @inheritParams plot_curve
@@ -133,7 +135,7 @@ plot_backtrack <- function(
   backtrack_curve
 }
 
-# ------------------------------------------------------------------------------
+# ==============================================================================
 
 #' @title Fit a GMM to the backtrack solution.
 #'
@@ -321,6 +323,226 @@ backtrack_gmm <- function(
     "outlier_bool" = outlier_bool,
     "outlier_num" = outlier_num,
     "mix" = mix,
+    "call" = this_call
+  )
+}
+
+# ==============================================================================
+
+#' Fit a LCWM to the backtrack solution.
+#'
+#' @inheritParams ombc_lcwm
+#' @inheritParams backtrack
+#' @inheritParams backtrack_gmm
+#' @param ombc_lcwm_out Output from ombc_lcwm.
+#'
+#' @returns List:
+#' * labels
+#' * outlier_bool
+#' * outlier_num
+#' * lcwm
+#' * call
+#'
+#' @export
+#'
+#' @examples
+#'
+#' gross_lcwm_k3n1000o10 <- find_gross(lcwm_k3n1000o10, 20)
+#'
+#' ombc_lcwm_k3n1000o10 <- ombc_lcwm(
+#'   xy = lcwm_k3n1000o10[, c("X1", "Y")],
+#'   x = lcwm_k3n1000o10$X1,
+#'   y_formula = Y ~ X1,
+#'   comp_num = 2,
+#'   max_out = 20,
+#'   mnames = "V",
+#'   gross_outs = gross_lcwm_k3n1000o10$gross_bool
+#' )
+#'
+#' backtrack_lcwm_k3n1000o10 <- backtrack_lcwm(
+#'   xy = lcwm_k3n1000o10[, c("X1", "Y")],
+#'   x = lcwm_k3n1000o10$X1,
+#'   ombc_lcwm_out = ombc_lcwm_k3n1000o10
+#' )
+backtrack_lcwm <- function(
+    xy, x, ombc_lcwm_out,
+    max_total_rise = 0.1, max_step_rise = 0.05,
+    init_z = NULL, manual_outlier_num = NULL) {
+  this_call <- call(
+    "backtrack_lcwm",
+    "xy" = substitute(xy), "x" = substitute(x),
+    "ombc_lcwm_out" = substitute(ombc_lcwm_out),
+    "max_total_rise" = max_total_rise, "max_step_rise" = max_step_rise,
+    "init_z" = substitute(init_z)
+  )
+
+  x <- as.matrix(x)
+  x0 <- x
+  xy0 <- xy
+
+  gross_num <- sum(ombc_lcwm_out$gross_outs)
+
+  if (is.null(manual_outlier_num)) {
+    backtrack_out <- backtrack(
+      ombc_lcwm_out$distrib_diff_vec, max_total_rise, max_step_rise
+    )
+
+    if (backtrack_out$backtrack$ind == backtrack_out$minimum$ind) {
+      cat(paste0(
+        "backtrack stayed at the minimum.",
+        "backtrack_lcwm will return ombc_lcwm results directly.\n"
+      ))
+
+      return(list(
+        "labels" = ombc_lcwm_out$labels,
+        "outlier_bool" = ombc_lcwm_out$outlier_bool,
+        "outlier_num" = ombc_lcwm_out$outlier_num,
+        "lcwm" = ombc_lcwm_out$lcwm,
+        "call" = this_call
+      ))
+    }
+
+    outlier_num <- backtrack_out$backtrack$ind - 1 + gross_num
+  } else {
+    outlier_num <- manual_outlier_num
+  }
+
+  outlier_bool <-
+    ombc_lcwm_out$outlier_rank <= outlier_num & ombc_lcwm_out$outlier_rank != 0
+
+  init_scheme <- ombc_lcwm_out$call$init_scheme
+  init_scaling <- ombc_lcwm_out$call$init_scaling
+
+  stopifnot(
+    "init_scheme must be 'update' or 'reinit' or 'reuse'." = (
+      init_scheme %in% c("update", "reinit", "reuse")
+    )
+  )
+  stopifnot(
+    "init_z cannot be used with the 'reinit' init_scheme." = (
+      (init_scheme != "reinit") || is.null(init_z)
+    )
+  )
+
+  if (!is.null(init_z)) {
+    z0 <- init_z
+  } else if (init_scheme != "reinit") {
+    xy1 <- scale(xy0, center = init_scaling, scale = init_scaling)
+    z0 <- get_init_z(
+      comp_num = ombc_lcwm_out$call$comp_num,
+      dist_mat = as.matrix(
+        stats::dist(xy1[!ombc_lcwm_out$gross_outs, ])
+      ),
+      x = x0[!ombc_lcwm_out$gross_outs, , drop = FALSE],
+      init_method = ombc_lcwm_out$call$init_method,
+      kmpp_seed = ombc_lcwm_out$call$kmpp_seed
+    )
+  }
+
+  if (init_scheme == "reinit") {
+    xy1 <- scale(xy0, center = init_scaling, scale = init_scaling)
+    z <- get_init_z(
+      comp_num = ombc_lcwm_out$call$comp_num,
+      dist_mat = as.matrix(
+        stats::dist(xy1[!outlier_bool, , drop = FALSE])
+      ),
+      x = xy0[!outlier_bool, , drop = FALSE],
+      init_method = ombc_lcwm_out$call$init_method,
+      kmpp_seed = ombc_lcwm_out$call$kmpp_seed
+    )
+
+    invisible(utils::capture.output(lcwm <- flexCWM::cwm(
+      formulaY = ombc_lcwm_out$call$y_formula,
+      familyY = stats::gaussian(link = "identity"),
+      data = xy0[!outlier_bool, , drop = FALSE],
+      Xnorm = x0[!outlier_bool, , drop = FALSE],
+      modelXnorm = ombc_lcwm_out$call$mnames,
+      k = ombc_lcwm_out$call$comp_num,
+      initialization = "manual",
+      start.z = z,
+      iter.max = ombc_lcwm_out$call$nmax,
+      threshold = ombc_lcwm_out$call$atol
+    )))
+  } else if (init_scheme == "reuse") {
+    short_outlier_bool <- outlier_bool[!ombc_lcwm_out$gross_outs]
+    z <- z0[!short_outlier_bool, !short_outlier_bool]
+
+    invisible(utils::capture.output(lcwm <- flexCWM::cwm(
+      formulaY = ombc_lcwm_out$call$y_formula,
+      familyY = stats::gaussian(link = "identity"),
+      data = xy0[!outlier_bool, , drop = FALSE],
+      Xnorm = x0[!outlier_bool, , drop = FALSE],
+      modelXnorm = ombc_lcwm_out$call$mnames,
+      k = ombc_lcwm_out$call$comp_num,
+      initialization = "manual",
+      start.z = z,
+      iter.max = ombc_lcwm_out$call$nmax,
+      threshold = ombc_lcwm_out$call$atol
+    )))
+  } else {
+    xy <- xy0[!ombc_lcwm_out$gross_outs, , drop = FALSE]
+    x <- x0[!ombc_lcwm_out$gross_outs, , drop = FALSE]
+    z <- z0
+
+    cat("Fitting backtrack model:\n")
+    if (outlier_num > gross_num) {
+      temp_outlier_rank <- ombc_lcwm_out$outlier_rank[!ombc_lcwm_out$gross_outs]
+
+      prog_bar <- utils::txtProgressBar(
+        gross_num, outlier_num,
+        style = 3
+      )
+      removals <- c()
+      for (i in seq(gross_num, outlier_num)) {
+        utils::setTxtProgressBar(prog_bar, i)
+
+        invisible(utils::capture.output(lcwm <- flexCWM::cwm(
+          formulaY = ombc_lcwm_out$call$y_formula,
+          familyY = stats::gaussian(link = "identity"),
+          data = xy,
+          Xnorm = x,
+          modelXnorm = ombc_lcwm_out$call$mnames,
+          k = ombc_lcwm_out$call$comp_num,
+          initialization = "manual",
+          start.z = z,
+          iter.max = ombc_lcwm_out$call$nmax,
+          threshold = ombc_lcwm_out$call$atol
+        )))
+
+        next_removal <- which(temp_outlier_rank == i + 1)
+        removals <- append(removals, next_removal)
+        xy <- xy[-next_removal, , drop = FALSE]
+        x <- x[-next_removal, , drop = FALSE]
+        z <- lcwm$models[[1]]$posterior[-next_removal, -next_removal]
+        temp_outlier_rank <- temp_outlier_rank[-next_removal]
+      }
+      close(prog_bar)
+    } else {
+      invisible(utils::capture.output(lcwm <- flexCWM::cwm(
+        formulaY = ombc_lcwm_out$call$y_formula,
+        familyY = stats::gaussian(link = "identity"),
+        data = xy,
+        Xnorm = x,
+        modelXnorm = ombc_lcwm_out$call$mnames,
+        k = ombc_lcwm_out$call$comp_num,
+        initialization = "manual",
+        start.z = z,
+        iter.max = ombc_lcwm_out$call$nmax,
+        threshold = ombc_lcwm_out$call$atol
+      )))
+    }
+    cat("backtrack model fitted.\n")
+  }
+
+  labels <- integer(nrow(x))
+  labels[outlier_bool] <- 0
+  labels[!outlier_bool] <- lcwm$models[[1]]$cluster
+
+  list(
+    "labels" = labels,
+    "outlier_bool" = outlier_bool,
+    "outlier_num" = outlier_num,
+    "lcwm" = lcwm,
     "call" = this_call
   )
 }
