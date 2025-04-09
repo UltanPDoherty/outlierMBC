@@ -20,11 +20,11 @@ backtrack_gmm(
 \item{ombc_out}{Output from ombc_gmm.}
 
 \item{max_total_rise}{Upper limit for the cumulative increase, as a
-proportion of the global minimum value, from all
-backward steps.}
+proportion of the global minimum dissimilarity, from
+all backward steps.}
 
 \item{max_step_rise}{Upper limit for the increase, as a proportion of the
-global minimum value, from each backward step.}
+global minimum dissimilarity, from each backward step.}
 
 \item{init_model}{mixture::gpcm best_model}
 
@@ -35,14 +35,20 @@ global minimum value, from each backward step.}
 \value{
 List:
 \itemize{
-\item labels
-\item outlier_bool
-\item outlier_num
-\item mix
+\item labels: vector of component labels with outliers denoted by 0.
+\item outlier_bool: logical vector indicating if an observation has been
+classified as an outlier.
+\item outlier_num: number of observations classified as outliers.
+\item mix: Output from mixture::gpcm fitted to the non-outlier observations.
+\item call: Arguments / parameter values used in this function call.
 }
 }
 \description{
-Fit a GMM to the backtrack solution.
+The \link{backtrack} function determines the number of outliers for the backtrack
+solution and \link{plot_backtrack} plots this on a dissimilarity curve.
+\code{backtrack_gmm} fits the mixture model corresponding to the number of
+outliers selected by the backtrack solution (or any manually specified number
+of outliers).
 }
 \examples{
 
@@ -51,5 +57,5 @@ ombc_gmm_k3n1000o10 <- ombc_gmm(
   comp_num = 3, max_out = 20
 )
 
-backtrack_gmm(gmm_k3n1000o10[, 1:2], ombc_gmm_k3n1000o10, 0.1, 0.01)
+backtrack_gmm(gmm_k3n1000o10[, 1:2], ombc_gmm_k3n1000o10)
 }

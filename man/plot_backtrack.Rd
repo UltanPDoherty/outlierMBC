@@ -2,7 +2,7 @@
 % Please edit documentation in R/backtrack.R
 \name{plot_backtrack}
 \alias{plot_backtrack}
-\title{Plot the outlier number selection curve for the backtrack method.}
+\title{Plot the dissimilarity curve for the backtrack method.}
 \usage{
 plot_backtrack(ombc_out, max_total_rise = 0.1, max_step_rise = 0.05)
 }
@@ -10,15 +10,18 @@ plot_backtrack(ombc_out, max_total_rise = 0.1, max_step_rise = 0.05)
 \item{ombc_out}{Output from ombc_gmm.}
 
 \item{max_total_rise}{Upper limit for the cumulative increase, as a
-proportion of the global minimum value, from all
-backward steps.}
+proportion of the global minimum dissimilarity, from
+all backward steps.}
 
 \item{max_step_rise}{Upper limit for the increase, as a proportion of the
-global minimum value, from each backward step.}
+global minimum dissimilarity, from each backward step.}
 }
 \value{
-A gg object.
+ggplot of the dissimilarity curve showing the minimum solution and
+the backtack solutions. The dissimilarity values (y axis) are
+divided by the minimum dissimilarity so that the rescaled minimum is
+at 1.
 }
 \description{
-Plot the outlier number selection curve for the backtrack method.
+Plot the dissimilarity curve for the backtrack method.
 }

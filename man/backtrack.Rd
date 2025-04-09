@@ -7,16 +7,15 @@
 backtrack(x, max_total_rise = 0.1, max_step_rise = 0.05)
 }
 \arguments{
-\item{x}{Numeric vector where lower values and lower indices are desirable.
-For example, if the quantity is to be minimised but there is an
-undefined cost which rises as the index increases.}
+\item{x}{Vector of dissimilarity values corresponding to consecutive and
+increasing numbers of outliers.}
 
 \item{max_total_rise}{Upper limit for the cumulative increase, as a
-proportion of the global minimum value, from all
-backward steps.}
+proportion of the global minimum dissimilarity, from
+all backward steps.}
 
 \item{max_step_rise}{Upper limit for the increase, as a proportion of the
-global minimum value, from each backward step.}
+global minimum dissimilarity, from each backward step.}
 }
 \value{
 List of two lists:
@@ -34,11 +33,13 @@ List of two lists:
 }
 }
 \description{
-Given a sequence of measurements for a quantity to be minimised, this
-function first finds the index and value of the minimum, then moves backwards
-from right to left to a reasonable solution with a lower index. Limits are
-placed on the maximum increase from a single step (\code{max_step_rise}) and from
-all steps (\code{max_total_rise}).
+Given a vector of dissimilarity values, each corresponding to a different
+number of outliers, this function first finds the index and value of the
+minimum dissimilarity, then moves backwards from right to left to a
+reasonable solution with a lower index (i.e. lower number of outliers).
+Limits are placed on the maximum increase in dissimilarity from a single step
+(\code{max_step_rise}) and from all steps (\code{max_total_rise}), where both are
+defined in proportion to the minimum dissimilarity value.
 }
 \examples{
 

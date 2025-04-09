@@ -22,11 +22,11 @@ backtrack_lcwm(
 \item{ombc_lcwm_out}{Output from ombc_lcwm.}
 
 \item{max_total_rise}{Upper limit for the cumulative increase, as a
-proportion of the global minimum value, from all
-backward steps.}
+proportion of the global minimum dissimilarity, from
+all backward steps.}
 
 \item{max_step_rise}{Upper limit for the increase, as a proportion of the
-global minimum value, from each backward step.}
+global minimum dissimilarity, from each backward step.}
 
 \item{init_z}{Initial z matrix.}
 

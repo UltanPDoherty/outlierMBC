@@ -13,14 +13,15 @@
 #' @inheritParams ombc_gmm
 #' @param multiplier Multiplicative factor used to get gross outlier threshold.
 #' @param k_neighbours Number of neighbours for dbscan::kNNdist.
-#' @param manual_gross_threshold Optional preset number of gross outliers.
-#' @param scale Logical
+#' @param manual_threshold Optional preset threshold.
+#' @param scale Logical value controlling whether we apply `scale` to `x`.
 #'
 #' @return List:
-#' * $gross_choice: a numeric value indicating the elbow's location.
-#' * $gross_bool: a logical vector identifying the gross outliers.
-#' * $gross_curve:
-#' * $gross_scatter:
+#' * gross_choice: a numeric value indicating the elbow's location.
+#' * gross_bool: a logical vector identifying the gross outliers.
+#' * gross_curve: ggplot of the highest 2 * `max_out` kNN distances in
+#'                 decreasing order.
+#' * gross_scatter: ggplot of all kNN distances in index order.
 #'
 #' @export
 find_gross <- function(
@@ -28,7 +29,7 @@ find_gross <- function(
     max_out,
     multiplier = 3,
     k_neighbours = floor(nrow(x) / 100),
-    manual_gross_threshold = NULL,
+    manual_threshold = NULL,
     scale = TRUE) {
   outlier_number <- seq_len(2 * max_out)
 
@@ -41,10 +42,10 @@ find_gross <- function(
 
   knndist_benchmark <- knndist_sort[max_out + 1]
 
-  if (is.null(manual_gross_threshold)) {
+  if (is.null(manual_threshold)) {
     gross_threshold <- multiplier * knndist_benchmark
   } else {
-    gross_threshold <- manual_gross_threshold
+    gross_threshold <- manual_threshold
     multiplier <- NA
   }
 
@@ -79,7 +80,7 @@ find_gross <- function(
     ggplot2::expand_limits(y = 0) +
     ggplot2::scale_colour_manual(values = c("#000000", "#E69F00"))
 
-  if (is.null(manual_gross_threshold)) {
+  if (is.null(manual_threshold)) {
     curve <- curve +
       ggplot2::geom_linerange(
         ymax = knndist_benchmark, ymin = 0, x = max_out + 1,
@@ -114,7 +115,7 @@ find_gross <- function(
     ggplot2::expand_limits(y = 0) +
     ggplot2::scale_colour_manual(values = c("#000000", "#E69F00"))
 
-  if (is.null(manual_gross_threshold)) {
+  if (is.null(manual_threshold)) {
     scatter <- scatter +
       ggplot2::geom_hline(yintercept = knndist_benchmark, linetype = "dashed")
   }

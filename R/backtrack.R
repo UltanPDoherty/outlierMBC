@@ -1,20 +1,21 @@
 #' @title Move backwards from the minimum to a more conservative solution.
 #'
 #' @description
-#' Given a sequence of measurements for a quantity to be minimised, this
-#' function first finds the index and value of the minimum, then moves backwards
-#' from right to left to a reasonable solution with a lower index. Limits are
-#' placed on the maximum increase from a single step (`max_step_rise`) and from
-#' all steps (`max_total_rise`).
+#' Given a vector of dissimilarity values, each corresponding to a different
+#' number of outliers, this function first finds the index and value of the
+#' minimum dissimilarity, then moves backwards from right to left to a
+#' reasonable solution with a lower index (i.e. lower number of outliers).
+#' Limits are placed on the maximum increase in dissimilarity from a single step
+#' (`max_step_rise`) and from all steps (`max_total_rise`), where both are
+#' defined in proportion to the minimum dissimilarity value.
 #'
-#' @param x Numeric vector where lower values and lower indices are desirable.
-#'          For example, if the quantity is to be minimised but there is an
-#'          undefined cost which rises as the index increases.
+#' @param x Vector of dissimilarity values corresponding to consecutive and
+#'          increasing numbers of outliers.
 #' @param max_total_rise Upper limit for the cumulative increase, as a
-#'                       proportion of the global minimum value, from all
-#'                       backward steps.
+#'                       proportion of the global minimum dissimilarity, from
+#'                       all backward steps.
 #' @param max_step_rise Upper limit for the increase, as a proportion of the
-#'                      global minimum value, from each backward step.
+#'                      global minimum dissimilarity, from each backward step.
 #'
 #' @returns List of two lists:
 #' * minimum:
@@ -58,12 +59,15 @@ backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.05) {
   list("minimum" = minimum, "backtrack" = backtrack)
 }
 
-#' Plot the outlier number selection curve for the backtrack method.
+#' Plot the dissimilarity curve for the backtrack method.
 #'
 #' @inheritParams plot_curve
 #' @inheritParams backtrack
 #'
-#' @returns A gg object.
+#' @returns ggplot of the dissimilarity curve showing the minimum solution and
+#'          the backtack solutions. The dissimilarity values (y axis) are
+#'          divided by the minimum dissimilarity so that the rescaled minimum is
+#'          at 1.
 #' @export
 plot_backtrack <- function(
     ombc_out, max_total_rise = 0.1, max_step_rise = 0.05) {
@@ -131,7 +135,14 @@ plot_backtrack <- function(
 
 # ------------------------------------------------------------------------------
 
-#' Fit a GMM to the backtrack solution.
+#' @title Fit a GMM to the backtrack solution.
+#'
+#' @description
+#' The [backtrack] function determines the number of outliers for the backtrack
+#' solution and [plot_backtrack] plots this on a dissimilarity curve.
+#' `backtrack_gmm` fits the mixture model corresponding to the number of
+#' outliers selected by the backtrack solution (or any manually specified number
+#' of outliers).
 #'
 #' @inheritParams ombc_gmm
 #' @inheritParams plot_curve
@@ -139,10 +150,12 @@ plot_backtrack <- function(
 #' @param manual_outlier_num User-specified number of outliers.
 #'
 #' @returns List:
-#' * labels
-#' * outlier_bool
-#' * outlier_num
-#' * mix
+#' * labels: vector of component labels with outliers denoted by 0.
+#' * outlier_bool: logical vector indicating if an observation has been
+#'                 classified as an outlier.
+#' * outlier_num: number of observations classified as outliers.
+#' * mix: Output from mixture::gpcm fitted to the non-outlier observations.
+#' * call: Arguments / parameter values used in this function call.
 #'
 #' @export
 #'
@@ -153,7 +166,7 @@ plot_backtrack <- function(
 #'   comp_num = 3, max_out = 20
 #' )
 #'
-#' backtrack_gmm(gmm_k3n1000o10[, 1:2], ombc_gmm_k3n1000o10, 0.1, 0.01)
+#' backtrack_gmm(gmm_k3n1000o10[, 1:2], ombc_gmm_k3n1000o10)
 backtrack_gmm <- function(
     x, ombc_out,
     max_total_rise = 0.1, max_step_rise = 0.05,

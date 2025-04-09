@@ -9,7 +9,7 @@ find_gross(
   max_out,
   multiplier = 3,
   k_neighbours = floor(nrow(x)/100),
-  manual_gross_threshold = NULL,
+  manual_threshold = NULL,
   scale = TRUE
 )
 }
@@ -22,17 +22,18 @@ find_gross(
 
 \item{k_neighbours}{Number of neighbours for dbscan::kNNdist.}
 
-\item{manual_gross_threshold}{Optional preset number of gross outliers.}
+\item{manual_threshold}{Optional preset threshold.}
 
-\item{scale}{Logical}
+\item{scale}{Logical value controlling whether we apply \code{scale} to \code{x}.}
 }
 \value{
 List:
 \itemize{
-\item $gross_choice: a numeric value indicating the elbow's location.
-\item $gross_bool: a logical vector identifying the gross outliers.
-\item $gross_curve:
-\item $gross_scatter:
+\item gross_choice: a numeric value indicating the elbow's location.
+\item gross_bool: a logical vector identifying the gross outliers.
+\item gross_curve: ggplot of the highest 2 * \code{max_out} kNN distances in
+decreasing order.
+\item gross_scatter: ggplot of all kNN distances in index order.
 }
 }
 \description{
