@@ -36,9 +36,9 @@ List of two lists:
 \description{
 Given a sequence of measurements for a quantity to be minimised, this
 function first finds the index and value of the minimum, then moves backwards
-from right to left to a reasonable solution with a lower index. Limits are placed on the
-maximum increase from a single step (\code{max_step_rise}) and from all steps
-(\code{max_total_rise}).
+from right to left to a reasonable solution with a lower index. Limits are
+placed on the maximum increase from a single step (\code{max_step_rise}) and from
+all steps (\code{max_total_rise}).
 }
 \examples{
 

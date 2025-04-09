@@ -23,8 +23,8 @@ A data frame with 4040 rows and 3 columns:
 lcwm_k3n4000o40
 }
 \description{
-This data set was simulated using \code{simulate_lcwm}. There are 2000 observations
-in Component 1, 1000 observations in Component 2, and 1000 observations in
-Component 3.
+This data set was simulated using \code{simulate_lcwm}. There are 1200
+observations in Component 1, 1200 observations in Component 2, and 1600
+observations in Component 3.
 }
 \keyword{datasets}
