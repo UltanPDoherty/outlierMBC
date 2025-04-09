@@ -17,7 +17,8 @@ A data frame with 2020 rows and 3 columns:
 }
 }
 \source{
-\url{https://github.com/UltanPDoherty/outlierMBC/blob/main/data-raw/lcwm_k3n2000o20.R}
+For simulation code, see \code{lcwm_k3n2000o20.R} in \code{data-raw} folder at
+\url{https://github.com/UltanPDoherty/outlierMBC}.
 }
 \usage{
 lcwm_k3n2000o20

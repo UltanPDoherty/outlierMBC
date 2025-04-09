@@ -8,10 +8,10 @@
 #' @param logdet Vector of log-determinants for covariance matrices.
 #'
 #' @return List of
-#' * distrib_diff
-#' * distrib_diff_vec
-#' * choice_id
-#' * removal_dens
+#' * distrib_diff_vec: Vector containing dissimilarity value for each component.
+#' * distrib_diff: Aggregated dissimilarity across components.
+#' * choice_id: Index of observation with lowest mixture density.
+#' * removal_dens: Value of the lowest mixture density.
 distrib_diff_gmm <- function(
     x, z, prop, mu, sigma, logdet) {
   obs_num <- nrow(x)
@@ -55,8 +55,10 @@ distrib_diff_gmm <- function(
 #' @param logdet_g Log-determinants of covariance matrix for component g.
 #'
 #' @return List of
-#' * diff
-#' * dens
+#' * diff: Dissimilarity value for this component.
+#' * dens: Gaussian density of all observations for this component.
+#' * mahalas: Scaled squared sample Mahalanobis distances for all observations
+#'            with respect to this component.
 distrib_diff_mahalanobis <- function(
     x,
     z_g,

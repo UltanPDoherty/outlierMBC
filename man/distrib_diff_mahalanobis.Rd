@@ -20,8 +20,10 @@ distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g)
 \value{
 List of
 \itemize{
-\item diff
-\item dens
+\item diff: Dissimilarity value for this component.
+\item dens: Gaussian density of all observations for this component.
+\item mahalas: Scaled squared sample Mahalanobis distances for all observations
+with respect to this component.
 }
 }
 \description{

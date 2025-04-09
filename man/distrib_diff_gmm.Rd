@@ -22,10 +22,10 @@ distrib_diff_gmm(x, z, prop, mu, sigma, logdet)
 \value{
 List of
 \itemize{
-\item distrib_diff
-\item distrib_diff_vec
-\item choice_id
-\item removal_dens
+\item distrib_diff_vec: Vector containing dissimilarity value for each component.
+\item distrib_diff: Aggregated dissimilarity across components.
+\item choice_id: Index of observation with lowest mixture density.
+\item removal_dens: Value of the lowest mixture density.
 }
 }
 \description{
