@@ -3,9 +3,9 @@
 #' @description
 #' Given a sequence of measurements for a quantity to be minimised, this
 #' function first finds the index and value of the minimum, then moves backwards
-#' from right to left to a reasonable solution with a lower index. Limits are placed on the
-#' maximum increase from a single step (`max_step_rise`) and from all steps
-#' (`max_total_rise`).
+#' from right to left to a reasonable solution with a lower index. Limits are
+#' placed on the maximum increase from a single step (`max_step_rise`) and from
+#' all steps (`max_total_rise`).
 #'
 #' @param x Numeric vector where lower values and lower indices are desirable.
 #'          For example, if the quantity is to be minimised but there is an

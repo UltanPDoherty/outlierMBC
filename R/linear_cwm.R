@@ -475,7 +475,6 @@ simulate_lcwm <- function(
 
   set.seed(seed)
   observations <- covariates <- errors <- responses <- uniform_spans <- list()
-  inner_contour <- outer_contour <- list()
   for (g in seq_len(comp_num)) {
     covariates[[g]] <- mvtnorm::rmvnorm(n[g], mu[[g]], sigma[[g]])
 
@@ -663,15 +662,13 @@ test_outlier_ombc <- function(
     )
   }
 
-  check2 <- switch(
-    outlier_type,
+  check2 <- switch(outlier_type,
     x_and_y = (prob_x[g] * prob_y[g]) > prob_range[1],
     x_only = prob_x[g] > prob_range[1],
     y_only = prob_y[g] > prob_range[1]
   )
 
-  prob_g <- switch(
-    outlier_type,
+  prob_g <- switch(outlier_type,
     x_and_y = min(prob_x[g] * prob_y[g]),
     x_only = min(prob_x[g]),
     y_only = min(prob_y[g])
