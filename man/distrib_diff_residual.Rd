@@ -17,10 +17,10 @@ distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
 \item{y_sigma_g}{Component regression standard deviation for the response.}
 }
 \value{
-List of
-\itemize{
-\item diff: Response dissimilarity value for this component.
-\item dens: Response density of all observations for this component.
+\code{distrib_diff_lcwm_residual} returns a list with the following elements:
+\describe{
+\item{\code{diff}}{Response dissimilarity value for this component.}
+\item{\code{dens}}{Response density of all observations for this component.}
 }
 }
 \description{

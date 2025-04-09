@@ -45,15 +45,14 @@ ombc_lcwm(
 
 \item{atol}{EM convergence tolerance threshold for mixture::gpcm.}
 
-\item{init_z}{Initial z matrix.}
+\item{init_z}{Initial component assignment probability matrix.}
 
 \item{init_method}{Method used to initialise each mixture model.}
 
-\item{init_scaling}{Logical: whether the data should be scaled for
-initialisation.}
+\item{init_scaling}{Logical value controlling whether the data should be
+scaled for initialisation.}
 
-\item{kmpp_seed}{Optional seed for k-means++ initialisation. Default is
-hierarchical clustering.}
+\item{kmpp_seed}{Optional seed for k-means++ initialisation.}
 
 \item{print_interval}{How frequently the iteration count is printed.}
 

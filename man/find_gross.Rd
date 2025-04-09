@@ -27,13 +27,13 @@ find_gross(
 \item{scale}{Logical value controlling whether we apply \code{scale} to \code{x}.}
 }
 \value{
-List:
-\itemize{
-\item gross_choice: a numeric value indicating the elbow's location.
-\item gross_bool: a logical vector identifying the gross outliers.
-\item gross_curve: ggplot of the highest 2 * \code{max_out} kNN distances in
-decreasing order.
-\item gross_scatter: ggplot of all kNN distances in index order.
+\code{find_gross} returns a list with the following elements:
+\describe{
+\item{\code{gross_choice}}{A numeric value indicating the elbow's location.}
+\item{\code{gross_bool}}{A logical vector identifying the gross outliers.}
+\item{\code{gross_curve}}{ggplot of the highest \code{2 * max_out} kNN distances in
+decreasing order.}
+\item{\code{gross_scatter}}{ggplot of all kNN distances in index order.}
 }
 }
 \description{

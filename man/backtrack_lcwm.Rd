@@ -2,7 +2,7 @@
 % Please edit documentation in R/backtrack.R
 \name{backtrack_lcwm}
 \alias{backtrack_lcwm}
-\title{Fit a LCWM to the backtrack solution.}
+\title{Fit a Linear CWM to the backtrack solution.}
 \usage{
 backtrack_lcwm(
   xy,
@@ -28,22 +28,28 @@ all backward steps.}
 \item{max_step_rise}{Upper limit for the increase, as a proportion of the
 global minimum dissimilarity, from each backward step.}
 
-\item{init_z}{Initial z matrix.}
+\item{init_z}{Initial component assignment probability matrix.}
 
 \item{manual_outlier_num}{User-specified number of outliers.}
 }
 \value{
-List:
-\itemize{
-\item labels
-\item outlier_bool
-\item outlier_num
-\item lcwm
-\item call
+\code{backtrack_gmm} returns a list with the following elements:
+\describe{
+\item{\code{labels}}{Vector of component labels with outliers denoted by 0.}
+\item{\code{outlier_bool}}{Logical vector indicating if an observation has been
+classified as an outlier.}
+\item{\code{outlier_num}}{Number of observations classified as outliers.}
+\item{\code{lcwm}}{Output from flexCWM::cwm fitted to the non-outlier
+observations.}
+\item{\code{call}}{Arguments / parameter values used in this function call.}
 }
 }
 \description{
-Fit a LCWM to the backtrack solution.
+The \link{backtrack} function determines the number of outliers for
+the backtrack solution and \link{plot_backtrack} plots this on a dissimilarity
+curve. \code{backtrack_gmm} fits the mixture model corresponding to the number of
+outliers selected by the backtrack solution (or any manually specified number
+of outliers).
 }
 \examples{
 

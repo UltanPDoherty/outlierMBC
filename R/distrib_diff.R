@@ -13,11 +13,15 @@
 #' @param sigma List of component covariance matrices.
 #' @param logdet Vector of log-determinants for covariance matrices.
 #'
-#' @return List of
-#' * distrib_diff_vec: Vector containing dissimilarity value for each component.
-#' * distrib_diff: Aggregated dissimilarity across components.
-#' * choice_id: Index of observation with lowest mixture density.
-#' * removal_dens: Value of the lowest mixture density.
+#' @returns List of
+#' `distrib_diff_gmm` returns a list with the following elements:
+#' \describe{
+#'   \item{`distrib_diff_vec`}{Vector containing dissimilarity value for each
+#'                             component.}
+#'   \item{`distrib_diff`}{Aggregated dissimilarity across components.}
+#'   \item{`choice_id`}{Index of observation with lowest mixture density.}
+#'   \item{`removal_dens`}{Value of the lowest mixture density.}
+#' }
 distrib_diff_gmm <- function(
     x, z, prop, mu, sigma, logdet) {
   obs_num <- nrow(x)
@@ -66,11 +70,14 @@ distrib_diff_gmm <- function(
 #' @param sigma_g Covariance matrix for component g.
 #' @param logdet_g Log-determinants of covariance matrix for component g.
 #'
-#' @return List of
-#' * diff: Dissimilarity value for this component.
-#' * dens: Gaussian density of all observations for this component.
-#' * mahalas: Scaled squared sample Mahalanobis distances for all observations
-#'            with respect to this component.
+#' @returns
+#' `distrib_diff_mahalanobis` returns a list with the following elements:
+#' \describe{
+#'   \item{`diff`}{Dissimilarity value for this component.}
+#'   \item{`dens`}{Gaussian density of all observations for this component.}
+#'   \item{`mahalas`}{Scaled squared sample Mahalanobis distances for all
+#'                    observations with respect to this component.}
+#' }
 distrib_diff_mahalanobis <- function(
     x,
     z_g,
@@ -124,13 +131,17 @@ distrib_diff_mahalanobis <- function(
 #' @param mod_list List of component regression models.
 #' @param y_sigma Vector of component regression standard deviations.
 #'
-#' @return List of
-#' * distrib_diff: Aggregated dissimilarity across components.
-#' * distrib_diff_vec: Vector containing dissimilarity value for each component.
-#' * choice_id: Index of observation with lowest mixture density.
-#' * removal_dens: Value of the lowest mixture density.
-#' * distrib_diff_mat: Two-column matrix containing response and covariate
-#'                     dissimilarities across components.
+#' @returns
+#' `distrib_diff_lcwm_lcwm_g` returns a list with the following elements:
+#' \describe{
+#'   \item{`distrib_diff`}{Aggregated dissimilarity across components.}
+#'   \item{`distrib_diff_vec`}{Vector containing dissimilarity value for each
+#'                           component.}
+#'   \item{`choice_id`}{Index of observation with lowest mixture density.}
+#'   \item{`removal_dens`}{Value of the lowest mixture density.}
+#'   \item{`distrib_diff_mat`}{Two-column matrix containing response and
+#'                             covariate dissimilarities across components.}
+#' }
 distrib_diff_lcwm <- function(
     x,
     z,
@@ -199,15 +210,17 @@ distrib_diff_lcwm <- function(
 #' @param mod_g Component regression model.
 #' @param y_sigma_g Component regression standard deviation for the response.
 #'
-#' @return List of
-#' * diff: Aggregated dissimilarity value for this component.
-#' * dens: Joint (covariate & response) density of all observations for this
-#'         component.
-#' * diff_x: Covariate dissimilarity value for this component.
-#' * diff_y: Response dissimilarity value for this component.
-#' * dens_x: Covariate density of all observations for this component.
-#' * dens_y: Response density of all observations for this component.
-#'
+#' @returns
+#' `distrib_diff_lcwm_lcwm_g` returns a list with the following elements:
+#' \describe{
+#'   \item{`diff`}{Aggregated dissimilarity value for this component.}
+#'   \item{`dens`}{Joint (covariate & response) density of all observations for
+#'                 this component.}
+#'   \item{`diff_x`}{Covariate dissimilarity value for this component.}
+#'   \item{`diff_y`}{Response dissimilarity value for this component.}
+#'   \item{`dens_x`}{Covariate density of all observations for this component.}
+#'   \item{`dens_y`}{Response density of all observations for this component.}
+#' }
 distrib_diff_lcwm_g <- function(
     x,
     z_g,
@@ -259,9 +272,12 @@ distrib_diff_lcwm_g <- function(
 #'
 #' @inheritParams distrib_diff_lcwm_g
 #'
-#' @return List of
-#' * diff: Response dissimilarity value for this component.
-#' * dens: Response density of all observations for this component.
+#' @returns
+#' `distrib_diff_lcwm_residual` returns a list with the following elements:
+#' \describe{
+#'   \item{`diff`}{Response dissimilarity value for this component.}
+#'   \item{`dens`}{Response density of all observations for this component.}
+#' }
 distrib_diff_residual <- function(
     x,
     z_g,

@@ -11,13 +11,12 @@
 #' @param mnames Model names for mixture::gpcm.
 #' @param nmax Maximum number of iterations for mixture::gpcm.
 #' @param atol EM convergence tolerance threshold for mixture::gpcm.
-#' @param init_z Initial z matrix.
-#' @param init_model mixture::gpcm best_model
+#' @param init_z Initial component assignment probability matrix.
+#' @param init_model Initial mixture model (mixture::gpcm best_model).
 #' @param init_method Method used to initialise each mixture model.
-#' @param init_scaling Logical: whether the data should be scaled for
-#'                     initialisation.
-#' @param kmpp_seed Optional seed for k-means++ initialisation. Default is
-#'                  hierarchical clustering.
+#' @param init_scaling Logical value controlling whether the data should be
+#'                     scaled for initialisation.
+#' @param kmpp_seed Optional seed for k-means++ initialisation.
 #' @param print_interval How frequently the iteration count is printed.
 #'
 #' @return List of

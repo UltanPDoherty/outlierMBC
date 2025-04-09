@@ -18,17 +18,19 @@ all backward steps.}
 global minimum dissimilarity, from each backward step.}
 }
 \value{
-List of two lists:
-\itemize{
-\item minimum:
-\itemize{
-\item ind - Index of the minimum solution.
-\item val - Value of the minimum solution.
+\code{backtrack} returns a list with two elements, \code{minimum} and \code{backtrack}:
+\describe{
+\item{\code{minimum} is a list with the following elements:}{
+\describe{
+\item{\code{ind}}{Index of the minimum solution.}
+\item{\code{val}}{Value of the minimum solution.}
 }
-\item backtrack:
-\itemize{
-\item ind - Index of the backtrack solution.
-\item val - Value of the backtrack solution.
+}
+\item{\code{backtrack} is a list with the following elements:}{
+\describe{
+\item{\code{ind}}{Index of the backtrack solution.}
+\item{\code{val}}{Value of the backtrack solution.}
+}
 }
 }
 }

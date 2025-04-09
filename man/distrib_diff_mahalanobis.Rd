@@ -19,12 +19,12 @@ distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g)
 \item{logdet_g}{Log-determinants of covariance matrix for component g.}
 }
 \value{
-List of
-\itemize{
-\item diff: Dissimilarity value for this component.
-\item dens: Gaussian density of all observations for this component.
-\item mahalas: Scaled squared sample Mahalanobis distances for all observations
-with respect to this component.
+\code{distrib_diff_mahalanobis} returns a list with the following elements:
+\describe{
+\item{\code{diff}}{Dissimilarity value for this component.}
+\item{\code{dens}}{Gaussian density of all observations for this component.}
+\item{\code{mahalas}}{Scaled squared sample Mahalanobis distances for all
+observations with respect to this component.}
 }
 }
 \description{

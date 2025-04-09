@@ -26,21 +26,22 @@ all backward steps.}
 \item{max_step_rise}{Upper limit for the increase, as a proportion of the
 global minimum dissimilarity, from each backward step.}
 
-\item{init_model}{mixture::gpcm best_model}
+\item{init_model}{Initial mixture model (mixture::gpcm best_model).}
 
-\item{init_z}{Initial z matrix.}
+\item{init_z}{Initial component assignment probability matrix.}
 
 \item{manual_outlier_num}{User-specified number of outliers.}
 }
 \value{
-List:
-\itemize{
-\item labels: vector of component labels with outliers denoted by 0.
-\item outlier_bool: logical vector indicating if an observation has been
-classified as an outlier.
-\item outlier_num: number of observations classified as outliers.
-\item mix: Output from mixture::gpcm fitted to the non-outlier observations.
-\item call: Arguments / parameter values used in this function call.
+\code{backtrack_gmm} returns a list with the following elements:
+\describe{
+\item{\code{labels}}{Vector of component labels with outliers denoted by 0.}
+\item{\code{outlier_bool}}{Logical vector indicating if an observation has been
+classified as an outlier.}
+\item{\code{outlier_num}}{Number of observations classified as outliers.}
+\item{\code{mix}}{Output from mixture::gpcm fitted to the non-outlier
+observations.}
+\item{\code{call}}{Arguments / parameter values used in this function call.}
 }
 }
 \description{

@@ -37,14 +37,15 @@ distrib_diff_lcwm(
 \item{dens_power}{.}
 }
 \value{
-List of
-\itemize{
-\item distrib_diff: Aggregated dissimilarity across components.
-\item distrib_diff_vec: Vector containing dissimilarity value for each component.
-\item choice_id: Index of observation with lowest mixture density.
-\item removal_dens: Value of the lowest mixture density.
-\item distrib_diff_mat: Two-column matrix containing response and covariate
-dissimilarities across components.
+\code{distrib_diff_lcwm_lcwm_g} returns a list with the following elements:
+\describe{
+\item{\code{distrib_diff}}{Aggregated dissimilarity across components.}
+\item{\code{distrib_diff_vec}}{Vector containing dissimilarity value for each
+component.}
+\item{\code{choice_id}}{Index of observation with lowest mixture density.}
+\item{\code{removal_dens}}{Value of the lowest mixture density.}
+\item{\code{distrib_diff_mat}}{Two-column matrix containing response and
+covariate dissimilarities across components.}
 }
 }
 \description{

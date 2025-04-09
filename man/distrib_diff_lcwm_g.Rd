@@ -33,15 +33,15 @@ distrib_diff_lcwm_g(
 \item{dens_power}{.}
 }
 \value{
-List of
-\itemize{
-\item diff: Aggregated dissimilarity value for this component.
-\item dens: Joint (covariate & response) density of all observations for this
-component.
-\item diff_x: Covariate dissimilarity value for this component.
-\item diff_y: Response dissimilarity value for this component.
-\item dens_x: Covariate density of all observations for this component.
-\item dens_y: Response density of all observations for this component.
+\code{distrib_diff_lcwm_lcwm_g} returns a list with the following elements:
+\describe{
+\item{\code{diff}}{Aggregated dissimilarity value for this component.}
+\item{\code{dens}}{Joint (covariate & response) density of all observations for
+this component.}
+\item{\code{diff_x}}{Covariate dissimilarity value for this component.}
+\item{\code{diff_y}}{Response dissimilarity value for this component.}
+\item{\code{dens_x}}{Covariate density of all observations for this component.}
+\item{\code{dens_y}}{Response density of all observations for this component.}
 }
 }
 \description{

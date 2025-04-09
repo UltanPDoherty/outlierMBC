@@ -17,13 +17,22 @@
 #' @param max_step_rise Upper limit for the increase, as a proportion of the
 #'                      global minimum dissimilarity, from each backward step.
 #'
-#' @returns List of two lists:
-#' * minimum:
-#'   * ind - Index of the minimum solution.
-#'   * val - Value of the minimum solution.
-#' * backtrack:
-#'   * ind - Index of the backtrack solution.
-#'   * val - Value of the backtrack solution.
+#' @returns
+#' `backtrack` returns a list with two elements, `minimum` and `backtrack`:
+#' \describe{
+#'   \item{`minimum` is a list with the following elements:}{
+#'     \describe{
+#'       \item{`ind`}{Index of the minimum solution.}
+#'       \item{`val`}{Value of the minimum solution.}
+#'     }
+#'   }
+#'   \item{`backtrack` is a list with the following elements:}{
+#'     \describe{
+#'       \item{`ind`}{Index of the backtrack solution.}
+#'       \item{`val`}{Value of the backtrack solution.}
+#'     }
+#'   }
+#' }
 #' @export
 #'
 #' @examples
@@ -151,13 +160,17 @@ plot_backtrack <- function(
 #' @inheritParams backtrack
 #' @param manual_outlier_num User-specified number of outliers.
 #'
-#' @returns List:
-#' * labels: vector of component labels with outliers denoted by 0.
-#' * outlier_bool: logical vector indicating if an observation has been
-#'                 classified as an outlier.
-#' * outlier_num: number of observations classified as outliers.
-#' * mix: Output from mixture::gpcm fitted to the non-outlier observations.
-#' * call: Arguments / parameter values used in this function call.
+#' @returns
+#' `backtrack_gmm` returns a list with the following elements:
+#' \describe{
+#'   \item{`labels`}{Vector of component labels with outliers denoted by 0.}
+#'   \item{`outlier_bool`}{Logical vector indicating if an observation has been
+#'                         classified as an outlier.}
+#'   \item{`outlier_num`}{Number of observations classified as outliers.}
+#'   \item{`mix`}{Output from mixture::gpcm fitted to the non-outlier
+#'                observations.}
+#'   \item{`call`}{Arguments / parameter values used in this function call.}
+#' }
 #'
 #' @export
 #'
@@ -329,19 +342,30 @@ backtrack_gmm <- function(
 
 # ==============================================================================
 
-#' Fit a LCWM to the backtrack solution.
+#' @title Fit a Linear CWM to the backtrack solution.
+#'
+#' @description The [backtrack] function determines the number of outliers for
+#' the backtrack solution and [plot_backtrack] plots this on a dissimilarity
+#' curve. `backtrack_gmm` fits the mixture model corresponding to the number of
+#' outliers selected by the backtrack solution (or any manually specified number
+#' of outliers).
 #'
 #' @inheritParams ombc_lcwm
 #' @inheritParams backtrack
 #' @inheritParams backtrack_gmm
 #' @param ombc_lcwm_out Output from ombc_lcwm.
 #'
-#' @returns List:
-#' * labels
-#' * outlier_bool
-#' * outlier_num
-#' * lcwm
-#' * call
+#' @returns
+#' `backtrack_gmm` returns a list with the following elements:
+#' \describe{
+#'   \item{`labels`}{Vector of component labels with outliers denoted by 0.}
+#'   \item{`outlier_bool`}{Logical vector indicating if an observation has been
+#'                         classified as an outlier.}
+#'   \item{`outlier_num`}{Number of observations classified as outliers.}
+#'   \item{`lcwm`}{Output from flexCWM::cwm fitted to the non-outlier
+#'                 observations.}
+#'   \item{`call`}{Arguments / parameter values used in this function call.}
+#' }
 #'
 #' @export
 #'

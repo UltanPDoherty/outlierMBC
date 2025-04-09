@@ -16,12 +16,15 @@
 #' @param manual_threshold Optional preset threshold.
 #' @param scale Logical value controlling whether we apply `scale` to `x`.
 #'
-#' @return List:
-#' * gross_choice: a numeric value indicating the elbow's location.
-#' * gross_bool: a logical vector identifying the gross outliers.
-#' * gross_curve: ggplot of the highest 2 * `max_out` kNN distances in
-#'                 decreasing order.
-#' * gross_scatter: ggplot of all kNN distances in index order.
+#' @return
+#' `find_gross` returns a list with the following elements:
+#' \describe{
+#'   \item{`gross_choice`}{A numeric value indicating the elbow's location.}
+#'   \item{`gross_bool`}{A logical vector identifying the gross outliers.}
+#'   \item{`gross_curve`}{ggplot of the highest `2 * max_out` kNN distances in
+#'                 decreasing order.}
+#'   \item{`gross_scatter`}{ggplot of all kNN distances in index order.}
+#' }
 #'
 #' @export
 find_gross <- function(
