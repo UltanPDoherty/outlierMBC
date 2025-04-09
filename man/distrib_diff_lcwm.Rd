@@ -2,7 +2,8 @@
 % Please edit documentation in R/distrib_diff.R
 \name{distrib_diff_lcwm}
 \alias{distrib_diff_lcwm}
-\title{distrib_diff_lcwm}
+\title{Compute the dissimilarity for a linear cluster-weighted model and
+identify the lowest density observation.}
 \usage{
 distrib_diff_lcwm(
   x,
@@ -38,11 +39,16 @@ distrib_diff_lcwm(
 \value{
 List of
 \itemize{
-\item distrib_diff
-\item distrib_diff_vec
-\item choice_id
+\item distrib_diff: Aggregated dissimilarity across components.
+\item distrib_diff_vec: Vector containing dissimilarity value for each component.
+\item choice_id: Index of observation with lowest mixture density.
+\item removal_dens: Value of the lowest mixture density.
+\item distrib_diff_mat: Two-column matrix containing response and covariate
+dissimilarities across components.
 }
 }
 \description{
-distrib_diff_lcwm
+At each iteration of \link{ombc_lcwm}, \code{distrib_diff_lcwm} computes the
+dissimilarity value of the current linear cluster-weighted model. It also
+identifies the observation with the lowest mixture density.
 }

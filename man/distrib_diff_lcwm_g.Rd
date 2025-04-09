@@ -2,7 +2,7 @@
 % Please edit documentation in R/distrib_diff.R
 \name{distrib_diff_lcwm_g}
 \alias{distrib_diff_lcwm_g}
-\title{distrib_diff_lcwm_g}
+\title{Compute the dissimilarity for a single component of a Linear CWM.}
 \usage{
 distrib_diff_lcwm_g(
   x,
@@ -20,13 +20,13 @@ distrib_diff_lcwm_g(
 
 \item{z_g}{Component assignment probability vector.}
 
-\item{mu_g}{Component mean vector.}
+\item{mu_g}{Component mean vector for the covariates.}
 
-\item{sigma_g}{Component covariance matrix.}
+\item{sigma_g}{Component covariance matrix for the covariates.}
 
 \item{mod_g}{Component regression model.}
 
-\item{y_sigma_g}{Component regression standard deviation.}
+\item{y_sigma_g}{Component regression standard deviation for the response.}
 
 \item{dd_weight}{.}
 
@@ -35,10 +35,17 @@ distrib_diff_lcwm_g(
 \value{
 List of
 \itemize{
-\item diff
-\item dens
+\item diff: Aggregated dissimilarity value for this component.
+\item dens: Joint (covariate & response) density of all observations for this
+component.
+\item diff_x: Covariate dissimilarity value for this component.
+\item diff_y: Response dissimilarity value for this component.
+\item dens_x: Covariate density of all observations for this component.
+\item dens_y: Response density of all observations for this component.
 }
 }
 \description{
-distrib_diff_lcwm_g
+Computes the covariate dissimilarity value, the response dissimilarity value,
+and their aggregated dissimilarity value. It also obtains the covariate,
+response, and joint densities for every observation.
 }

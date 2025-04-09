@@ -2,7 +2,8 @@
 % Please edit documentation in R/distrib_diff.R
 \name{distrib_diff_gmm}
 \alias{distrib_diff_gmm}
-\title{distrib_diff_gmm}
+\title{Compute the dissimilarity for a Gaussian mixture model and identify
+the lowest density observation.}
 \usage{
 distrib_diff_gmm(x, z, prop, mu, sigma, logdet)
 }
@@ -29,5 +30,7 @@ List of
 }
 }
 \description{
-distrib_diff_gmm
+At each iteration of \link{ombc_gmm}, \code{distrib_diff_gmm} computes the
+dissimilarity value of the current Gaussian mixture model. It also
+identifies the observation with the lowest mixture density.
 }

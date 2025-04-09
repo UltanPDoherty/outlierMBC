@@ -2,7 +2,8 @@
 % Please edit documentation in R/distrib_diff.R
 \name{distrib_diff_mahalanobis}
 \alias{distrib_diff_mahalanobis}
-\title{distrib_diff_mahalanobis}
+\title{Compute the dissimilarity for a single multivariate Gaussian
+distribution.}
 \usage{
 distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g)
 }
@@ -27,5 +28,7 @@ with respect to this component.
 }
 }
 \description{
-distrib_diff_mahalanobis
+Compute the dissimilarity value and observation densities for a single
+multivariate Gaussian distribution. This could be a whole component in a
+Gaussian mixture model or the covariate part of a component in a Linear CWM.
 }

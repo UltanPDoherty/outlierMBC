@@ -2,7 +2,8 @@
 % Please edit documentation in R/distrib_diff.R
 \name{distrib_diff_residual}
 \alias{distrib_diff_residual}
-\title{distrib_diff_residual}
+\title{Compute the response dissimilarity for a single component of a Linear
+CWM.}
 \usage{
 distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
 }
@@ -13,15 +14,16 @@ distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
 
 \item{mod_g}{Component regression model.}
 
-\item{y_sigma_g}{Component regression standard deviation.}
+\item{y_sigma_g}{Component regression standard deviation for the response.}
 }
 \value{
 List of
 \itemize{
-\item diff
-\item dens
+\item diff: Response dissimilarity value for this component.
+\item dens: Response density of all observations for this component.
 }
 }
 \description{
-distrib_diff_residual
+Computes the response dissimilarity value and the response density for every
+observation.
 }

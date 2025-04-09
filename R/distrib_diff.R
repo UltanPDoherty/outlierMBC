@@ -1,4 +1,10 @@
-#' distrib_diff_gmm
+#' @title Compute the dissimilarity for a Gaussian mixture model and identify
+#' the lowest density observation.
+#'
+#' @description
+#' At each iteration of [ombc_gmm], `distrib_diff_gmm` computes the
+#' dissimilarity value of the current Gaussian mixture model. It also
+#' identifies the observation with the lowest mixture density.
 #'
 #' @inheritParams ombc_gmm
 #' @param z Component assignment probability matrix.
@@ -46,7 +52,13 @@ distrib_diff_gmm <- function(
 
 # ==============================================================================
 
-#' distrib_diff_mahalanobis
+#' @title Compute the dissimilarity for a single multivariate Gaussian
+#' distribution.
+#'
+#' @description
+#' Compute the dissimilarity value and observation densities for a single
+#' multivariate Gaussian distribution. This could be a whole component in a
+#' Gaussian mixture model or the covariate part of a component in a Linear CWM.
 #'
 #' @inheritParams distrib_diff_gmm
 #' @param z_g Assignment probability vector for component g.
@@ -97,7 +109,13 @@ distrib_diff_mahalanobis <- function(
 
 # ==============================================================================
 
-#' distrib_diff_lcwm
+#' @title Compute the dissimilarity for a linear cluster-weighted model and
+#' identify the lowest density observation.
+#'
+#' @description
+#' At each iteration of [ombc_lcwm], `distrib_diff_lcwm` computes the
+#' dissimilarity value of the current linear cluster-weighted model. It also
+#' identifies the observation with the lowest mixture density.
 #'
 #' @inheritParams ombc_lcwm
 #' @inheritParams distrib_diff_gmm
@@ -107,9 +125,12 @@ distrib_diff_mahalanobis <- function(
 #' @param y_sigma Vector of component regression standard deviations.
 #'
 #' @return List of
-#' * distrib_diff
-#' * distrib_diff_vec
-#' * choice_id
+#' * distrib_diff: Aggregated dissimilarity across components.
+#' * distrib_diff_vec: Vector containing dissimilarity value for each component.
+#' * choice_id: Index of observation with lowest mixture density.
+#' * removal_dens: Value of the lowest mixture density.
+#' * distrib_diff_mat: Two-column matrix containing response and covariate
+#'                     dissimilarities across components.
 distrib_diff_lcwm <- function(
     x,
     z,
@@ -162,20 +183,31 @@ distrib_diff_lcwm <- function(
   )
 }
 
-# ------------------------------------------------------------------------------
+# ==============================================================================
 
-#' distrib_diff_lcwm_g
+#' @title Compute the dissimilarity for a single component of a Linear CWM.
+#'
+#' @description
+#' Computes the covariate dissimilarity value, the response dissimilarity value,
+#' and their aggregated dissimilarity value. It also obtains the covariate,
+#' response, and joint densities for every observation.
 #'
 #' @inheritParams distrib_diff_lcwm
 #' @param z_g Component assignment probability vector.
-#' @param mu_g Component mean vector.
-#' @param sigma_g Component covariance matrix.
+#' @param mu_g Component mean vector for the covariates.
+#' @param sigma_g Component covariance matrix for the covariates.
 #' @param mod_g Component regression model.
-#' @param y_sigma_g Component regression standard deviation.
+#' @param y_sigma_g Component regression standard deviation for the response.
 #'
 #' @return List of
-#' * diff
-#' * dens
+#' * diff: Aggregated dissimilarity value for this component.
+#' * dens: Joint (covariate & response) density of all observations for this
+#'         component.
+#' * diff_x: Covariate dissimilarity value for this component.
+#' * diff_y: Response dissimilarity value for this component.
+#' * dens_x: Covariate density of all observations for this component.
+#' * dens_y: Response density of all observations for this component.
+#'
 distrib_diff_lcwm_g <- function(
     x,
     z_g,
@@ -216,15 +248,20 @@ distrib_diff_lcwm_g <- function(
   )
 }
 
-# ------------------------------------------------------------------------------
+# ==============================================================================
 
-#' distrib_diff_residual
+#' @title Compute the response dissimilarity for a single component of a Linear
+#' CWM.
+#'
+#' @description
+#' Computes the response dissimilarity value and the response density for every
+#' observation.
 #'
 #' @inheritParams distrib_diff_lcwm_g
 #'
 #' @return List of
-#' * diff
-#' * dens
+#' * diff: Response dissimilarity value for this component.
+#' * dens: Response density of all observations for this component.
 distrib_diff_residual <- function(
     x,
     z_g,
