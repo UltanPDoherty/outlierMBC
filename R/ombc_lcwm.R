@@ -27,7 +27,6 @@
 #' @param y_formula Regression formula.
 #' @param dd_weight A value between `0` and `1` which controls the weighting of
 #'                  the response and covariate dissimilarities when aggregating.
-#' @param dens_power .
 #'
 #' @return List of
 #' * labels
@@ -75,8 +74,7 @@ ombc_lcwm <- function(
     init_scaling = TRUE,
     kmpp_seed = 123,
     print_interval = Inf,
-    dd_weight = 0.5,
-    dens_power = 0.5) {
+    dd_weight = 0.5) {
   init_method <- match.arg(init_method)
   init_scheme <- match.arg(init_scheme)
   init_model <- NULL
@@ -90,7 +88,7 @@ ombc_lcwm <- function(
     "init_z" = substitute(init_z),
     "init_method" = init_method, "init_scaling" = init_scaling,
     "kmpp_seed" = kmpp_seed, "print_interval" = print_interval,
-    "dd_weight" = dd_weight, "dens_power" = dens_power
+    "dd_weight" = dd_weight
   )
 
   ombc_version <- utils::packageVersion("outlierMBC")
@@ -180,8 +178,7 @@ ombc_lcwm <- function(
       lcwm$models[[1]]$concomitant$normal.Sigma,
       mod_list,
       y_sigma,
-      dd_weight,
-      dens_power
+      dd_weight
     )
 
     distrib_diff_arr[i, , ] <- dd$distrib_diff_mat

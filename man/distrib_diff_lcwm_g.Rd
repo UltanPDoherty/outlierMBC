@@ -4,16 +4,7 @@
 \alias{distrib_diff_lcwm_g}
 \title{Compute the dissimilarity for a single component of a Linear CWM.}
 \usage{
-distrib_diff_lcwm_g(
-  x,
-  z_g,
-  mu_g,
-  sigma_g,
-  mod_g,
-  y_sigma_g,
-  dd_weight = 0.5,
-  dens_power = 0.5
-)
+distrib_diff_lcwm_g(x, z_g, mu_g, sigma_g, mod_g, y_sigma_g, dd_weight = 0.5)
 }
 \arguments{
 \item{x}{Covariate data only.}
@@ -30,8 +21,6 @@ distrib_diff_lcwm_g(
 
 \item{dd_weight}{A value between \code{0} and \code{1} which controls the weighting of
 the response and covariate dissimilarities when aggregating.}
-
-\item{dens_power}{.}
 }
 \value{
 \code{distrib_diff_lcwm_lcwm_g} returns a list with the following elements:

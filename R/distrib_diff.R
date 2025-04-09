@@ -150,8 +150,7 @@ distrib_diff_lcwm <- function(
     sigma,
     mod_list,
     y_sigma,
-    dd_weight = 0.5,
-    dens_power = 0.5) {
+    dd_weight = 0.5) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
 
@@ -166,8 +165,7 @@ distrib_diff_lcwm <- function(
       as.matrix(sigma[, , g]),
       mod_list[[g]],
       y_sigma[g],
-      dd_weight,
-      dens_power
+      dd_weight
     )
     distrib_diff_vec[g] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
@@ -228,28 +226,17 @@ distrib_diff_lcwm_g <- function(
     sigma_g,
     mod_g,
     y_sigma_g,
-    dd_weight = 0.5,
-    dens_power = 0.5) {
-  if (dd_weight == 0 && dens_power == 0) {
-    diff_g_x <- 0
-    dens_g_x <- 1
-  } else {
-    dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
-    diff_g_x <- dd_g_x$diff
-    dens_g_x <- dd_g_x$dens
-  }
+    dd_weight = 0.5) {
+  dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
+  diff_g_x <- dd_g_x$diff
+  dens_g_x <- dd_g_x$dens
 
-  if (dd_weight == 1 && dens_power == 1) {
-    diff_g_y <- 0
-    dens_g_y <- 1
-  } else {
-    dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
-    diff_g_y <- dd_g_y$diff
-    dens_g_y <- dd_g_y$dens
-  }
+  dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
+  diff_g_y <- dd_g_y$diff
+  dens_g_y <- dd_g_y$dens
 
   diff_g <- sqrt(dd_weight * diff_g_x^2 + (1 - dd_weight) * diff_g_y^2)
-  dens_g <- dens_g_x^dens_power * dens_g_y^(1 - dens_power)
+  dens_g <- dens_g_x * dens_g_y
 
   list(
     diff = diff_g,

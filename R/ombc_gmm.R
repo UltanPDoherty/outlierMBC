@@ -45,11 +45,11 @@
 #'                         set. Observations which were provisionally removed,
 #'                         including those that were eventually not classified
 #'                         as outliers, are ranked from `1` to `max_out`. All
-#'                         gross outliers have rank `1`. If there are `gross_num`
-#'                         gross outliers, then the observations removed during
-#'                         the main algorithm itself will be numbered from
-#'                         `gross_num + 1` to `max_out`. Observations that were
-#'                         never removed have rank `0`.}
+#'                         gross outliers have rank `1`. If there are
+#'                         `gross_num` gross outliers, then the observations
+#'                         removed during the main algorithm itself will be
+#'                         numbered from gross_num + 1` to `max_out`.
+#'                         Observations that were ever removed have rank `0`.}
 #'   \item{`gross_outs`}{Logical vector identifying the gross outliers. This is
 #'                       identical to the `gross_outs` vector passed to this
 #'                       function as an argument / input.}
