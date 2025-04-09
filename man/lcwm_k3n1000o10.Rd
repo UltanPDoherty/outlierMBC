@@ -3,23 +3,28 @@
 \docType{data}
 \name{lcwm_k3n1000o10}
 \alias{lcwm_k3n1000o10}
-\title{Data set from \code{simulate_lcwm}. 3 components, 1000 true observations,
-10 outliers.}
+\title{Simulated data set consisting of 1000 observations from 3 Gaussian
+components and 10 outliers.}
 \format{
 \subsection{\code{lcwm_k3n1000o10}}{
 
 A data frame with 1010 rows and 3 columns:
 \describe{
-\item{X1, Y}{Continuous variables.}
+\item{X1}{Continuous explanatory variable.}
+\item{Y}{Continuous response variable.}
 \item{G}{Component label: 0 for outliers; 1, 2, or 3 for true points.}
 }
 }
+}
+\source{
+\url{https://github.com/UltanPDoherty/outlierMBC/blob/main/data-raw/lcwm_k3n1000o10.R}
 }
 \usage{
 lcwm_k3n1000o10
 }
 \description{
-Simulated data set with 1000 observations from 3 Gaussian components and 10
-outliers.
+This data set was simulated using \code{simulate_lcwm}. There are 500 observations
+in Component 1, 250 observations in Component 2, and 250 observations in
+Component 3
 }
 \keyword{datasets}

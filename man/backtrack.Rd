@@ -2,35 +2,48 @@
 % Please edit documentation in R/backtrack.R
 \name{backtrack}
 \alias{backtrack}
-\title{Move backwards from the global minimum to a more conservative solution.}
+\title{Move backwards from the minimum to a more conservative solution.}
 \usage{
 backtrack(x, max_total_rise = 0.1, max_step_rise = 0.05)
 }
 \arguments{
-\item{x}{Data.}
+\item{x}{Numeric vector where lower values and lower indices are desirable.
+For example, if the quantity is to be minimised but there is an
+undefined cost which rises as the index increases.}
 
-\item{max_total_rise}{Value cannot exceed minimum * (1 + max_total_rise).}
+\item{max_total_rise}{Upper limit for the cumulative increase, as a
+proportion of the global minimum value, from all
+backward steps.}
 
-\item{max_step_rise}{Each step must be less than minimum * (1 + max_step_rise).}
+\item{max_step_rise}{Upper limit for the increase, as a proportion of the
+global minimum value, from each backward step.}
 }
 \value{
 List of two lists:
 \itemize{
-\item minimum: $ind
-$val
-\item backtrack: $ind
-$val
+\item minimum:
+\itemize{
+\item ind - Index of the minimum solution.
+\item val - Value of the minimum solution.
+}
+\item backtrack:
+\itemize{
+\item ind - Index of the backtrack solution.
+\item val - Value of the backtrack solution.
+}
 }
 }
 \description{
-Move backwards from the global minimum to a more conservative solution.
+Given a sequence of measurements for a quantity to be minimised, this
+function first finds the index and value of the minimum, then moves backwards
+from right to left to a reasonable solution with a lower index. Limits are placed on the
+maximum increase from a single step (\code{max_step_rise}) and from all steps
+(\code{max_total_rise}).
 }
 \examples{
 
-ombc_gmm_k3n1000o10 <- ombc_gmm(
-  gmm_k3n1000o10[, 1:2],
-  comp_num = 3, max_out = 20
-)
+ombc_gmm_k3n1000o10 <-
+  ombc_gmm(gmm_k3n1000o10[, 1:2], comp_num = 3, max_out = 20)
 
 backtrack(ombc_gmm_k3n1000o10$distrib_diff_vec)
 

@@ -9,9 +9,12 @@ plot_backtrack(ombc_out, max_total_rise = 0.1, max_step_rise = 0.05)
 \arguments{
 \item{ombc_out}{Output from ombc_gmm.}
 
-\item{max_total_rise}{Value cannot exceed minimum * (1 + max_total_rise).}
+\item{max_total_rise}{Upper limit for the cumulative increase, as a
+proportion of the global minimum value, from all
+backward steps.}
 
-\item{max_step_rise}{Each step must be less than minimum * (1 + max_step_rise).}
+\item{max_step_rise}{Upper limit for the increase, as a proportion of the
+global minimum value, from each backward step.}
 }
 \value{
 A gg object.

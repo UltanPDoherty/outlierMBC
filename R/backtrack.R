@@ -1,23 +1,34 @@
-#' Move backwards from the global minimum to a more conservative solution.
+#' @title Move backwards from the minimum to a more conservative solution.
 #'
-#' @inheritParams ombc_gmm
-#' @param max_total_rise Value cannot exceed minimum * (1 + max_total_rise).
-#' @param max_step_rise
-#' Each step must be less than minimum * (1 + max_step_rise).
+#' @description
+#' Given a sequence of measurements for a quantity to be minimised, this
+#' function first finds the index and value of the minimum, then moves backwards
+#' from right to left to a reasonable solution with a lower index. Limits are placed on the
+#' maximum increase from a single step (`max_step_rise`) and from all steps
+#' (`max_total_rise`).
+#'
+#' @param x Numeric vector where lower values and lower indices are desirable.
+#'          For example, if the quantity is to be minimised but there is an
+#'          undefined cost which rises as the index increases.
+#' @param max_total_rise Upper limit for the cumulative increase, as a
+#'                       proportion of the global minimum value, from all
+#'                       backward steps.
+#' @param max_step_rise Upper limit for the increase, as a proportion of the
+#'                      global minimum value, from each backward step.
 #'
 #' @returns List of two lists:
-#' * minimum: $ind
-#'            $val
-#' * backtrack: $ind
-#'              $val
+#' * minimum:
+#'   * ind - Index of the minimum solution.
+#'   * val - Value of the minimum solution.
+#' * backtrack:
+#'   * ind - Index of the backtrack solution.
+#'   * val - Value of the backtrack solution.
 #' @export
 #'
 #' @examples
 #'
-#' ombc_gmm_k3n1000o10 <- ombc_gmm(
-#'   gmm_k3n1000o10[, 1:2],
-#'   comp_num = 3, max_out = 20
-#' )
+#' ombc_gmm_k3n1000o10 <-
+#'   ombc_gmm(gmm_k3n1000o10[, 1:2], comp_num = 3, max_out = 20)
 #'
 #' backtrack(ombc_gmm_k3n1000o10$distrib_diff_vec)
 #'

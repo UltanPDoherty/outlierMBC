@@ -3,8 +3,8 @@
 \docType{data}
 \name{gmm_k3n2000o20}
 \alias{gmm_k3n2000o20}
-\title{Data set from \code{simulate_gmm}. 3 components, 2000 true observations, 20
-outliers.}
+\title{Simulated data set consisting of 2000 observations from 3 Gaussian
+components and 20 outliers.}
 \format{
 \subsection{\code{gmm_k3n2000o20}}{
 
@@ -15,11 +15,15 @@ A data frame with 2020 rows and 3 columns:
 }
 }
 }
+\source{
+\url{https://github.com/UltanPDoherty/outlierMBC/blob/main/data-raw/gmm_k3n2000o20.R}
+}
 \usage{
 gmm_k3n2000o20
 }
 \description{
-Simulated data set with 2000 observations from 3 Gaussian components and 20
-outliers from a uniform distribution with a rejection step.
+This data set was simulated using \code{simulate_gmm}. There are 1000 observations
+in Component 1, 500 observations in Component 2, and 500 observations in
+Component 3.
 }
 \keyword{datasets}
