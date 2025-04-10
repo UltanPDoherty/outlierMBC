@@ -21,7 +21,6 @@ distrib_diff_gmm(x, z, prop, mu, sigma, logdet)
 \item{logdet}{Vector of log-determinants for covariance matrices.}
 }
 \value{
-List of
 \code{distrib_diff_gmm} returns a list with the following elements:
 \describe{
 \item{\code{distrib_diff}}{Aggregated dissimilarity across components.}

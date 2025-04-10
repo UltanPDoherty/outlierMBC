@@ -2,7 +2,7 @@
 % Please edit documentation in R/backtrack.R
 \name{backtrack_gmm}
 \alias{backtrack_gmm}
-\title{Fit a GMM to the backtrack solution.}
+\title{Fit a Gaussian mixture model to the backtrack solution.}
 \usage{
 backtrack_gmm(
   x,
@@ -17,7 +17,7 @@ backtrack_gmm(
 \arguments{
 \item{x}{Data.}
 
-\item{ombc_out}{Output from ombc_gmm.}
+\item{ombc_out}{Output from \code{ombc_gmm} or \code{ombc_lcwm}.}
 
 \item{max_total_rise}{Upper limit for the cumulative increase, as a
 proportion of the global minimum dissimilarity, from
@@ -26,7 +26,7 @@ all backward steps.}
 \item{max_step_rise}{Upper limit for the increase, as a proportion of the
 global minimum dissimilarity, from each backward step.}
 
-\item{init_model}{Initial mixture model (mixture::gpcm best_model).}
+\item{init_model}{Initial mixture model (\code{mixture::gpcm} \code{best_model}).}
 
 \item{init_z}{Initial component assignment probability matrix.}
 
@@ -53,7 +53,6 @@ outliers selected by the backtrack solution (or any manually specified number
 of outliers).
 }
 \examples{
-
 ombc_gmm_k3n1000o10 <- ombc_gmm(
   gmm_k3n1000o10[, 1:2],
   comp_num = 3, max_out = 20

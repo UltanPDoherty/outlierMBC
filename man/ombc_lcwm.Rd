@@ -2,7 +2,8 @@
 % Please edit documentation in R/ombc_lcwm.R
 \name{ombc_lcwm}
 \alias{ombc_lcwm}
-\title{Sequentially identify outliers while fitting a linear cluster-weighted model.}
+\title{Sequentially identify outliers while fitting a linear cluster-weighted
+model.}
 \usage{
 ombc_lcwm(
   xy,
@@ -40,9 +41,9 @@ ombc_lcwm(
 
 \item{mnames}{Model names for mixture::gpcm.}
 
-\item{nmax}{Maximum number of iterations for mixture::gpcm.}
+\item{nmax}{Maximum number of iterations for \code{flexCWM::cwm}.}
 
-\item{atol}{EM convergence tolerance threshold for mixture::gpcm.}
+\item{atol}{EM convergence threshold for \code{flexCWM::cwm}.}
 
 \item{init_z}{Initial component assignment probability matrix.}
 
@@ -59,21 +60,42 @@ scaled for initialisation.}
 the response and covariate dissimilarities when aggregating.}
 }
 \value{
-List of
-\itemize{
-\item labels
-\item outlier_bool
-\item outlier_num
-\item outlier_rank
-\item gross_outs
-\item lcwm = lcwm
-\item loglike
-\item removal_dens
-\item distrib_diff_vec
-\item distrib_diff_mat
-\item call
-\item version
-\item conv_status
+\code{ombc_lcwm} returns a list with the following elements:
+\describe{
+\item{\code{labels}}{Vector of mixture component labels with outliers denoted by
+0.}
+\item{\code{outlier_bool}}{Logical vector indicating if an observation has been
+classified as an outlier.}
+\item{\code{outlier_num}}{Number of observations classified as outliers.}
+\item{\code{outlier_rank}}{Order in which observations are removed from the data
+set. Observations which were provisionally removed,
+including those that were eventually not classified
+as outliers, are ranked from \code{1} to \code{max_out}. All
+gross outliers have rank \code{1}. If there are
+\code{gross_num} gross outliers, then the observations
+removed during the main algorithm itself will be
+numbered from \code{gross_num + 1} to \code{max_out}.
+Observations that were ever removed have rank \code{0}.}
+\item{\code{gross_outs}}{Logical vector identifying the gross outliers. This is
+identical to the \code{gross_outs} vector passed to this
+function as an argument / input.}
+\item{\code{lcwm}}{Output from \code{flexCWM::cwm} fitted to the non-outlier
+observations.}
+\item{\code{loglike}}{Vector of log-likelihood values for each iteration.}
+\item{\code{removal_dens}}{Vector of mixture densities for the removed
+observations. These are the lowest mixture densities
+at each iteration.}
+\item{\code{distrib_diff_vec}}{Vector of aggregated cross-component
+dissimilarity values for each iteration.}
+\item{\code{distrib_diff_mat}}{Matrix of component-specific dissimilarity values
+for each iteration.}
+\item{\code{distrib_diff_arr}}{Array of component-specific response and
+covariate dissimilarity values for each
+iteration.}
+\item{\code{call}}{Arguments / parameter values used in this function call.}
+\item{\code{version}}{Version of \code{outlierMBC} used in this function call.}
+\item{\code{conv_status}}{Logical vector indicating which iterations' mixture
+models reached convergence during model-fitting.}
 }
 }
 \description{
@@ -99,7 +121,6 @@ cluster-weighted model to the remaining data.
 }
 }
 \examples{
-
 gross_lcwm_k3n1000o10 <- find_gross(lcwm_k3n1000o10, 20)
 
 ombc_lcwm_k3n1000o10 <- ombc_lcwm(
@@ -111,5 +132,4 @@ ombc_lcwm_k3n1000o10 <- ombc_lcwm(
   mnames = "V",
   gross_outs = gross_lcwm_k3n1000o10$gross_bool
 )
-
 }

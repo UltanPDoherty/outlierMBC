@@ -33,15 +33,14 @@
 #'     }
 #'   }
 #' }
+#'
 #' @export
 #'
 #' @examples
-#'
 #' ombc_gmm_k3n1000o10 <-
 #'   ombc_gmm(gmm_k3n1000o10[, 1:2], comp_num = 3, max_out = 20)
 #'
 #' backtrack(ombc_gmm_k3n1000o10$distrib_diff_vec)
-#'
 backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.05) {
   xmin_val <- min(x)
   xmin_ind <- which.min(x)
@@ -70,15 +69,20 @@ backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.05) {
 
 # ==============================================================================
 
-#' Plot the dissimilarity curve for the backtrack method.
+#' @title Plot the dissimilarity curve showing the backtrack solution.
+#'
+#' @description
+#' Plots a rescaled dissimilarity curve where the dissimilarity values (y axis)
+#' have been divided by their minimum so that the rescaled minimum is at 1.
+#' Vertical lines mark the minimum and backtrack solutions.
 #'
 #' @inheritParams plot_curve
 #' @inheritParams backtrack
 #'
-#' @returns ggplot of the dissimilarity curve showing the minimum solution and
-#'          the backtack solutions. The dissimilarity values (y axis) are
-#'          divided by the minimum dissimilarity so that the rescaled minimum is
-#'          at 1.
+#' @returns
+#' `plot_backtrack` returns a ggplot of the rescaled dissimilarity curve showing
+#' the minimum solution and the backtrack solutions.
+#'
 #' @export
 plot_backtrack <- function(
     ombc_out, max_total_rise = 0.1, max_step_rise = 0.05) {
@@ -146,7 +150,7 @@ plot_backtrack <- function(
 
 # ==============================================================================
 
-#' @title Fit a GMM to the backtrack solution.
+#' @title Fit a Gaussian mixture model to the backtrack solution.
 #'
 #' @description
 #' The [backtrack] function determines the number of outliers for the backtrack
@@ -176,7 +180,6 @@ plot_backtrack <- function(
 #' @export
 #'
 #' @examples
-#'
 #' ombc_gmm_k3n1000o10 <- ombc_gmm(
 #'   gmm_k3n1000o10[, 1:2],
 #'   comp_num = 3, max_out = 20
@@ -343,11 +346,12 @@ backtrack_gmm <- function(
 
 # ==============================================================================
 
-#' @title Fit a Linear CWM to the backtrack solution.
+#' @title Fit a linear cluster-weighted model to the backtrack solution.
 #'
-#' @description The [backtrack] function determines the number of outliers for
-#' the backtrack solution and [plot_backtrack] plots this on a dissimilarity
-#' curve. `backtrack_gmm` fits the mixture model corresponding to the number of
+#' @description
+#' The [backtrack] function determines the number of outliers for the backtrack
+#' solution and [plot_backtrack] plots this on a dissimilarity curve.
+#' `backtrack_gmm` fits the mixture model corresponding to the number of
 #' outliers selected by the backtrack solution (or any manually specified number
 #' of outliers).
 #'
@@ -371,7 +375,6 @@ backtrack_gmm <- function(
 #' @export
 #'
 #' @examples
-#'
 #' gross_lcwm_k3n1000o10 <- find_gross(lcwm_k3n1000o10, 20)
 #'
 #' ombc_lcwm_k3n1000o10 <- ombc_lcwm(

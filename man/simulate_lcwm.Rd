@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate_lcwm.R
 \name{simulate_lcwm}
 \alias{simulate_lcwm}
-\title{simulate_lcwm}
+\title{Simulate data from a linear cluster-weighted model with outliers.}
 \usage{
 simulate_lcwm(
   n,
@@ -32,13 +32,20 @@ simulate_lcwm(
 
 \item{outlier_num}{Desired number of outliers.}
 
-\item{outlier_type}{.}
+\item{outlier_type}{Character string governing whether the outliers are
+outlying with respect to the explanatory variable only
+(\code{"x_only"}), the response variable only (\code{"y_only"}), or
+both (\code{"x_and_y"}). \code{"x_and_y"} is the default value.}
 
 \item{seed}{Seed.}
 
 \item{prob_range}{Values for uniform sample rejection.}
 
-\item{range_multipliers}{.}
+\item{range_multipliers}{For every explanatory variable, the sampling region
+The sampling region for the Uniform distribution
+used to simulate proposed outliers is
+controlled by multiplying the component widths by
+these values.}
 
 \item{print_interval}{How frequently the iteration count is printed.}
 
@@ -46,16 +53,57 @@ simulate_lcwm(
 simulated outlier.}
 }
 \value{
-\code{data.frame}:
-\itemize{
-\item $X1: first covariate
-\item ...
-\item $Y: response
-\item $G: label
-}
+\code{simulate_lcwm} returns a \code{data.frame} with continuous variables
+\code{X1}, \code{X2}, ..., followed by a continuous response variable, \code{Y}, and a
+mixture component label vector \code{G} with outliers denoted by \code{0}.
 }
 \description{
-Simulate a multiple linear regression model with response variable outliers.
+Simulates data from a linear cluster-weighted model, then simulates outliers
+from a region around each mixture component, with a rejection step to
+control how unlikely the outliers are under the model.
+}
+\details{
+\code{simulate_lcwm} samples a user-defined number of outliers for each component.
+However, even though an outlier may be associated with one component, it must
+be outlying with respect to every component.
+
+The covariate values of the simulated outliers for a given component \code{g} are
+sampled from a Uniform distribution over a hyper-rectangle which is specific
+to that component. For each covariate dimension, the hyper-rectangle is
+centred at the midpoint between the maximum and minimum values for that
+variable from all of the Gaussian observations from component \code{g}. Its width
+in that dimension is the distance between the minimum and maximum values for
+that variable multiplied by the value of \code{range_multiplier[1]}.
+
+The response values of the simulated outliers for a given component \code{g} are
+obtained by sampling random errors from a Uniform distribution over a
+univariate interval, simulating covariate values as discussed above,
+computing the mean response value for those covariate values, then adding
+this simulated error to the response. The error sampling interval is centred
+at the midpoint between the maximum and minimum errors for that variable from
+all of the Gaussian observations from component \code{g}. Its width is the
+distance between the minimum and maximum errors multiplied by the value of
+\code{range_multiplier[2]}.
+
+A proposed outlier for component \code{g} is rejected if the probability of
+sampling a more extreme point from any of the components is greater than
+\code{prob_range[2]} or if the probability of sampling a less extreme point from
+component \code{g} is less than \code{prob_range[1]}. This can be visualised as a pair
+of inner and outer envelopes around each component. To be accepted, a
+proposed outlier must lie inside the outer envelope for its component and
+outside the inner envelopes of all components. Setting \code{prob_range[1] = 0}
+will eliminate the outer envelope, while setting \code{prob_range[2] = 0} will
+eliminate the inner envelope.
+
+By setting \code{outlier_type} = \code{"x_only"} and giving arbitrary values to
+\code{error_sd} (e.g. a zero vector) and \code{beta} (e.g. a list of zero vectors),
+then ignoring the simulated \code{Y} variable, \code{simulate_lcwm} can be used to
+simulate a Gaussian mixture model. Since \code{simulate_lcwm} simulates
+component-specific outliers from sampling regions around each component,
+rather than a single sampling region around all of the components, this will
+not be equivalent to \link{simulate_gmm}. \code{simulate_lcwm} also allows the user to
+set an upper bound on how unlikely an outlier is, as well as a lower bound,
+whereas \link{simulate_gmm} only sets a lower bound.
 }
 \examples{
 lcwm_k3n1000o10 <- simulate_lcwm(

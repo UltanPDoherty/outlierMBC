@@ -44,10 +44,8 @@ Limits are placed on the maximum increase in dissimilarity from a single step
 defined in proportion to the minimum dissimilarity value.
 }
 \examples{
-
 ombc_gmm_k3n1000o10 <-
   ombc_gmm(gmm_k3n1000o10[, 1:2], comp_num = 3, max_out = 20)
 
 backtrack(ombc_gmm_k3n1000o10$distrib_diff_vec)
-
 }

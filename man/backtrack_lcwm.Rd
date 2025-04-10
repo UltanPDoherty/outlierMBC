@@ -2,7 +2,7 @@
 % Please edit documentation in R/backtrack.R
 \name{backtrack_lcwm}
 \alias{backtrack_lcwm}
-\title{Fit a Linear CWM to the backtrack solution.}
+\title{Fit a linear cluster-weighted model to the backtrack solution.}
 \usage{
 backtrack_lcwm(
   xy,
@@ -45,14 +45,13 @@ observations.}
 }
 }
 \description{
-The \link{backtrack} function determines the number of outliers for
-the backtrack solution and \link{plot_backtrack} plots this on a dissimilarity
-curve. \code{backtrack_gmm} fits the mixture model corresponding to the number of
+The \link{backtrack} function determines the number of outliers for the backtrack
+solution and \link{plot_backtrack} plots this on a dissimilarity curve.
+\code{backtrack_gmm} fits the mixture model corresponding to the number of
 outliers selected by the backtrack solution (or any manually specified number
 of outliers).
 }
 \examples{
-
 gross_lcwm_k3n1000o10 <- find_gross(lcwm_k3n1000o10, 20)
 
 ombc_lcwm_k3n1000o10 <- ombc_lcwm(

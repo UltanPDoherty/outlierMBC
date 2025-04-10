@@ -4,23 +4,30 @@
 \name{outlierMBC-package}
 \alias{outlierMBC}
 \alias{outlierMBC-package}
-\title{outlierMBC: Iterative Detection & Identification of Outliers for Model-Based Clustering}
+\title{outlierMBC: Model-Based Clustering with Sequential Outlier Identification using the Distribution of Mahalanobis Distances}
 \description{
-Exported Functions:
-\itemize{
-\item \code{ombc_gmm} - Identify outliers while clustering the data by fitting a
-Gaussian mixture model.
-\item \code{ombc_lcwm} - Identify outliers while performing regression and clustering
-by fitting a linear cluster-weighted model to the data.
-\item \code{simulate_gmm} - Simulate data from a Gaussian mixture model with outliers.
-\item \code{simulate_lcwm} - Simulate data from a linear cluster-weighted model with
-outliers.
-\item \code{find_gross} -
-\item \code{backtrack} -
-\item \code{backtrack_gmm} -
-\item \code{backtrack_lcwm} -
-\item \code{plot_curve} -
-\item \code{plot_backtrack} -
+This package has the following exported functions:
+\describe{
+\item{\code{ombc_gmm}}{Sequentially identify outliers while fitting a Gaussian
+mixture model.}
+\item{\code{ombc_lcwm}}{Sequentially identify outliers while fitting a linear
+cluster-weighted model.}
+\item{\code{simulate_gmm}}{Simulate data from a Gaussian mixture model with
+outliers.}
+\item{\code{simulate_lcwm}}{Simulate data from a linear cluster-weighted model
+with outliers.}
+\item{\code{find_gross}}{Find gross outliers.}
+\item{\code{backtrack}}{Move backwards from the minimum to a more conservative
+solution.}
+\item{\code{backtrack_gmm}}{Fit a Gaussian mixture model to the backtrack
+solution.}
+\item{\code{backtrack_lcwm}}{Fit a linear cluster-weighted model to the
+backtrack solution.}
+\item{\code{plot_curve}}{Plot the dissimilarity curve.}
+\item{\code{plot_backtrack}}{Plot the dissimilarity curve showing the backtrack
+solution.}
+\item{\code{plot_comparison}}{Plot multiple dissimilarity curves.}
+\item{\code{plot_selection}}{Plot dissimilarity values for multiple solutions.}
 }
 }
 \author{

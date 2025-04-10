@@ -1,7 +1,52 @@
-#' simulate_lcwm
+#' @title Simulate data from a linear cluster-weighted model with outliers.
 #'
 #' @description
-#' Simulate a multiple linear regression model with response variable outliers.
+#' Simulates data from a linear cluster-weighted model, then simulates outliers
+#' from a region around each mixture component, with a rejection step to
+#' control how unlikely the outliers are under the model.
+#'
+#' @details
+#' `simulate_lcwm` samples a user-defined number of outliers for each component.
+#' However, even though an outlier may be associated with one component, it must
+#' be outlying with respect to every component.
+#'
+#' The covariate values of the simulated outliers for a given component `g` are
+#' sampled from a Uniform distribution over a hyper-rectangle which is specific
+#' to that component. For each covariate dimension, the hyper-rectangle is
+#' centred at the midpoint between the maximum and minimum values for that
+#' variable from all of the Gaussian observations from component `g`. Its width
+#' in that dimension is the distance between the minimum and maximum values for
+#' that variable multiplied by the value of `range_multiplier[1]`.
+#'
+#' The response values of the simulated outliers for a given component `g` are
+#' obtained by sampling random errors from a Uniform distribution over a
+#' univariate interval, simulating covariate values as discussed above,
+#' computing the mean response value for those covariate values, then adding
+#' this simulated error to the response. The error sampling interval is centred
+#' at the midpoint between the maximum and minimum errors for that variable from
+#' all of the Gaussian observations from component `g`. Its width is the
+#' distance between the minimum and maximum errors multiplied by the value of
+#' `range_multiplier[2]`.
+#'
+#' A proposed outlier for component `g` is rejected if the probability of
+#' sampling a more extreme point from any of the components is greater than
+#' `prob_range[2]` or if the probability of sampling a less extreme point from
+#' component `g` is less than `prob_range[1]`. This can be visualised as a pair
+#' of inner and outer envelopes around each component. To be accepted, a
+#' proposed outlier must lie inside the outer envelope for its component and
+#' outside the inner envelopes of all components. Setting `prob_range[1] = 0`
+#' will eliminate the outer envelope, while setting `prob_range[2] = 0` will
+#' eliminate the inner envelope.
+#'
+#' By setting `outlier_type` = `"x_only"` and giving arbitrary values to
+#' `error_sd` (e.g. a zero vector) and `beta` (e.g. a list of zero vectors),
+#' then ignoring the simulated `Y` variable, `simulate_lcwm` can be used to
+#' simulate a Gaussian mixture model. Since `simulate_lcwm` simulates
+#' component-specific outliers from sampling regions around each component,
+#' rather than a single sampling region around all of the components, this will
+#' not be equivalent to [simulate_gmm]. `simulate_lcwm` also allows the user to
+#' set an upper bound on how unlikely an outlier is, as well as a lower bound,
+#' whereas [simulate_gmm] only sets a lower bound.
 #'
 #' @param n Vector of component sizes.
 #' @param mu List of component mean vectors.
@@ -9,19 +54,25 @@
 #' @param beta List of component regression coefficient vectors.
 #' @param error_sd Vector of component regression error standard deivations.
 #' @param outlier_num Desired number of outliers.
-#' @param outlier_type .
+#' @param outlier_type Character string governing whether the outliers are
+#'                     outlying with respect to the explanatory variable only
+#'                     (`"x_only"`), the response variable only (`"y_only"`), or
+#'                     both (`"x_and_y"`). `"x_and_y"` is the default value.
 #' @param seed Seed.
 #' @param prob_range Values for uniform sample rejection.
-#' @param range_multipliers .
+#' @param range_multipliers For every explanatory variable, the sampling region
+#' The sampling region for the Uniform distribution
+#'                          used to simulate proposed outliers is
+#'                          controlled by multiplying the component widths by
+#'                          these values.
 #' @param print_interval How frequently the iteration count is printed.
 #' @param print_prob_g Print how likely a more extreme value would be for each
 #'                     simulated outlier.
 #'
-#' @return `data.frame`:
-#' * $X1: first covariate
-#' * ...
-#' * $Y: response
-#' * $G: label
+#' @returns
+#' `simulate_lcwm` returns a `data.frame` with continuous variables
+#' `X1`, `X2`, ..., followed by a continuous response variable, `Y`, and a
+#' mixture component label vector `G` with outliers denoted by `0`.
 #'
 #' @export
 #'
@@ -86,10 +137,10 @@ simulate_lcwm <- function(
       out <- uniform_outlier_ombc(
         outlier_type, mu, sigma, beta, error_sd, g, uniform_spans, prob_range
       )
-      outliers[[g]][j, ] <- out[1:3]
+      outliers[[g]][j, ] <- out[seq_len(var_num + 2)]
       if (print_prob_g) {
         cat(paste0(
-          "g = ", g, ", Outlier No.: ", j, ", prob_g = ", out[4], "\n"
+          "g = ", g, ", Outlier No.: ", j, ", prob_g = ", out[var_num + 3], "\n"
         ))
       } else if (j %% print_interval == 0) {
         cat(paste0("g = ", g, ", Outlier No.: ", j, "\n"))
@@ -106,16 +157,22 @@ simulate_lcwm <- function(
   lcwm
 }
 
-# ------------------------------------------------------------------------------
+# ==============================================================================
 
-#' Obtain the span of the observations for each component.
+#' @title Obtain the span of the observations for each component.
+#'
+#' @description
+#' Determine the minimum and maximum values for each covariate / explanatory
+#' variable and for the response errors from all Gaussian observations.
 #'
 #' @inheritParams simulate_lcwm
 #' @param covariates_g Covariate values of the sampled observations.
 #' @param errors_g Response errors of the sampled observations.
 #'
-#' @return `matrix`: minimum and maximum columns, rows for each covariate and
-#'                   one for the response errors.
+#' @returns
+#' `uniform_spans_lcwm` returns a 2-column matrix. The final row contains the
+#' minimum and maximum values of the response errors, while the previous rows
+#' contain the minimum and maximum values for each covariate.
 uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
   ranges_x <- apply(covariates_g, 2, range)
   centres_x <- colMeans(ranges_x)
@@ -132,15 +189,24 @@ uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
   cbind(c(mins_x, min_err), c(maxs_x, max_err))
 }
 
-# ------------------------------------------------------------------------------
+# ==============================================================================
 
-#' Produce a single sample that passes the outlier checks.
+#' @title Produce a single sample that passes the outlier checks.
+#'
+#' @description
+#' This function calls [uniform_sample_lcwm] to sample a proposed outlier and
+#' then calls [test_outlier_ombc] to check if it satisfies the required
+#' criteria.
 #'
 #' @inheritParams simulate_lcwm
 #' @param g Component index.
 #' @param uniform_spans Covariate and response error spans.
 #'
-#' @return Vector consisting of covariate values, response value, and label 0.
+#' @returns
+#' `uniform_outlier_ombc` returns a simulated outlier as a vector containing its
+#' covariate values, response value, and its component label `0`. This vector's
+#' final element is the probability of sampling a more extreme Gaussian point
+#' from this outlier's associated component.
 uniform_outlier_ombc <- function(
     outlier_type,
     mu, sigma, beta, error_sd, g,
@@ -164,23 +230,35 @@ uniform_outlier_ombc <- function(
     test <- test[1]
   }
 
+  # This zero is the outlier label.
   c(uniform_sample$x, uniform_sample$y, 0, prob_g)
 }
 
-# ------------------------------------------------------------------------------
+# ==============================================================================
 
-#' Sample a potential outlier.
+#' @title Sample a potential outlier.
+#'
+#' @description
+#' If `outlier_type = "x_and_y"`, then both the covariate values and response
+#' error of the outlier proposed by this function will be Uniformly distributed.
+#' If `outlier_type = "x_only"`, then the covariate values will be Uniformly
+#' distributed but the response error will be Normally distributed. If
+#' `outlier_type = "y_only"`, then the response error will be Uniformly
+#' distributed but the covariate values will be Normally distributed.
 #'
 #' @inheritParams simulate_lcwm
-#' @param mu_g Covariate mean vector for one component.
-#' @param sigma_g Covariate covariance matrix for one component.
-#' @param beta_g Regression coefficient vector for one component.
-#' @param error_sd_g Regression error standard deviation for one component.
-#' @param uniform_spans_g Covariate and response error ranges for one component.
+#' @param mu_g Covariate mean vector for component `g`.
+#' @param sigma_g Covariate covariance matrix for component `g`.
+#' @param beta_g Regression coefficient vector for component `g`.
+#' @param error_sd_g Regression error standard deviation for component `g`.
+#' @param uniform_spans_g Covariate and response error ranges for component `g`.
 #'
-#' @return List:
-#' * x = Covariate sample
-#' * y = Response sample
+#' @returns
+#' `uniform_sample_lcwm` returns a list with the following elements:
+#' \describe{
+#'   \item{`x`}{Vector of covariate values.}
+#'   \item{`y`}{Response value.}
+#' }
 uniform_sample_lcwm <- function(
     outlier_type, mu_g, sigma_g, beta_g, error_sd_g, uniform_spans_g) {
   var_num <- length(beta_g) - 1
@@ -211,16 +289,24 @@ uniform_sample_lcwm <- function(
   list(x = outlier_x_g, y = outlier_y_g)
 }
 
-# ------------------------------------------------------------------------------
+# ==============================================================================
 
-#' Check whether a new sample is an outlier for each component.
+#' @title Check if a new sample satisfies the outlier criteria.
+#'
+#' @description
+#' This function checks whether a given sample is an acceptable outlier with
+#' respect to `prob_range` and also computes the probability of sampling a more
+#' extreme point from component `g`.
 #'
 #' @inheritParams simulate_lcwm
 #' @param x_sample New covariate sample.
 #' @param y_sample New response sample.
 #' @param g Component number.
 #'
-#' @return Logical: TRUE if the new sample is an outlier for each component.
+#' @returns
+#' `test_outlier_ombc` returns a vector consisting of a logical value indicating
+#' whether the new sample satisfies the outlier checks, and a numeric value
+#' giving the probability of sampling a more extreme point from component `g`.
 test_outlier_ombc <- function(
     outlier_type,
     mu, sigma, beta, error_sd,

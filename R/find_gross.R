@@ -16,7 +16,7 @@
 #' @param manual_threshold Optional preset threshold.
 #' @param scale Logical value controlling whether we apply `scale` to `x`.
 #'
-#' @return
+#' @returns
 #' `find_gross` returns a list with the following elements:
 #' \describe{
 #'   \item{`gross_choice`}{A numeric value indicating the elbow's location.}

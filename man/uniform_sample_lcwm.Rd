@@ -14,25 +14,33 @@ uniform_sample_lcwm(
 )
 }
 \arguments{
-\item{outlier_type}{.}
+\item{outlier_type}{Character string governing whether the outliers are
+outlying with respect to the explanatory variable only
+(\code{"x_only"}), the response variable only (\code{"y_only"}), or
+both (\code{"x_and_y"}). \code{"x_and_y"} is the default value.}
 
-\item{mu_g}{Covariate mean vector for one component.}
+\item{mu_g}{Covariate mean vector for component \code{g}.}
 
-\item{sigma_g}{Covariate covariance matrix for one component.}
+\item{sigma_g}{Covariate covariance matrix for component \code{g}.}
 
-\item{beta_g}{Regression coefficient vector for one component.}
+\item{beta_g}{Regression coefficient vector for component \code{g}.}
 
-\item{error_sd_g}{Regression error standard deviation for one component.}
+\item{error_sd_g}{Regression error standard deviation for component \code{g}.}
 
-\item{uniform_spans_g}{Covariate and response error ranges for one component.}
+\item{uniform_spans_g}{Covariate and response error ranges for component \code{g}.}
 }
 \value{
-List:
-\itemize{
-\item x = Covariate sample
-\item y = Response sample
+\code{uniform_sample_lcwm} returns a list with the following elements:
+\describe{
+\item{\code{x}}{Vector of covariate values.}
+\item{\code{y}}{Response value.}
 }
 }
 \description{
-Sample a potential outlier.
+If \code{outlier_type = "x_and_y"}, then both the covariate values and response
+error of the outlier proposed by this function will be Uniformly distributed.
+If \code{outlier_type = "x_only"}, then the covariate values will be Uniformly
+distributed but the response error will be Normally distributed. If
+\code{outlier_type = "y_only"}, then the response error will be Uniformly
+distributed but the covariate values will be Normally distributed.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate_gmm.R
 \name{simulate_gmm}
 \alias{simulate_gmm}
-\title{simulate_gmm}
+\title{Simulate data from a Gaussian mixture model with outliers.}
 \usage{
 simulate_gmm(
   n,
@@ -34,15 +34,33 @@ samples be than the range of the Normal samples?}
 \item{print_interval}{How frequently the iteration count is printed.}
 }
 \value{
-\code{data.frame} with columns:
-\itemize{
-\item $X1: first covariate
-\item ...
-\item $G: label
-}
+\code{simulate_gmm} return a \code{data.frame} with continuous variables
+\code{X1}, \code{X2}, ..., followed by a mixture component label vector \code{G} with
+outliers denoted by \code{0}.
 }
 \description{
-Simulate a Gaussian mixture model with multivariate outliers.
+Simulates data from a Gaussian mixture model, then simulates outliers from a
+hyper-rectangle, with a rejection step to ensure that the outliers are
+sufficiently unlikely under the model.
+}
+\details{
+The simulated outliers are sampled from a Uniform distribution over a
+hyper-rectangle. For each dimension, the hyper-rectangle is centred at the
+midpoint between the maximum and minimum values for that variable from all of
+the Gaussian observations. Its width in that dimension is the distance
+between the minimum and maximum values for that variable multiplied by the
+value of \code{range_multiplier}. If \code{range_multiplier = 1}, then this
+hyper-rectangle is the axis-aligned minimum bounding box for all of the
+Gaussian data points in this data set.
+
+The \code{crit_val} ensures that it would have been sufficiently unlikely for a
+simulated outlier to have been sampled from any of the Gaussian components.
+The Mahalanobis distances of a proposed outlier from each component's mean
+vector with respect to that component's covariance matrix are computed. If
+any of these Mahalanobis distances are smaller than the critical value of the
+appropriate Chi-squared distribution, then the proposed outlier is rejected.
+In summary, for a Uniform sample to be accepted, it must be sufficiently far
+from each component in terms of Mahalanobis distance.
 }
 \examples{
 gmm_k3n1000o10 <- simulate_gmm(

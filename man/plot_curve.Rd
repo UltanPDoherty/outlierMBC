@@ -2,16 +2,20 @@
 % Please edit documentation in R/plot_ombc.R
 \name{plot_curve}
 \alias{plot_curve}
-\title{Plot the outlier number selection curve.}
+\title{Plot the dissimilarity curve.}
 \usage{
 plot_curve(ombc_out)
 }
 \arguments{
-\item{ombc_out}{Output from ombc_gmm.}
+\item{ombc_out}{Output from \code{ombc_gmm} or \code{ombc_lcwm}.}
 }
 \value{
-A gg object.
+\code{plot_curve} returns a ggplot object showing the dissimilarity values as a
+curve and marking the minimum solution with a vertical line.
 }
 \description{
-Plot the outlier number selection curve.
+Given the output from \link{ombc_gmm} or \link{ombc_lcwm}, this function extracts the
+dissimilarity value associated with each outlier number and plots them as a
+curve. It also draws a vertical line at the outlier number which minimised
+the dissimilarity.
 }

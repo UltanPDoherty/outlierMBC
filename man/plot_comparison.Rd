@@ -7,11 +7,15 @@
 plot_comparison(ombc_list)
 }
 \arguments{
-\item{ombc_list}{A list of outputs from ombc_gmm.}
+\item{ombc_list}{A list of outputs from \code{ombc_gmm}.}
 }
 \value{
-A gg object.
+\code{plot_comparison} returns a ggplot object consisting of multiple
+dissimilarity curves overlaid on the same plot.
 }
 \description{
-Plot multiple dissimilarity curves.
+Given a range of \link{ombc_gmm} outputs, each arising from a different model,
+this function is designed to produce a graphical aid for selecting the best
+model. It displays the dissimilarity curves from each of these models on the
+same plot.
 }

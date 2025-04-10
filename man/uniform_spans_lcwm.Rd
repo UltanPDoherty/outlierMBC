@@ -7,16 +7,22 @@
 uniform_spans_lcwm(range_multipliers, covariates_g, errors_g)
 }
 \arguments{
-\item{range_multipliers}{.}
+\item{range_multipliers}{For every explanatory variable, the sampling region
+The sampling region for the Uniform distribution
+used to simulate proposed outliers is
+controlled by multiplying the component widths by
+these values.}
 
 \item{covariates_g}{Covariate values of the sampled observations.}
 
 \item{errors_g}{Response errors of the sampled observations.}
 }
 \value{
-\code{matrix}: minimum and maximum columns, rows for each covariate and
-one for the response errors.
+\code{uniform_spans_lcwm} returns a 2-column matrix. The final row contains the
+minimum and maximum values of the response errors, while the previous rows
+contain the minimum and maximum values for each covariate.
 }
 \description{
-Obtain the span of the observations for each component.
+Determine the minimum and maximum values for each covariate / explanatory
+variable and for the response errors from all Gaussian observations.
 }

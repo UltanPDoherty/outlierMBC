@@ -13,7 +13,7 @@
 #' @param sigma List of component covariance matrices.
 #' @param logdet Vector of log-determinants for covariance matrices.
 #'
-#' @returns List of
+#' @returns
 #' `distrib_diff_gmm` returns a list with the following elements:
 #' \describe{
 #'   \item{`distrib_diff`}{Aggregated dissimilarity across components.}
@@ -132,7 +132,7 @@ distrib_diff_mahalanobis <- function(
 #' @param y_sigma Vector of component regression standard deviations.
 #'
 #' @returns
-#' `distrib_diff_lcwm_lcwm_g` returns a list with the following elements:
+#' `distrib_diff_lcwm_lcwm` returns a list with the following elements:
 #' \describe{
 #'   \item{`distrib_diff`}{Aggregated dissimilarity across components.}
 #'   \item{`distrib_diff_vec`}{Vector containing dissimilarity value for each

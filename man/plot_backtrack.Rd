@@ -2,12 +2,12 @@
 % Please edit documentation in R/backtrack.R
 \name{plot_backtrack}
 \alias{plot_backtrack}
-\title{Plot the dissimilarity curve for the backtrack method.}
+\title{Plot the dissimilarity curve showing the backtrack solution.}
 \usage{
 plot_backtrack(ombc_out, max_total_rise = 0.1, max_step_rise = 0.05)
 }
 \arguments{
-\item{ombc_out}{Output from ombc_gmm.}
+\item{ombc_out}{Output from \code{ombc_gmm} or \code{ombc_lcwm}.}
 
 \item{max_total_rise}{Upper limit for the cumulative increase, as a
 proportion of the global minimum dissimilarity, from
@@ -17,11 +17,11 @@ all backward steps.}
 global minimum dissimilarity, from each backward step.}
 }
 \value{
-ggplot of the dissimilarity curve showing the minimum solution and
-the backtack solutions. The dissimilarity values (y axis) are
-divided by the minimum dissimilarity so that the rescaled minimum is
-at 1.
+\code{plot_backtrack} returns a ggplot of the rescaled dissimilarity curve showing
+the minimum solution and the backtrack solutions.
 }
 \description{
-Plot the dissimilarity curve for the backtrack method.
+Plots a rescaled dissimilarity curve where the dissimilarity values (y axis)
+have been divided by their minimum so that the rescaled minimum is at 1.
+Vertical lines mark the minimum and backtrack solutions.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate_lcwm.R
 \name{test_outlier_ombc}
 \alias{test_outlier_ombc}
-\title{Check whether a new sample is an outlier for each component.}
+\title{Check if a new sample satisfies the outlier criteria.}
 \usage{
 test_outlier_ombc(
   outlier_type,
@@ -17,7 +17,10 @@ test_outlier_ombc(
 )
 }
 \arguments{
-\item{outlier_type}{.}
+\item{outlier_type}{Character string governing whether the outliers are
+outlying with respect to the explanatory variable only
+(\code{"x_only"}), the response variable only (\code{"y_only"}), or
+both (\code{"x_and_y"}). \code{"x_and_y"} is the default value.}
 
 \item{mu}{List of component mean vectors.}
 
@@ -36,8 +39,12 @@ test_outlier_ombc(
 \item{g}{Component number.}
 }
 \value{
-Logical: TRUE if the new sample is an outlier for each component.
+\code{test_outlier_ombc} returns a vector consisting of a logical value indicating
+whether the new sample satisfies the outlier checks, and a numeric value
+giving the probability of sampling a more extreme point from component \code{g}.
 }
 \description{
-Check whether a new sample is an outlier for each component.
+This function checks whether a given sample is an acceptable outlier with
+respect to \code{prob_range} and also computes the probability of sampling a more
+extreme point from component \code{g}.
 }

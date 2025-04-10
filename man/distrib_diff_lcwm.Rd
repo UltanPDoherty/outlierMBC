@@ -26,7 +26,7 @@ distrib_diff_lcwm(x, z, prop, mu, sigma, mod_list, y_sigma, dd_weight = 0.5)
 the response and covariate dissimilarities when aggregating.}
 }
 \value{
-\code{distrib_diff_lcwm_lcwm_g} returns a list with the following elements:
+\code{distrib_diff_lcwm_lcwm} returns a list with the following elements:
 \describe{
 \item{\code{distrib_diff}}{Aggregated dissimilarity across components.}
 \item{\code{distrib_diff_vec}}{Vector containing dissimilarity value for each

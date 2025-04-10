@@ -34,13 +34,13 @@ ombc_gmm(
 
 \item{mnames}{Model names for mixture::gpcm.}
 
-\item{nmax}{Maximum number of iterations for mixture::gpcm.}
+\item{nmax}{Maximum number of iterations for \code{mixture::gpcm}.}
 
-\item{atol}{EM convergence tolerance threshold for mixture::gpcm.}
+\item{atol}{EM convergence tolerance threshold for \code{mixture::gpcm}.}
 
 \item{init_z}{Initial component assignment probability matrix.}
 
-\item{init_model}{Initial mixture model (mixture::gpcm best_model).}
+\item{init_model}{Initial mixture model (\code{mixture::gpcm} \code{best_model}).}
 
 \item{init_method}{Method used to initialise each mixture model.}
 
@@ -63,15 +63,15 @@ classified as an outlier.}
 set. Observations which were provisionally removed,
 including those that were eventually not classified
 as outliers, are ranked from \code{1} to \code{max_out}. All
-gross outliers have rank \code{1}. If there are \code{gross_num}
-gross outliers, then the observations removed during
-the main algorithm itself will be numbered from
-\code{gross_num + 1} to \code{max_out}. Observations that were
-never removed have rank \code{0}.}
+gross outliers have rank \code{1}. If there are
+\code{gross_num} gross outliers, then the observations
+removed during the main algorithm itself will be
+numbered from \code{gross_num + 1} to \code{max_out}.
+Observations that were ever removed have rank \code{0}.}
 \item{\code{gross_outs}}{Logical vector identifying the gross outliers. This is
 identical to the \code{gross_outs} vector passed to this
 function as an argument / input.}
-\item{\code{mix}}{Output from mixture::gpcm fitted to the non-outlier
+\item{\code{mix}}{Output from \code{mixture::gpcm} fitted to the non-outlier
 observations.}
 \item{\code{loglike}}{Vector of log-likelihood values for each iteration.}
 \item{\code{removal_dens}}{Vector of mixture densities for the removed
@@ -106,12 +106,10 @@ model to the remaining data.
 }
 }
 \examples{
-
 ombc_gmm_k3n1000o10 <- ombc_gmm(
   gmm_k3n1000o10[, 1:2],
   comp_num = 3, max_out = 20
 )
 
 plot_curve(ombc_gmm_k3n1000o10)
-
 }

@@ -16,7 +16,10 @@ uniform_outlier_ombc(
 )
 }
 \arguments{
-\item{outlier_type}{.}
+\item{outlier_type}{Character string governing whether the outliers are
+outlying with respect to the explanatory variable only
+(\code{"x_only"}), the response variable only (\code{"y_only"}), or
+both (\code{"x_and_y"}). \code{"x_and_y"} is the default value.}
 
 \item{mu}{List of component mean vectors.}
 
@@ -33,8 +36,13 @@ uniform_outlier_ombc(
 \item{prob_range}{Values for uniform sample rejection.}
 }
 \value{
-Vector consisting of covariate values, response value, and label 0.
+\code{uniform_outlier_ombc} returns a simulated outlier as a vector containing its
+covariate values, response value, and its component label \code{0}. This vector's
+final element is the probability of sampling a more extreme Gaussian point
+from this outlier's associated component.
 }
 \description{
-Produce a single sample that passes the outlier checks.
+This function calls \link{uniform_sample_lcwm} to sample a proposed outlier and
+then calls \link{test_outlier_ombc} to check if it satisfies the required
+criteria.
 }

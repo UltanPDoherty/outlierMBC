@@ -1,8 +1,17 @@
-#' Plot the outlier number selection curve.
+#' @title Plot the dissimilarity curve.
 #'
-#' @param ombc_out Output from ombc_gmm.
+#' @description
+#' Given the output from [ombc_gmm] or [ombc_lcwm], this function extracts the
+#' dissimilarity value associated with each outlier number and plots them as a
+#' curve. It also draws a vertical line at the outlier number which minimised
+#' the dissimilarity.
 #'
-#' @returns A gg object.
+#' @param ombc_out Output from `ombc_gmm` or `ombc_lcwm`.
+#'
+#' @returns
+#' `plot_curve` returns a ggplot object showing the dissimilarity values as a
+#' curve and marking the minimum solution with a vertical line.
+#'
 #' @export
 plot_curve <- function(ombc_out) {
   gross_num <- sum(ombc_out$gross_outs)
@@ -50,12 +59,24 @@ plot_curve <- function(ombc_out) {
 
 # ==============================================================================
 
-#' Plot dissimilarity values for multiple solutions.
+#' @title Plot dissimilarity values for multiple solutions.
 #'
-#' @param ombc_list A list of outputs from ombc_gmm.
+#' @description
+#' Given a range of [ombc_gmm] outputs, each arising from a different model,
+#' this function is designed to produce a graphical aid for selecting the best
+#' model. It plots the dissimilarity values of the models' minimum and backtrack
+#' solutions against their number of components (`x_axis = "comp_num"`), number
+#' of outliers (`x_axis = "outlier_num"`), or number of parameters
+#' (`x_axis = "param_num"`).
+#'
+#' @param ombc_list A list of outputs from `ombc_gmm`.
 #' @param x_axis The quantity to be plotted on the x axis.
 #'
-#' @returns A gg object.
+#' @returns
+#' `plot_selection` return a ggplot object plotting the minimum dissimilarity
+#' and backtrack solutions from a number of outputs from `ombc_gmm` versus their
+#' number of components, outliers, or parameters.
+#'
 #' @export
 plot_selection <- function(
     ombc_list, x_axis = c("comp_num", "outlier_num", "param_num")) {
@@ -129,11 +150,20 @@ plot_selection <- function(
 
 # ==============================================================================
 
-#' Plot multiple dissimilarity curves.
+#' @title Plot multiple dissimilarity curves.
+#'
+#' @description
+#' Given a range of [ombc_gmm] outputs, each arising from a different model,
+#' this function is designed to produce a graphical aid for selecting the best
+#' model. It displays the dissimilarity curves from each of these models on the
+#' same plot.
 #'
 #' @inheritParams plot_selection
 #'
-#' @returns A gg object.
+#' @returns
+#' `plot_comparison` returns a ggplot object consisting of multiple
+#' dissimilarity curves overlaid on the same plot.
+#'
 #' @export
 plot_comparison <- function(ombc_list) {
   gross_num <- sum(ombc_list[[1]]$gross_outs)

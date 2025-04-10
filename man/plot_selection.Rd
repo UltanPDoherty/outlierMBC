@@ -7,13 +7,20 @@
 plot_selection(ombc_list, x_axis = c("comp_num", "outlier_num", "param_num"))
 }
 \arguments{
-\item{ombc_list}{A list of outputs from ombc_gmm.}
+\item{ombc_list}{A list of outputs from \code{ombc_gmm}.}
 
 \item{x_axis}{The quantity to be plotted on the x axis.}
 }
 \value{
-A gg object.
+\code{plot_selection} return a ggplot object plotting the minimum dissimilarity
+and backtrack solutions from a number of outputs from \code{ombc_gmm} versus their
+number of components, outliers, or parameters.
 }
 \description{
-Plot dissimilarity values for multiple solutions.
+Given a range of \link{ombc_gmm} outputs, each arising from a different model,
+this function is designed to produce a graphical aid for selecting the best
+model. It plots the dissimilarity values of the models' minimum and backtrack
+solutions against their number of components (\code{x_axis = "comp_num"}), number
+of outliers (\code{x_axis = "outlier_num"}), or number of parameters
+(\code{x_axis = "param_num"}).
 }

@@ -15,7 +15,6 @@
 #'
 #' @source For simulation code, see `gmm_k3n1000o10.R` in `data-raw` folder at
 #'         <https://github.com/UltanPDoherty/outlierMBC>.
-#'
 "gmm_k3n1000o10"
 
 #' @title Simulated data set consisting of 2000 observations from 3 Gaussian
@@ -35,7 +34,6 @@
 #'
 #' @source For simulation code, see `gmm_k3n2000o20.R` in `data-raw` folder at
 #'         <https://github.com/UltanPDoherty/outlierMBC>.
-#'
 "gmm_k3n2000o20"
 
 #' @title Simulated data set consisting of 4000 observations from 3 Gaussian

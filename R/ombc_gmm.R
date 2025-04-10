@@ -1,4 +1,4 @@
-#' Sequentially identify outliers while fitting a Gaussian mixture model.
+#' @title Sequentially identify outliers while fitting a Gaussian mixture model.
 #'
 #' @description
 #' This function performs model-based clustering and outlier identification. It
@@ -23,10 +23,10 @@
 #' @param gross_outs Logical vector identifying gross outliers.
 #' @param init_scheme Which initialisation scheme to use.
 #' @param mnames Model names for mixture::gpcm.
-#' @param nmax Maximum number of iterations for mixture::gpcm.
-#' @param atol EM convergence tolerance threshold for mixture::gpcm.
+#' @param nmax Maximum number of iterations for `mixture::gpcm`.
+#' @param atol EM convergence tolerance threshold for `mixture::gpcm`.
 #' @param init_z Initial component assignment probability matrix.
-#' @param init_model Initial mixture model (mixture::gpcm best_model).
+#' @param init_model Initial mixture model (`mixture::gpcm` `best_model`).
 #' @param init_method Method used to initialise each mixture model.
 #' @param init_scaling Logical value controlling whether the data should be
 #'                     scaled for initialisation.
@@ -48,12 +48,12 @@
 #'                         gross outliers have rank `1`. If there are
 #'                         `gross_num` gross outliers, then the observations
 #'                         removed during the main algorithm itself will be
-#'                         numbered from gross_num + 1` to `max_out`.
+#'                         numbered from `gross_num + 1` to `max_out`.
 #'                         Observations that were ever removed have rank `0`.}
 #'   \item{`gross_outs`}{Logical vector identifying the gross outliers. This is
 #'                       identical to the `gross_outs` vector passed to this
 #'                       function as an argument / input.}
-#'   \item{`mix`}{Output from mixture::gpcm fitted to the non-outlier
+#'   \item{`mix`}{Output from `mixture::gpcm` fitted to the non-outlier
 #'                observations.}
 #'   \item{`loglike`}{Vector of log-likelihood values for each iteration.}
 #'   \item{`removal_dens`}{Vector of mixture densities for the removed
@@ -72,14 +72,12 @@
 #' @export
 #'
 #' @examples
-#'
 #' ombc_gmm_k3n1000o10 <- ombc_gmm(
 #'   gmm_k3n1000o10[, 1:2],
 #'   comp_num = 3, max_out = 20
 #' )
 #'
 #' plot_curve(ombc_gmm_k3n1000o10)
-#'
 ombc_gmm <- function(
     x,
     comp_num,
@@ -255,7 +253,7 @@ get_init_z <- function(
   z
 }
 
-# ------------------------------------------------------------------------------
+# ==============================================================================
 
 try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
   mix <- NULL
