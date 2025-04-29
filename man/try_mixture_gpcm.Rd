@@ -21,7 +21,7 @@ try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
 \item{atol}{EM convergence tolerance threshold for \code{mixture::gpcm}.}
 }
 \value{
-Object of class \code{"gpcm"} outputted by mixture::gpcm.
+Object of class \code{"gpcm"} outputted by \code{mixture::gpcm}.
 }
 \description{
 If \code{mixture::gpcm} returns an error, this function first tries
