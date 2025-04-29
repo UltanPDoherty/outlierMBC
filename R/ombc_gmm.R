@@ -273,7 +273,7 @@ get_init_z <- function(
 #' @inheritParams ombc_gmm
 #' @param z Component assignment probability matrix for initialisation.
 #'
-#' @returns Object of class `"gpcm"` outputted by mixture::gpcm.
+#' @returns Object of class `"gpcm"` outputted by `mixture::gpcm`.
 try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
   mix <- NULL
   try(mix <- mixture::gpcm(
