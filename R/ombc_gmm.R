@@ -226,8 +226,17 @@ ombc_gmm <- function(
   )
 }
 
-# ------------------------------------------------------------------------------
+# ==============================================================================
 
+#' @title Obtain an initial clustering as a component assignment matrix.
+#'
+#' @description Implement the specified initial clustering, either hierarchical
+#' clustering or k-means++, and return a binary component assignment matrix.
+#'
+#' @inheritParams ombc_gmm
+#' @param dist_mat Euclidean distance matrix.
+#'
+#' @returns A component assignment matrix for initialisation.
 get_init_z <- function(
     comp_num,
     dist_mat = NULL, x = NULL,
@@ -255,6 +264,16 @@ get_init_z <- function(
 
 # ==============================================================================
 
+#' @title Run `mixture::gpcm` and try alternative covariance structures or
+#' initialisations if necessary.
+#'
+#' @description If `mixture::gpcm` returns an error, this function first tries
+#' the other covariance structures, and then tries a k-means initialisation.
+#'
+#' @inheritParams ombc_gmm
+#' @param z Component assignment probability matrix for initialisation.
+#'
+#' @returns Object of class `"gpcm"` outputted by mixture::gpcm.
 try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
   mix <- NULL
   try(mix <- mixture::gpcm(
