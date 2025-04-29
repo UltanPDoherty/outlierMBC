@@ -19,7 +19,7 @@ backtrack_lcwm(
 
 \item{x}{Covariate data only.}
 
-\item{ombc_lcwm_out}{Output from ombc_lcwm.}
+\item{ombc_lcwm_out}{An \code{"outliermbc_lcwm"} object outputted by ombc_lcwm.}
 
 \item{max_total_rise}{Upper limit for the cumulative increase, as a
 proportion of the global minimum dissimilarity, from

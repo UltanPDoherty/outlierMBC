@@ -60,7 +60,8 @@ scaled for initialisation.}
 the response and covariate dissimilarities when aggregating.}
 }
 \value{
-\code{ombc_lcwm} returns a list with the following elements:
+\code{ombc_lcwm} returns an object of class "outliermbc_lcwm", which is
+essentially a list with the following elements:
 \describe{
 \item{\code{labels}}{Vector of mixture component labels with outliers denoted by
 0.}

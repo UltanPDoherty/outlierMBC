@@ -6,7 +6,8 @@
 #' curve. It also draws a vertical line at the outlier number which minimised
 #' the dissimilarity.
 #'
-#' @param ombc_out Output from `ombc_gmm` or `ombc_lcwm`.
+#' @param ombc_out An `"outliermbc_gmm"` or `"outliermbc_lcwm"` object, i.e. an
+#' output from `ombc_gmm` or `ombc_lcwm`.
 #'
 #' @returns
 #' `plot_curve` returns a ggplot object showing the dissimilarity values as a

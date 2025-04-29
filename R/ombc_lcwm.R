@@ -32,7 +32,8 @@
 #'                  the response and covariate dissimilarities when aggregating.
 #'
 #' @returns
-#' `ombc_lcwm` returns a list with the following elements:
+#' `ombc_lcwm` returns an object of class "outliermbc_lcwm", which is
+#' essentially a list with the following elements:
 #' \describe{
 #'   \item{`labels`}{Vector of mixture component labels with outliers denoted by
 #'                   0.}
@@ -260,7 +261,7 @@ ombc_lcwm <- function(
 
   colnames(distrib_diff_mat) <- paste0("k", seq_len(comp_num))
 
-  list(
+  new_outliermbc_lcwm(list(
     labels = labels,
     outlier_bool = outlier_bool,
     outlier_num = outlier_num,
@@ -275,5 +276,5 @@ ombc_lcwm <- function(
     call = this_call,
     version = ombc_version,
     conv_status = conv_status
-  )
+  ))
 }

@@ -52,7 +52,8 @@ scaled for initialisation.}
 \item{print_interval}{How frequently the iteration count is printed.}
 }
 \value{
-\code{ombc_gmm} returns a list with the following elements:
+\code{ombc_gmm} returns an object of class "outliermbc_gmm", which is essentially
+a list with the following elements:
 \describe{
 \item{\code{labels}}{Vector of mixture component labels with outliers denoted by
 0.}

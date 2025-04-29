@@ -358,7 +358,7 @@ backtrack_gmm <- function(
 #' @inheritParams ombc_lcwm
 #' @inheritParams backtrack
 #' @inheritParams backtrack_gmm
-#' @param ombc_lcwm_out Output from ombc_lcwm.
+#' @param ombc_lcwm_out An `"outliermbc_lcwm"` object outputted by ombc_lcwm.
 #'
 #' @returns
 #' `backtrack_gmm` returns a list with the following elements:

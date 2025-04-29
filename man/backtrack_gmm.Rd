@@ -17,7 +17,8 @@ backtrack_gmm(
 \arguments{
 \item{x}{Data.}
 
-\item{ombc_out}{Output from \code{ombc_gmm} or \code{ombc_lcwm}.}
+\item{ombc_out}{An \code{"outliermbc_gmm"} or \code{"outliermbc_lcwm"} object, i.e. an
+output from \code{ombc_gmm} or \code{ombc_lcwm}.}
 
 \item{max_total_rise}{Upper limit for the cumulative increase, as a
 proportion of the global minimum dissimilarity, from

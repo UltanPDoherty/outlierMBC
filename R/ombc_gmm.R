@@ -34,7 +34,8 @@
 #' @param print_interval How frequently the iteration count is printed.
 #'
 #' @returns
-#' `ombc_gmm` returns a list with the following elements:
+#' `ombc_gmm` returns an object of class "outliermbc_gmm", which is essentially
+#' a list with the following elements:
 #' \describe{
 #'   \item{`labels`}{Vector of mixture component labels with outliers denoted by
 #'                   0.}
@@ -209,7 +210,7 @@ ombc_gmm <- function(
 
   colnames(distrib_diff_mat) <- paste0("k", seq_len(comp_num))
 
-  list(
+  new_outliermbc_gmm(list(
     labels = labels,
     outlier_bool = outlier_bool,
     outlier_num = outlier_num,
@@ -223,7 +224,7 @@ ombc_gmm <- function(
     call = this_call,
     version = ombc_version,
     conv_status = conv_status
-  )
+  ))
 }
 
 # ==============================================================================

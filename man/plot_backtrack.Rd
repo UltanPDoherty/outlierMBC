@@ -7,7 +7,8 @@
 plot_backtrack(ombc_out, max_total_rise = 0.1, max_step_rise = 0.05)
 }
 \arguments{
-\item{ombc_out}{Output from \code{ombc_gmm} or \code{ombc_lcwm}.}
+\item{ombc_out}{An \code{"outliermbc_gmm"} or \code{"outliermbc_lcwm"} object, i.e. an
+output from \code{ombc_gmm} or \code{ombc_lcwm}.}
 
 \item{max_total_rise}{Upper limit for the cumulative increase, as a
 proportion of the global minimum dissimilarity, from

@@ -7,7 +7,8 @@
 plot_curve(ombc_out)
 }
 \arguments{
-\item{ombc_out}{Output from \code{ombc_gmm} or \code{ombc_lcwm}.}
+\item{ombc_out}{An \code{"outliermbc_gmm"} or \code{"outliermbc_lcwm"} object, i.e. an
+output from \code{ombc_gmm} or \code{ombc_lcwm}.}
 }
 \value{
 \code{plot_curve} returns a ggplot object showing the dissimilarity values as a
