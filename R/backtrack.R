@@ -277,7 +277,8 @@ backtrack_gmm <- function(
       ombc_out$call$comp_num, ombc_out$call$mnames,
       z,
       ombc_out$call$nmax,
-      ombc_out$call$atol
+      ombc_out$call$atol,
+      ombc_out$fixed_labels
     )
   } else if (init_scheme == "reuse") {
     short_outlier_bool <- outlier_bool[!ombc_out$gross_outs]
@@ -288,11 +289,13 @@ backtrack_gmm <- function(
       ombc_out$call$comp_num, ombc_out$call$mnames,
       z,
       ombc_out$call$nmax,
-      ombc_out$call$atol
+      ombc_out$call$atol,
+      ombc_out$fixed_labels[!outlier_bool]
     )
   } else {
     x <- x0[!ombc_out$gross_outs, ]
     z <- z0
+    fixed_labels <- ombc_out$fixed_labels[!ombc_out$gross_outs]
 
     if (outlier_num > gross_num) {
       temp_outlier_rank <- ombc_out$outlier_rank[!ombc_out$gross_outs]
@@ -309,7 +312,8 @@ backtrack_gmm <- function(
           ombc_out$call$comp_num, ombc_out$call$mnames,
           z,
           ombc_out$call$nmax,
-          ombc_out$call$atol
+          ombc_out$call$atol,
+          fixed_labels
         )
 
         next_removal <- which(temp_outlier_rank == i + 1)
@@ -317,6 +321,7 @@ backtrack_gmm <- function(
         x <- x[-next_removal, ]
         z <- mix$z[-next_removal, -next_removal]
         temp_outlier_rank <- temp_outlier_rank[-next_removal]
+        fixed_labels <- fixed_labels[-next_removal]
       }
       close(prog_bar)
     } else {
@@ -325,7 +330,8 @@ backtrack_gmm <- function(
         ombc_out$call$comp_num, ombc_out$call$mnames,
         z,
         ombc_out$call$nmax,
-        ombc_out$call$atol
+        ombc_out$call$atol,
+        fixed_labels
       )
     }
   }

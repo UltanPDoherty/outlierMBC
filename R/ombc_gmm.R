@@ -31,6 +31,8 @@
 #' @param init_scaling Logical value controlling whether the data should be
 #'                     scaled for initialisation.
 #' @param kmpp_seed Optional seed for k-means++ initialisation.
+#' @param fixed_labels Cluster labels that are known a prior. See `label`
+#'                     argument in `mixture::gpcm`.
 #' @param print_interval How frequently the iteration count is printed.
 #'
 #' @returns
@@ -93,6 +95,7 @@ ombc_gmm <- function(
     init_method = c("hc", "kmpp"),
     init_scaling = FALSE,
     kmpp_seed = 123,
+    fixed_labels = NULL,
     print_interval = Inf) {
   init_method <- match.arg(init_method)
   init_scheme <- match.arg(init_scheme)
@@ -104,13 +107,16 @@ ombc_gmm <- function(
     "mnames" = mnames, "nmax" = nmax, "atol" = atol,
     "init_z" = substitute(init_z), "init_model" = substitute(init_model),
     "init_method" = init_method, "init_scaling" = init_scaling,
-    "kmpp_seed" = kmpp_seed, "print_interval" = print_interval
+    "kmpp_seed" = kmpp_seed, "fixed_labels" = substitute(fixed_labels),
+    "print_interval" = print_interval
   )
 
   ombc_version <- utils::packageVersion("outlierMBC")
 
   x <- as.matrix(x)
   x0 <- x
+
+  fixed_labels0 <- fixed_labels
 
   obs_num <- nrow(x)
 
@@ -148,13 +154,15 @@ ombc_gmm <- function(
     if (i %% print_interval == 0) cat("i = ", i, "\n")
 
     if (init_scheme %in% c("update", "reuse")) {
-      mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
+      mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol, fixed_labels)
     } else {
       reinit_z <- get_init_z(
         comp_num = comp_num, dist_mat = dist_mat, x = x,
         init_method = init_method, kmpp_seed = kmpp_seed
       )
-      mix <- try_mixture_gpcm(x, comp_num, mnames, reinit_z, nmax, atol)
+      mix <- try_mixture_gpcm(
+        x, comp_num, mnames, reinit_z, nmax, atol, fixed_labels
+      )
     }
 
     loglike[i] <- mix$best_model$loglik
@@ -176,6 +184,7 @@ ombc_gmm <- function(
     outlier_rank_temp[!outlier_rank_temp][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
     dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
+    fixed_labels <- fixed_labels[-dd$choice_id]
 
     if (dd$distrib_diff < dd_min) {
       dd_min <- dd$distrib_diff
@@ -203,7 +212,8 @@ ombc_gmm <- function(
   outlier_bool <- outlier_rank <= outlier_num & outlier_rank != 0
 
   mix <- try_mixture_gpcm(
-    x0[!outlier_bool, ], comp_num, mnames, best_z, nmax, atol
+    x0[!outlier_bool, ], comp_num, mnames, best_z, nmax, atol,
+    fixed_labels0[!outlier_bool]
   )
 
   labels[!outlier_bool] <- mix$map
@@ -216,6 +226,7 @@ ombc_gmm <- function(
     outlier_num = outlier_num,
     outlier_rank = outlier_rank,
     gross_outs = gross_outs,
+    fixed_labels = fixed_labels0,
     mix = mix,
     loglike = loglike,
     removal_dens = removal_dens,
@@ -275,11 +286,13 @@ get_init_z <- function(
 #' @param z Component assignment probability matrix for initialisation.
 #'
 #' @returns Object of class `"gpcm"` outputted by `mixture::gpcm`.
-try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
+try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol, fixed_labels) {
   mix <- NULL
+
   try(mix <- mixture::gpcm(
     x,
-    G = comp_num, mnames = mnames, start = z, nmax = nmax, atol = atol
+    G = comp_num, mnames = mnames, start = z, nmax = nmax, atol = atol,
+    label = fixed_labels
   ))
   if (is.null(mix)) {
     cat(paste0("Trying alternative covariance structures.\n"))
@@ -292,7 +305,8 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
           "EEV", "VEV", "VVV", "EVE", "VVE", "VEE", "EVV"
         ),
         mnames
-      )
+      ),
+      label = fixed_labels
     ))
     if (!is.null(mix)) {
       cat(paste0(
@@ -303,7 +317,8 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol) {
       try(
         mix <- mixture::gpcm(
           x,
-          G = comp_num, start = 2, nmax = nmax, atol = atol
+          G = comp_num, start = 2, nmax = nmax, atol = atol,
+          label = fixed_labels
         )
       )
       if (!is.null(mix)) {

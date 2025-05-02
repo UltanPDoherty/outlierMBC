@@ -18,6 +18,7 @@ ombc_gmm(
   init_method = c("hc", "kmpp"),
   init_scaling = FALSE,
   kmpp_seed = 123,
+  fixed_labels = NULL,
   print_interval = Inf
 )
 }
@@ -48,6 +49,9 @@ ombc_gmm(
 scaled for initialisation.}
 
 \item{kmpp_seed}{Optional seed for k-means++ initialisation.}
+
+\item{fixed_labels}{Cluster labels that are known a prior. See \code{label}
+argument in \code{mixture::gpcm}.}
 
 \item{print_interval}{How frequently the iteration count is printed.}
 }

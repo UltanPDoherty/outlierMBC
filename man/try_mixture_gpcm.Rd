@@ -5,7 +5,7 @@
 \title{Run \code{mixture::gpcm} and try alternative covariance structures or
 initialisations if necessary.}
 \usage{
-try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
+try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol, fixed_labels)
 }
 \arguments{
 \item{x}{Data.}
@@ -19,6 +19,9 @@ try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol)
 \item{nmax}{Maximum number of iterations for \code{mixture::gpcm}.}
 
 \item{atol}{EM convergence tolerance threshold for \code{mixture::gpcm}.}
+
+\item{fixed_labels}{Cluster labels that are known a prior. See \code{label}
+argument in \code{mixture::gpcm}.}
 }
 \value{
 Object of class \code{"gpcm"} outputted by \code{mixture::gpcm}.
