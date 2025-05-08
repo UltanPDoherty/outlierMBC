@@ -1,9 +1,7 @@
 outlierMBC
 ================
 Ultán P. Doherty
-2024-06-26
-
-# Outlier Identification for Model-Based Clustering
+2025-05-08
 
 ## Gaussian Mixture Models
 

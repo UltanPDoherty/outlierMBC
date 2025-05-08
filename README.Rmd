@@ -5,8 +5,6 @@ date: "2025-05-08"
 output: github_document
 ---
 
-# Outlier Identification for Model-Based Clustering
-
 ```{r library, include=FALSE}
 library(tidyverse)
 library(outlierMBC)
