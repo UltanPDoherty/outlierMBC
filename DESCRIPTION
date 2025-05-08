@@ -1,10 +1,14 @@
 Package: outlierMBC
 Title: Model-Based Clustering with Sequential Outlier Identification using the 
     Distribution of Mahalanobis Distances
-Version: 0.0.0.0033
-Authors@R: 
-    person("Ultán", "Doherty", , "dohertyu@tcd.ie", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-1791-395X"))
+Version: 0.0.1.0000
+Authors@R: c(
+    person("Ultán P.", "Doherty", , "dohertyu@tcd.ie", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-1791-395X")),
+    person("Paul D.", "McNicholas", , "paulmc@mcmaster.ca", role = c("aut"),
+           comment = c(ORCID = "0000-0002-2482-523X")),
+    person("Arthur", "White", , "arwhite@tcd.ie", role = c("aut"),
+           comment = c(ORCID = "0000-0002-7268-5163")))
 Description: This package contains functions designed to perform sequential 
     outlier identification and removal while fitting Gaussian mixture models or 
     linear cluster-weighted models. We seek to minimise the dissimilarity

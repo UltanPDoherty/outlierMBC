@@ -31,7 +31,13 @@ solution.}
 }
 }
 \author{
-\strong{Maintainer}: Ultán Doherty \email{dohertyu@tcd.ie} (\href{https://orcid.org/0000-0003-1791-395X}{ORCID})
+\strong{Maintainer}: Ultán P. Doherty \email{dohertyu@tcd.ie} (\href{https://orcid.org/0000-0003-1791-395X}{ORCID})
+
+Authors:
+\itemize{
+  \item Paul D. McNicholas \email{paulmc@mcmaster.ca} (\href{https://orcid.org/0000-0002-2482-523X}{ORCID})
+  \item Arthur White \email{arwhite@tcd.ie} (\href{https://orcid.org/0000-0002-7268-5163}{ORCID})
+}
 
 }
 \keyword{internal}
