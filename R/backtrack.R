@@ -319,7 +319,7 @@ backtrack_gmm <- function(
         next_removal <- which(temp_outlier_rank == i + 1)
         removals <- append(removals, next_removal)
         x <- x[-next_removal, ]
-        z <- mix$z[-next_removal, -next_removal]
+        z <- mix$z[-next_removal, ]
         temp_outlier_rank <- temp_outlier_rank[-next_removal]
         fixed_labels <- fixed_labels[-next_removal]
       }
