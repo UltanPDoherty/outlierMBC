@@ -146,6 +146,7 @@ ombc_gmm <- function(
 
   conv_status <- c()
   loglike <- c()
+  bic <- c()
   removal_dens <- c()
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = comp_num)
   distrib_diff_vec <- double(max_out + 1)
@@ -166,6 +167,7 @@ ombc_gmm <- function(
     }
 
     loglike[i] <- mix$best_model$loglik
+    bic[i] <- mix$best_model$BIC
     conv_status[i] <- mix$best_model$status
 
     dd <- distrib_diff_gmm(
@@ -229,6 +231,7 @@ ombc_gmm <- function(
     fixed_labels = fixed_labels0,
     mix = mix,
     loglike = loglike,
+    bic = bic,
     removal_dens = removal_dens,
     distrib_diff_vec = distrib_diff_vec,
     distrib_diff_mat = distrib_diff_mat,
