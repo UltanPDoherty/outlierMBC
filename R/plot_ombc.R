@@ -280,7 +280,7 @@ plot_comparison_bic <- function(ombc_list) {
     "#E69F00", "#56B4E9", "#009E73", "#F0E442",
     "#0072B2", "#D55E00", "#CC79A7", "#000000"
   )
-  dissimilarity <- model_comp <- NULL
+  model_comp <- outlier_num <- bic<- NULL
   gg <- df |>
     ggplot2::ggplot(ggplot2::aes(
       x = outlier_seq, y = bic,
@@ -292,8 +292,8 @@ plot_comparison_bic <- function(ombc_list) {
       xintercept = outlier_num, colour = model_comp
     ), linetype = "dashed") +
     ggplot2::labs(
-      title = "Model Comparison for outlierMBC",
-      x = "Outlier Number", y = "Dissimilarity",
+      title = "BIC Model Comparison for outlierMBC",
+      x = "Outlier Number", y = "BIC",
       colour = "Model"
     ) +
     ggplot2::scale_colour_manual(values = ggokabeito_palette) +
