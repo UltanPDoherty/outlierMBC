@@ -197,7 +197,7 @@ plot_comparison <- function(ombc_list) {
 
     df <- Reduce(rbind, df_list)
   } else {
-    stop("plot_selection is currently only available for ombc_gmm.")
+    stop("plot_comparison is currently only available for ombc_gmm.")
   }
 
   ggokabeito_palette <- c(
@@ -220,6 +220,84 @@ plot_comparison <- function(ombc_list) {
     ggplot2::scale_colour_manual(values = ggokabeito_palette) +
     ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
     ggplot2::expand_limits(y = 0)
+
+  gg
+}
+
+# ==============================================================================
+
+#' @title Plot multiple dissimilarity curves.
+#'
+#' @description
+#' Given a range of [ombc_gmm] outputs, each arising from a different model,
+#' this function is designed to produce a graphical aid for selecting the best
+#' model. It displays the dissimilarity curves from each of these models on the
+#' same plot.
+#'
+#' @inheritParams plot_selection
+#'
+#' @returns
+#' `plot_comparison` returns a ggplot object consisting of multiple
+#' dissimilarity curves overlaid on the same plot.
+#'
+#' @export
+plot_comparison_bic <- function(ombc_list) {
+  gross_num <- sum(ombc_list[[1]]$gross_outs)
+  max_out <- max(ombc_list[[1]]$outlier_rank) - 1
+  outlier_seq <- seq(gross_num, max_out)
+  point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
+
+  ombc_calls <- sapply(ombc_list, \(x) x$call[1])
+  stopifnot(
+    "ombc_list must all be ombc_gmm output or all be ombc_lcwm output." =
+      length(unique(ombc_calls)) == 1
+  )
+
+  if (all(ombc_calls == "ombc_gmm()")) {
+    df_list <- lapply(
+      ombc_list,
+      function(x) {
+        data.frame(
+          "model" = x$mix$best_model$cov_type,
+          "comp_num" = x$call$comp_num,
+          "model_comp" = paste(
+            x$mix$best_model$cov_type, x$call$comp_num,
+            sep = "-"
+          ),
+          "outlier_seq" = outlier_seq,
+          "bic" = x$bic,
+          "outlier_num" = x$outlier_num
+        )
+      }
+    )
+
+    df <- Reduce(rbind, df_list)
+  } else {
+    stop("plot_comparison_bic is currently only available for ombc_gmm.")
+  }
+
+  ggokabeito_palette <- c(
+    "#E69F00", "#56B4E9", "#009E73", "#F0E442",
+    "#0072B2", "#D55E00", "#CC79A7", "#000000"
+  )
+  dissimilarity <- model_comp <- NULL
+  gg <- df |>
+    ggplot2::ggplot(ggplot2::aes(
+      x = outlier_seq, y = bic,
+      colour = model_comp
+    )) +
+    ggplot2::geom_line() +
+    ggplot2::geom_point(size = point_size) +
+    ggplot2::geom_vline(ggplot2::aes(
+      xintercept = outlier_num, colour = model_comp
+    ), linetype = "dashed") +
+    ggplot2::labs(
+      title = "Model Comparison for outlierMBC",
+      x = "Outlier Number", y = "Dissimilarity",
+      colour = "Model"
+    ) +
+    ggplot2::scale_colour_manual(values = ggokabeito_palette) +
+    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
 
   gg
 }
