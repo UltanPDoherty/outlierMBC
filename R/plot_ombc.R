@@ -266,7 +266,8 @@ plot_comparison_bic <- function(ombc_list) {
           ),
           "outlier_seq" = outlier_seq,
           "bic" = x$bic,
-          "outlier_num" = x$outlier_num
+          "outlier_num" = x$outlier_num,
+          "optimal" = outlier_seq == x$outlier_num
         )
       }
     )
@@ -280,24 +281,35 @@ plot_comparison_bic <- function(ombc_list) {
     "#E69F00", "#56B4E9", "#009E73", "#F0E442",
     "#0072B2", "#D55E00", "#CC79A7", "#000000"
   )
-  model_comp <- outlier_num <- bic<- NULL
+  optimal <- model_comp <- bic <- NULL
   gg <- df |>
     ggplot2::ggplot(ggplot2::aes(
       x = outlier_seq, y = bic,
       colour = model_comp
     )) +
     ggplot2::geom_line() +
-    ggplot2::geom_point(size = point_size) +
-    ggplot2::geom_vline(ggplot2::aes(
-      xintercept = outlier_num, colour = model_comp
-    ), linetype = "dashed") +
+    ggplot2::geom_point(
+      ggplot2::aes(shape = optimal, size = optimal, stroke = optimal)
+    ) +
     ggplot2::labs(
       title = "BIC Model Comparison for outlierMBC",
       x = "Outlier Number", y = "BIC",
+      shape = "Minimum Dissimilarity", size = "Minimum Dissimilarity",
+      stroke = "Minimum Dissimilarity",
       colour = "Model"
     ) +
     ggplot2::scale_colour_manual(values = ggokabeito_palette) +
-    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq))
+    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
+    ggplot2::scale_size_manual(
+      values = c("TRUE" = 5 * point_size, "FALSE" = point_size)
+    ) +
+    ggplot2::scale_shape_manual(
+      values = c("TRUE" = 4, "FALSE" = 19)
+    ) +
+    ggplot2::scale_discrete_manual(
+      aesthetics = "stroke",
+      values = c("TRUE" = 2, "FALSE" = 1)
+    )
 
   gg
 }
