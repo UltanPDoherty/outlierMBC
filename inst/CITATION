@@ -1,0 +1,18 @@
+citation(auto = meta)
+
+bibentry(
+  bibtype = "Misc",
+  title    = "Model-Based Clustering with Sequential Outlier Identification using the Distribution of Mahalanobis Distances",
+  author   = c(person(c("Ultán", "P."), "Doherty"),
+               person(c("Paul", "D."), "McNicholas"),
+               person("Arthur", "White")),
+  year     = 2025,
+  eprint = "2505.11668",
+  eprinttype = "arxiv",
+  eprintclass = "stat.ME",
+  urldate = "2025-05-16",
+  url = "https://arxiv.org/abs/2505.11668",
+  doi      = "10.48550/arXiv.2505.11668"
+)
+
+

@@ -12,7 +12,8 @@ Authors@R: c(
 Description: Sequential outlier identification for Gaussian mixture models and
     linear cluster-weighted models. The optimal number of outliers is chosen
     based on the dissimilarity between the theoretical and observed
-    distributions of the scaled squared sample Mahalanobis distances.
+    distributions of the scaled squared sample Mahalanobis distances. Doherty,
+    McNicholas, and White (2025) <doi:10.48550/arXiv.2505.11668>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
