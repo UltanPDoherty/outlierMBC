@@ -9,7 +9,7 @@
 Sequential outlier identification for Gaussian mixture models and linear cluster-weighted models. The optimal number of outliers is chosen based on the dissimilarity between the theoretical and observed distributions of the scaled squared sample Mahalanobis distances. Doherty, McNicholas, and White (2025) \doi{10.48550/arXiv.2505.11668}.
 }
 \author{
-\strong{Maintainer}: Ultán P. Doherty \email{dohertyu@tcd.ie} (\href{https://orcid.org/0000-0003-1791-395X}{ORCID})
+\strong{Maintainer}: Ultán P. Doherty \email{dohertyu@tcd.ie} (\href{https://orcid.org/0000-0003-1791-395X}{ORCID}) [copyright holder]
 
 Authors:
 \itemize{
