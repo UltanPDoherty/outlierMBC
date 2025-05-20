@@ -6,29 +6,7 @@
 \alias{outlierMBC-package}
 \title{outlierMBC: Model-Based Clustering with Sequential Outlier Identification using the Distribution of Mahalanobis Distances}
 \description{
-This package has the following exported functions:
-\describe{
-\item{\code{ombc_gmm}}{Sequentially identify outliers while fitting a Gaussian
-mixture model.}
-\item{\code{ombc_lcwm}}{Sequentially identify outliers while fitting a linear
-cluster-weighted model.}
-\item{\code{simulate_gmm}}{Simulate data from a Gaussian mixture model with
-outliers.}
-\item{\code{simulate_lcwm}}{Simulate data from a linear cluster-weighted model
-with outliers.}
-\item{\code{find_gross}}{Find gross outliers.}
-\item{\code{backtrack}}{Move backwards from the minimum to a more conservative
-solution.}
-\item{\code{backtrack_gmm}}{Fit a Gaussian mixture model to the backtrack
-solution.}
-\item{\code{backtrack_lcwm}}{Fit a linear cluster-weighted model to the
-backtrack solution.}
-\item{\code{plot_curve}}{Plot the dissimilarity curve.}
-\item{\code{plot_backtrack}}{Plot the dissimilarity curve showing the backtrack
-solution.}
-\item{\code{plot_comparison}}{Plot multiple dissimilarity curves.}
-\item{\code{plot_selection}}{Plot dissimilarity values for multiple solutions.}
-}
+Sequential outlier identification for Gaussian mixture models and linear cluster-weighted models. The optimal number of outliers is chosen based on the dissimilarity between the theoretical and observed distributions of the scaled squared sample Mahalanobis distances. Doherty, McNicholas, and White (2025) \doi{10.48550/arXiv.2505.11668}.
 }
 \author{
 \strong{Maintainer}: Ultán P. Doherty \email{dohertyu@tcd.ie} (\href{https://orcid.org/0000-0003-1791-395X}{ORCID})
