@@ -403,7 +403,8 @@ backtrack_gmm <- function(
 backtrack_lcwm <- function(
     xy, x, ombc_lcwm_out,
     max_total_rise = 0.1, max_step_rise = 0.05,
-    init_z = NULL, manual_outlier_num = NULL) {
+    init_z = NULL, manual_outlier_num = NULL,
+    verbose = TRUE) {
   this_call <- call(
     "backtrack_lcwm",
     "xy" = substitute(xy), "x" = substitute(x),
@@ -424,10 +425,12 @@ backtrack_lcwm <- function(
     )
 
     if (backtrack_out$backtrack$ind == backtrack_out$minimum$ind) {
-      cat(paste0(
-        "backtrack stayed at the minimum.",
-        "backtrack_lcwm will return ombc_lcwm results directly.\n"
-      ))
+      if (verbose) {
+        message(
+          "backtrack stayed at the minimum.",
+          " backtrack_gmm will return ombc_lcwm results directly."
+        )
+      }
 
       return(list(
         "labels" = ombc_lcwm_out$labels,
@@ -520,18 +523,11 @@ backtrack_lcwm <- function(
     x <- x0[!ombc_lcwm_out$gross_outs, , drop = FALSE]
     z <- z0
 
-    cat("Fitting backtrack model:\n")
     if (outlier_num > gross_num) {
       temp_outlier_rank <- ombc_lcwm_out$outlier_rank[!ombc_lcwm_out$gross_outs]
 
-      prog_bar <- utils::txtProgressBar(
-        gross_num, outlier_num,
-        style = 3
-      )
       removals <- c()
       for (i in seq(gross_num, outlier_num)) {
-        utils::setTxtProgressBar(prog_bar, i)
-
         invisible(utils::capture.output(lcwm <- flexCWM::cwm(
           formulaY = ombc_lcwm_out$call$y_formula,
           familyY = stats::gaussian(link = "identity"),
@@ -552,7 +548,13 @@ backtrack_lcwm <- function(
         z <- lcwm$models[[1]]$posterior[-next_removal, -next_removal]
         temp_outlier_rank <- temp_outlier_rank[-next_removal]
       }
-      close(prog_bar)
+      if (verbose) {
+        if ((i - gross_num + 1) %% 10 == 0) {
+          message("*: ", (i - gross_num + 1), " iterations.")
+        } else {
+          message("*", appendLF = FALSE)
+        }
+      }
     } else {
       invisible(utils::capture.output(lcwm <- flexCWM::cwm(
         formulaY = ombc_lcwm_out$call$y_formula,
