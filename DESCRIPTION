@@ -1,6 +1,5 @@
 Package: outlierMBC
-Title: Model-Based Clustering with Sequential Outlier Identification using the 
-    Distribution of Mahalanobis Distances
+Title: Model-Based Clustering with Sequential Outlier Identification
 Version: 0.0.1
 Authors@R: c(
     person("Ultán P.", "Doherty", , "dohertyu@tcd.ie", role = c("aut", "cre", 
@@ -9,11 +8,13 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-2482-523X")),
     person("Arthur", "White", , "arwhite@tcd.ie", role = c("aut"),
            comment = c(ORCID = "0000-0002-7268-5163")))
-Description: Sequential outlier identification for Gaussian mixture models and
-    linear cluster-weighted models. The optimal number of outliers is chosen
-    based on the dissimilarity between the theoretical and observed
-    distributions of the scaled squared sample Mahalanobis distances. Doherty, 
-    McNicholas, and White (2025) <doi:10.48550/arXiv.2505.11668>.
+Description: Sequential outlier identification for Gaussian mixture models using
+    the distribution of Mahalanobis distances. The optimal number
+    of outliers is chosen based on the dissimilarity between the theoretical and
+    observed distributions of the scaled squared sample Mahalanobis distances.
+    Also includes an extension for Gaussian linear cluster-weighted models using
+    the distribution of studentized residuals. 
+    Doherty, McNicholas, and White (2025) <doi:10.48550/arXiv.2505.11668>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
