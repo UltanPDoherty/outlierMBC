@@ -11,7 +11,8 @@ backtrack_gmm(
   max_step_rise = 0.05,
   init_model = NULL,
   init_z = NULL,
-  manual_outlier_num = NULL
+  manual_outlier_num = NULL,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ global minimum dissimilarity, from each backward step.}
 \item{init_z}{Initial component assignment probability matrix.}
 
 \item{manual_outlier_num}{User-specified number of outliers.}
+
+\item{verbose}{Whether the iteration count is printed.}
 }
 \value{
 \code{backtrack_gmm} returns a list with the following elements:

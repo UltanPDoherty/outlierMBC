@@ -189,7 +189,8 @@ plot_backtrack <- function(
 backtrack_gmm <- function(
     x, ombc_out,
     max_total_rise = 0.1, max_step_rise = 0.05,
-    init_model = NULL, init_z = NULL, manual_outlier_num = NULL) {
+    init_model = NULL, init_z = NULL, manual_outlier_num = NULL,
+    verbose = TRUE) {
   this_call <- call(
     "backtrack_gmm",
     "x" = substitute(x), "ombc_out" = substitute(ombc_out),
@@ -206,10 +207,12 @@ backtrack_gmm <- function(
     )
 
     if (backtrack_out$backtrack$ind == backtrack_out$minimum$ind) {
-      cat(paste0(
-        "backtrack stayed at the minimum.",
-        " backtrack_gmm will return ombc_gmm results directly.\n"
-      ))
+      if (verbose) {
+        message(
+          "backtrack stayed at the minimum.",
+          " backtrack_gmm will return ombc_gmm results directly."
+        )
+      }
 
       return(list(
         "labels" = ombc_out$labels,
@@ -261,7 +264,6 @@ backtrack_gmm <- function(
     )
   }
 
-  cat("Fitting backtrack model:\n")
   if (init_scheme == "reinit") {
     x1 <- scale(x0, center = init_scaling, scale = init_scaling)
     z <- get_init_z(
@@ -300,13 +302,8 @@ backtrack_gmm <- function(
     if (outlier_num > gross_num) {
       temp_outlier_rank <- ombc_out$outlier_rank[!ombc_out$gross_outs]
 
-      prog_bar <- utils::txtProgressBar(
-        gross_num, outlier_num,
-        style = 3
-      )
       removals <- c()
       for (i in seq(gross_num, outlier_num)) {
-        utils::setTxtProgressBar(prog_bar, i)
         mix <- try_mixture_gpcm(
           x,
           ombc_out$call$comp_num, ombc_out$call$mnames,
@@ -322,8 +319,14 @@ backtrack_gmm <- function(
         z <- mix$z[-next_removal, ]
         temp_outlier_rank <- temp_outlier_rank[-next_removal]
         fixed_labels <- fixed_labels[-next_removal]
+        if (verbose) {
+          if ((i - gross_num + 1) %% 10 == 0) {
+            message("*: ", (i - gross_num + 1), " iterations.")
+          } else {
+            message("*", appendLF = FALSE)
+          }
+        }
       }
-      close(prog_bar)
     } else {
       mix <- try_mixture_gpcm(
         x,
@@ -335,7 +338,6 @@ backtrack_gmm <- function(
       )
     }
   }
-  cat("backtrack model fitted.\n")
 
   labels <- integer(nrow(x))
   labels[outlier_bool] <- 0
