@@ -127,14 +127,19 @@ ombc_lcwm <- function(
   obs_num <- nrow(x)
 
   xy1 <- scale(xy0, center = init_scaling, scale = init_scaling)
-  dist_mat0 <- as.matrix(stats::dist(xy1))
-  dist_mat <- dist_mat0
+
+  if (init_method == "hc") {
+    dist_mat0 <- as.matrix(stats::dist(xy1))
+    dist_mat <- dist_mat0
+    dist_mat <- dist_mat[!gross_outs, !gross_outs]
+  } else {
+    dist_mat <- NULL
+  }
 
   gross_num <- sum(gross_outs)
   xy <- xy[!gross_outs, , drop = FALSE]
   x <- x[!gross_outs, , drop = FALSE]
   max_out <- max_out - gross_num
-  dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
   if (!is.null(init_model) && !is.null(init_z)) {
     stop("Only one of init_model and init_z may be provided.")
@@ -215,7 +220,9 @@ ombc_lcwm <- function(
     outlier_rank_temp[!outlier_rank_temp][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
     xy <- xy[-dd$choice_id, , drop = FALSE]
-    dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
+    if (init_method == "hc") {
+      dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
+    }
 
     if (dd$distrib_diff < dd_min) {
       dd_min <- dd$distrib_diff

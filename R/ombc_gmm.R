@@ -121,13 +121,18 @@ ombc_gmm <- function(
   obs_num <- nrow(x)
 
   x1 <- scale(x0, center = init_scaling, scale = init_scaling)
-  dist_mat0 <- as.matrix(stats::dist(x1))
-  dist_mat <- dist_mat0
+
+  if (init_method == "hc") {
+    dist_mat0 <- as.matrix(stats::dist(x1))
+    dist_mat <- dist_mat0
+    dist_mat <- dist_mat[!gross_outs, !gross_outs]
+  } else {
+    dist_mat <- NULL
+  }
 
   gross_num <- sum(gross_outs)
   x <- x[!gross_outs, ]
   max_out <- max_out - gross_num
-  dist_mat <- dist_mat[!gross_outs, !gross_outs]
 
   if (!is.null(init_model) && !is.null(init_z)) {
     stop("Only one of init_model and init_z may be provided.")
@@ -183,7 +188,9 @@ ombc_gmm <- function(
 
     outlier_rank_temp[!outlier_rank_temp][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
-    dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
+    if (init_method == "hc") {
+      dist_mat <- dist_mat[-dd$choice_id, -dd$choice_id]
+    }
     fixed_labels <- fixed_labels[-dd$choice_id]
 
     if (dd$distrib_diff < dd_min) {
@@ -275,7 +282,13 @@ get_init_z <- function(
     init <- kmpp$clusters
   }
 
-  z <- matrix(nrow = nrow(dist_mat), ncol = comp_num)
+  if (!is.null(dist_mat)) {
+    obs_num <- nrow(dist_mat)
+  } else if (!is.null(x)) {
+    obs_num <- nrow(x)
+  }
+
+  z <- matrix(nrow = obs_num, ncol = comp_num)
   for (k in seq_len(comp_num)) {
     z[, k] <- as.integer(init == k)
   }
