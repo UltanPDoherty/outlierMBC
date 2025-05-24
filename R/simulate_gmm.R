@@ -68,7 +68,7 @@ simulate_gmm <- function(
   var_num <- length(mu[[1]])
   comp_num <- length(n)
 
-  if(!is.null(seed)){
+  if (!is.null(seed)) {
     set.seed(seed)
   }
   comps <- list()
@@ -89,7 +89,7 @@ simulate_gmm <- function(
   dim_means <- rowMeans(range_mat)
   dim_widths <- range_mat[, 2] - range_mat[, 1]
 
-  if(!is.null(seed)){
+  if (!is.null(seed)) {
     set.seed(seed)
   }
   count <- 0

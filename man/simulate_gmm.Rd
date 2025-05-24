@@ -9,7 +9,7 @@ simulate_gmm(
   mu,
   sigma,
   outlier_num,
-  seed = 123,
+  seed = NULL,
   crit_val = 0.9999,
   range_multiplier = 1.5,
   print_interval = Inf

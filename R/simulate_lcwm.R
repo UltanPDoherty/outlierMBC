@@ -113,7 +113,7 @@ simulate_lcwm <- function(
   var_num <- length(mu[[1]])
   comp_num <- length(n)
 
-  if(!is.null(seed)){
+  if (!is.null(seed)) {
     set.seed(seed)
   }
   observations <- covariates <- errors <- responses <- uniform_spans <- list()
@@ -132,7 +132,7 @@ simulate_lcwm <- function(
     )
   }
 
-  if(!is.null(seed)){
+  if (!is.null(seed)) {
     set.seed(seed)
   }
   outliers <- lapply(outlier_num, function(x) matrix(NA, x, var_num + 2))

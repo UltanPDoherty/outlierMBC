@@ -12,7 +12,7 @@ simulate_lcwm(
   error_sd,
   outlier_num,
   outlier_type = c("x_and_y", "x_only", "y_only"),
-  seed = 123,
+  seed = NULL,
   prob_range = c(1e-08, 1e-06),
   range_multipliers = c(3, 3),
   print_interval = Inf,
