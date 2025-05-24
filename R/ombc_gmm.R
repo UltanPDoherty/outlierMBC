@@ -304,7 +304,6 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol, fixed_labels) {
     label = fixed_labels
   ))
   if (is.null(mix)) {
-    cat(paste0("Trying alternative covariance structures.\n"))
     try(mix <- mixture::gpcm(
       x,
       G = comp_num, start = z, nmax = nmax, atol = atol,
@@ -318,11 +317,13 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol, fixed_labels) {
       label = fixed_labels
     ))
     if (!is.null(mix)) {
-      cat(paste0(
-        mix$best_model$cov_type, " covariance structure implemented.\n"
-      ))
+      warning(
+        "mixture::gpcm failed for this iteration.\n  ",
+        "Trying alternative covariance structures.\n  ",
+        mix$best_model$cov_type, " covariance structure implemented.\n  ",
+        "Proceeding with algorithm."
+      )
     } else {
-      cat(paste0("Trying default gpcm k-means initialisation.\n"))
       try(
         mix <- mixture::gpcm(
           x,
@@ -331,9 +332,19 @@ try_mixture_gpcm <- function(x, comp_num, mnames, z, nmax, atol, fixed_labels) {
         )
       )
       if (!is.null(mix)) {
-        cat(paste0(
-          mix$best_model$cov_type, " covariance structure implemented.\n"
-        ))
+        warning(
+          "mixture::gpcm failed for this iteration.\n  ",
+          "Alternative covariance structures also failed.\n  ",
+          "Trying mixture::gpcm's default k-means initialisation with any ",
+          "covariance structure.\n  ",
+          mix$best_model$cov_type, " covariance structure implemented.\n  ",
+          "Proceeding with algorithm."
+        )
+      } else {
+        stop(
+          "Unable to successfully run mixture::gpcm.\n\t",
+          "Alternative covariance structures and initialisation were attempted."
+        )
       }
     }
   }
