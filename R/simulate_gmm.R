@@ -61,14 +61,16 @@ simulate_gmm <- function(
     mu,
     sigma,
     outlier_num,
-    seed = 123,
+    seed = NULL,
     crit_val = 0.9999,
     range_multiplier = 1.5,
     print_interval = Inf) {
   var_num <- length(mu[[1]])
   comp_num <- length(n)
 
-  set.seed(seed)
+  if(!is.null(seed)){
+    set.seed(seed)
+  }
   comps <- list()
   for (g in seq_len(comp_num)) {
     comps[[g]] <- mvtnorm::rmvnorm(
@@ -87,7 +89,9 @@ simulate_gmm <- function(
   dim_means <- rowMeans(range_mat)
   dim_widths <- range_mat[, 2] - range_mat[, 1]
 
-  set.seed(123)
+  if(!is.null(seed)){
+    set.seed(seed)
+  }
   count <- 0
   checks <- rep(NA, comp_num)
   attempts <- 0

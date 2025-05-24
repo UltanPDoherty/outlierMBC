@@ -103,7 +103,7 @@ simulate_lcwm <- function(
     error_sd,
     outlier_num,
     outlier_type = c("x_and_y", "x_only", "y_only"),
-    seed = 123,
+    seed = NULL,
     prob_range = c(1e-8, 1e-6),
     range_multipliers = c(3, 3),
     print_interval = Inf,
@@ -113,7 +113,9 @@ simulate_lcwm <- function(
   var_num <- length(mu[[1]])
   comp_num <- length(n)
 
-  set.seed(seed)
+  if(!is.null(seed)){
+    set.seed(seed)
+  }
   observations <- covariates <- errors <- responses <- uniform_spans <- list()
   for (g in seq_len(comp_num)) {
     covariates[[g]] <- mvtnorm::rmvnorm(n[g], mu[[g]], sigma[[g]])
@@ -130,7 +132,9 @@ simulate_lcwm <- function(
     )
   }
 
-  set.seed(seed)
+  if(!is.null(seed)){
+    set.seed(seed)
+  }
   outliers <- lapply(outlier_num, function(x) matrix(NA, x, var_num + 2))
   for (g in seq_len(comp_num)) {
     for (j in seq_len(outlier_num[g])) {
