@@ -65,14 +65,16 @@
 #'                          used to simulate proposed outliers is
 #'                          controlled by multiplying the component widths by
 #'                          these values.
-#' @param print_interval How frequently the iteration count is printed.
-#' @param print_prob_g Print how likely a more extreme value would be for each
-#'                     simulated outlier.
+#' @param more_extreme Whether to return a column in the data frame consisting
+#'                     of the probabilities of sampling more extreme true
+#'                     observations than the simulated outliers.
 #'
 #' @returns
 #' `simulate_lcwm` returns a `data.frame` with continuous variables
 #' `X1`, `X2`, ..., followed by a continuous response variable, `Y`, and a
-#' mixture component label vector `G` with outliers denoted by `0`.
+#' mixture component label vector `G` with outliers denoted by `0`. The
+#' optional variable `more_extreme` may be included, if specified by the
+#' corresponding argument.
 #'
 #' @export
 #'
@@ -106,8 +108,7 @@ simulate_lcwm <- function(
     seed = NULL,
     prob_range = c(1e-8, 1e-6),
     range_multipliers = c(3, 3),
-    print_interval = Inf,
-    print_prob_g = FALSE) {
+    more_extreme = FALSE) {
   outlier_type <- match.arg(outlier_type)
 
   var_num <- length(mu[[1]])
@@ -136,19 +137,16 @@ simulate_lcwm <- function(
     set.seed(seed)
   }
   outliers <- lapply(outlier_num, function(x) matrix(NA, x, var_num + 2))
+  more_extreme_prob <- list()
   for (g in seq_len(comp_num)) {
+    more_extreme_prob[[g]] <- double(outlier_num[g])
     for (j in seq_len(outlier_num[g])) {
       out <- uniform_outlier_ombc(
         outlier_type, mu, sigma, beta, error_sd, g, uniform_spans, prob_range
       )
       outliers[[g]][j, ] <- out[seq_len(var_num + 2)]
-      if (print_prob_g) {
-        cat(paste0(
-          "g = ", g, ", Outlier No.: ", j, ", prob_g = ", out[var_num + 3], "\n"
-        ))
-      } else if (j %% print_interval == 0) {
-        cat(paste0("g = ", g, ", Outlier No.: ", j, "\n"))
-      }
+
+      more_extreme_prob[[g]][j] <- out[var_num + 3]
     }
   }
 
@@ -157,6 +155,10 @@ simulate_lcwm <- function(
     Reduce(rbind, outliers)
   ))
   colnames(lcwm) <- c(paste0("X", seq_len(var_num)), "Y", "G")
+
+  if (more_extreme) {
+    lcwm$more_extreme <- c(rep(NA, sum(n)), Reduce(c, more_extreme_prob))
+  }
 
   lcwm
 }

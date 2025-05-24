@@ -15,8 +15,7 @@ simulate_lcwm(
   seed = NULL,
   prob_range = c(1e-08, 1e-06),
   range_multipliers = c(3, 3),
-  print_interval = Inf,
-  print_prob_g = FALSE
+  more_extreme = FALSE
 )
 }
 \arguments{
@@ -47,15 +46,16 @@ used to simulate proposed outliers is
 controlled by multiplying the component widths by
 these values.}
 
-\item{print_interval}{How frequently the iteration count is printed.}
-
-\item{print_prob_g}{Print how likely a more extreme value would be for each
-simulated outlier.}
+\item{more_extreme}{Whether to return a column in the data frame consisting
+of the probabilities of sampling more extreme true
+observations than the simulated outliers.}
 }
 \value{
 \code{simulate_lcwm} returns a \code{data.frame} with continuous variables
 \code{X1}, \code{X2}, ..., followed by a continuous response variable, \code{Y}, and a
-mixture component label vector \code{G} with outliers denoted by \code{0}.
+mixture component label vector \code{G} with outliers denoted by \code{0}. The
+optional variable \code{more_extreme} may be included, if specified by the
+corresponding argument.
 }
 \description{
 Simulates data from a linear cluster-weighted model, then simulates outliers
