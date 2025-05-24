@@ -32,7 +32,11 @@
 #' @param crit_val Critical value for uniform sample rejection.
 #' @param range_multiplier How much greater should the range of the Uniform
 #'                         samples be than the range of the Normal samples?
-#' @param print_interval How frequently the iteration count is printed.
+#' @param verbose Whether a message should be printed if a high number of
+#'                outliers are being simulated. This suggests that many
+#'                simulated outliers are being rejected and the other arguments
+#'                may need to be adjusted.
+#' @param max_rejection Maximum number of simulated outliers to be rejected.
 #'
 #' @returns
 #' `simulate_gmm` return a `data.frame` with continuous variables
@@ -64,7 +68,8 @@ simulate_gmm <- function(
     seed = NULL,
     crit_val = 0.9999,
     range_multiplier = 1.5,
-    print_interval = Inf) {
+    verbose = TRUE,
+    max_rejection = 1e6) {
   var_num <- length(mu[[1]])
   comp_num <- length(n)
 
@@ -116,8 +121,13 @@ simulate_gmm <- function(
     count <- count + all(checks)
 
     attempts <- attempts + 1
-    if (attempts %% print_interval == 0) {
-      cat(paste0("attempts = ", attempts, ", count = ", count, "\n"))
+    if (verbose) {
+      if (attempts %% 1000 == 0) {
+        message(attempts, " outliers simulated, ", count, " accepted.")
+      }
+    }
+    if (attempts - count >= max_rejection) {
+      stop("max_rejection has been reached.")
     }
   }
 

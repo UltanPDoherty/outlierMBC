@@ -12,7 +12,8 @@ simulate_gmm(
   seed = NULL,
   crit_val = 0.9999,
   range_multiplier = 1.5,
-  print_interval = Inf
+  verbose = TRUE,
+  max_rejection = 1e+06
 )
 }
 \arguments{
@@ -31,7 +32,12 @@ simulate_gmm(
 \item{range_multiplier}{How much greater should the range of the Uniform
 samples be than the range of the Normal samples?}
 
-\item{print_interval}{How frequently the iteration count is printed.}
+\item{verbose}{Whether a message should be printed if a high number of
+outliers are being simulated. This suggests that many
+simulated outliers are being rejected and the other arguments
+may need to be adjusted.}
+
+\item{max_rejection}{Maximum number of simulated outliers to be rejected.}
 }
 \value{
 \code{simulate_gmm} return a \code{data.frame} with continuous variables
