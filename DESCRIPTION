@@ -1,5 +1,5 @@
 Package: outlierMBC
-Title: Model-Based Clustering with Sequential Outlier Identification
+Title: Sequential Outlier Identification for Model-Based Clustering
 Version: 0.0.1
 Authors@R: c(
     person("Ultán P.", "Doherty", , "dohertyu@tcd.ie", role = c("aut", "cre", 

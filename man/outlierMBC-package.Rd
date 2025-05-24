@@ -4,7 +4,7 @@
 \name{outlierMBC-package}
 \alias{outlierMBC}
 \alias{outlierMBC-package}
-\title{outlierMBC: Model-Based Clustering with Sequential Outlier Identification}
+\title{outlierMBC: Sequential Outlier Identification for Model-Based Clustering}
 \description{
 Sequential outlier identification for Gaussian mixture models using the distribution of Mahalanobis distances. The optimal number of outliers is chosen based on the dissimilarity between the theoretical and observed distributions of the scaled squared sample Mahalanobis distances. Also includes an extension for Gaussian linear cluster-weighted models using the distribution of studentized residuals. Doherty, McNicholas, and White (2025) \doi{10.48550/arXiv.2505.11668}.
 }
