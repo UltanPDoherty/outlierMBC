@@ -569,7 +569,6 @@ backtrack_lcwm <- function(
         threshold = ombc_lcwm_out$call$atol
       )))
     }
-    cat("backtrack model fitted.\n")
   }
 
   labels <- integer(nrow(x))
