@@ -199,7 +199,7 @@ ombc_gmm <- function(
 
     if (verbose) {
       if (i %% 10 == 0) {
-        message("*: ", i, " provisional outliers.")
+        message("*: ", i, " iterations.")
       } else {
         message("*", appendLF = FALSE)
       }
