@@ -100,7 +100,7 @@ ombc_lcwm <- function(
     init_method = c("hc", "kmpp"),
     init_scaling = TRUE,
     kmpp_seed = 123,
-    print_interval = Inf,
+    verbose = TRUE,
     dd_weight = 0.5) {
   init_method <- match.arg(init_method)
   init_scheme <- match.arg(init_scheme)
@@ -114,7 +114,7 @@ ombc_lcwm <- function(
     "mnames" = mnames, "nmax" = nmax, "atol" = atol,
     "init_z" = substitute(init_z),
     "init_method" = init_method, "init_scaling" = init_scaling,
-    "kmpp_seed" = kmpp_seed, "print_interval" = print_interval,
+    "kmpp_seed" = kmpp_seed, "verbose" = verbose,
     "dd_weight" = dd_weight
   )
 
@@ -157,7 +157,6 @@ ombc_lcwm <- function(
   distrib_diff_vec <- double(max_out + 1)
   outlier_rank_temp <- rep(0, obs_num - gross_num)
   for (i in seq_len(max_out + 1)) {
-    if (i %% print_interval == 0) cat("i = ", i, "\n")
     if (init_scheme %in% c("update", "reuse")) {
       suppressWarnings(invisible(utils::capture.output(lcwm <- flexCWM::cwm(
         formulaY = y_formula,
@@ -227,6 +226,14 @@ ombc_lcwm <- function(
       z <- lcwm$models[[1]]$posterior[-dd$choice_id, , drop = FALSE]
     } else if (init_scheme == "reuse") {
       z <- z[-dd$choice_id, , drop = FALSE]
+    }
+
+    if (verbose) {
+      if (i %% 10 == 0) {
+        message("*: ", i, " provisional outliers.")
+      } else {
+        message("*", appendLF = FALSE)
+      }
     }
   }
 

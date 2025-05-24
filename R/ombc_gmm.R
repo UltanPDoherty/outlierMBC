@@ -33,7 +33,7 @@
 #' @param kmpp_seed Optional seed for k-means++ initialisation.
 #' @param fixed_labels Cluster labels that are known a prior. See `label`
 #'                     argument in `mixture::gpcm`.
-#' @param print_interval How frequently the iteration count is printed.
+#' @param verbose Whether the iteration count is printed.
 #'
 #' @returns
 #' `ombc_gmm` returns an object of class "outliermbc_gmm", which is essentially
@@ -96,7 +96,7 @@ ombc_gmm <- function(
     init_scaling = FALSE,
     kmpp_seed = 123,
     fixed_labels = NULL,
-    print_interval = Inf) {
+    verbose = TRUE) {
   init_method <- match.arg(init_method)
   init_scheme <- match.arg(init_scheme)
 
@@ -108,7 +108,7 @@ ombc_gmm <- function(
     "init_z" = substitute(init_z), "init_model" = substitute(init_model),
     "init_method" = init_method, "init_scaling" = init_scaling,
     "kmpp_seed" = kmpp_seed, "fixed_labels" = substitute(fixed_labels),
-    "print_interval" = print_interval
+    "verbose" = verbose
   )
 
   ombc_version <- utils::packageVersion("outlierMBC")
@@ -152,8 +152,6 @@ ombc_gmm <- function(
   distrib_diff_vec <- double(max_out + 1)
   outlier_rank_temp <- rep(0, obs_num - gross_num)
   for (i in seq_len(max_out + 1)) {
-    if (i %% print_interval == 0) cat("i = ", i, "\n")
-
     if (init_scheme %in% c("update", "reuse")) {
       mix <- try_mixture_gpcm(x, comp_num, mnames, z, nmax, atol, fixed_labels)
     } else {
@@ -197,6 +195,14 @@ ombc_gmm <- function(
       z <- mix$z[-dd$choice_id, , drop = FALSE]
     } else if (init_scheme == "reuse") {
       z <- z[-dd$choice_id, , drop = FALSE]
+    }
+
+    if (verbose) {
+      if (i %% 10 == 0) {
+        message("*: ", i, " provisional outliers.")
+      } else {
+        message("*", appendLF = FALSE)
+      }
     }
   }
 

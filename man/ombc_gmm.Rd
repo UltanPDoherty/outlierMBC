@@ -19,7 +19,7 @@ ombc_gmm(
   init_scaling = FALSE,
   kmpp_seed = 123,
   fixed_labels = NULL,
-  print_interval = Inf
+  verbose = TRUE
 )
 }
 \arguments{
@@ -53,7 +53,7 @@ scaled for initialisation.}
 \item{fixed_labels}{Cluster labels that are known a prior. See \code{label}
 argument in \code{mixture::gpcm}.}
 
-\item{print_interval}{How frequently the iteration count is printed.}
+\item{verbose}{Whether the iteration count is printed.}
 }
 \value{
 \code{ombc_gmm} returns an object of class "outliermbc_gmm", which is essentially

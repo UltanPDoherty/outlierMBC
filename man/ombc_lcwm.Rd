@@ -20,7 +20,7 @@ ombc_lcwm(
   init_method = c("hc", "kmpp"),
   init_scaling = TRUE,
   kmpp_seed = 123,
-  print_interval = Inf,
+  verbose = TRUE,
   dd_weight = 0.5
 )
 }
@@ -54,7 +54,7 @@ scaled for initialisation.}
 
 \item{kmpp_seed}{Optional seed for k-means++ initialisation.}
 
-\item{print_interval}{How frequently the iteration count is printed.}
+\item{verbose}{Whether the iteration count is printed.}
 
 \item{dd_weight}{A value between \code{0} and \code{1} which controls the weighting of
 the response and covariate dissimilarities when aggregating.}
