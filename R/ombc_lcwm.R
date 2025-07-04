@@ -243,6 +243,9 @@ ombc_lcwm <- function(
       }
     }
   }
+  if (verbose) {
+    message()
+  }
 
   outlier_rank <- double(length(gross_outs))
   outlier_rank[gross_outs] <- 1
