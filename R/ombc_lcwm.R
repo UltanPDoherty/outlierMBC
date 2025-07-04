@@ -107,7 +107,7 @@ ombc_lcwm <- function(
   init_model <- NULL
 
   this_call <- call(
-    "ombc_gmm",
+    "ombc_lcwm",
     "xy" = substitute(xy), "x" = substitute(x), "y_formula" = y_formula,
     "comp_num" = comp_num, "max_out" = max_out,
     "gross_outs" = substitute(gross_outs), "init_scheme" = init_scheme,
