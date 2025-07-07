@@ -54,20 +54,18 @@
 #' @param beta List of component regression coefficient vectors.
 #' @param error_sd Vector of component regression error standard deivations.
 #' @param outlier_num Desired number of outliers.
-#' @param outlier_type Character string governing whether the outliers are
-#'                     outlying with respect to the explanatory variable only
-#'                     (`"x_only"`), the response variable only (`"y_only"`), or
-#'                     both (`"x_and_y"`). `"x_and_y"` is the default value.
+#' @param outlier_type
+#' Character string governing whether the outliers are outlying with respect to
+#' the explanatory variable only (`"x_only"`), the response variable only
+#' (`"y_only"`), or both (`"x_and_y"`). `"x_and_y"` is the default value.
 #' @param seed Seed.
 #' @param prob_range Values for uniform sample rejection.
-#' @param range_multipliers For every explanatory variable, the sampling region
-#' The sampling region for the Uniform distribution
-#'                          used to simulate proposed outliers is
-#'                          controlled by multiplying the component widths by
-#'                          these values.
-#' @param more_extreme Whether to return a column in the data frame consisting
-#'                     of the probabilities of sampling more extreme true
-#'                     observations than the simulated outliers.
+#' @param range_multipliers
+#' The sampling region for the Uniform distribution used to simulate proposed
+#' outliers is controlled by multiplying the component widths by these values.
+#' @param more_extreme
+#' Whether to return a column in the data frame consisting of the probabilities
+#' of sampling more extreme true observations than the simulated outliers.
 #'
 #' @returns
 #' `simulate_lcwm` returns a `data.frame` with continuous variables
