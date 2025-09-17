@@ -129,7 +129,8 @@ distrib_diff_mahalanobis <- function(
 #' @param mu Matrix of component mean vectors.
 #' @param sigma Array of component covariance matrices.
 #' @param mod_list List of component regression models.
-#' @param y_sigma Vector of component regression standard deviations.
+#' @param weighted_rmse The square root of the weighted mean of the squared
+#'                      residuals for each component.
 #'
 #' @returns
 #' `distrib_diff_lcwm_lcwm` returns a list with the following elements:
@@ -149,7 +150,7 @@ distrib_diff_lcwm <- function(
     mu,
     sigma,
     mod_list,
-    y_sigma,
+    weighted_rmse,
     dd_weight = 0.5) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
@@ -164,7 +165,7 @@ distrib_diff_lcwm <- function(
       mu[, g, drop = FALSE],
       as.matrix(sigma[, , g]),
       mod_list[[g]],
-      y_sigma[g],
+      weighted_rmse[g],
       dd_weight
     )
     distrib_diff_vec[g] <- dd_g$diff
@@ -206,7 +207,8 @@ distrib_diff_lcwm <- function(
 #' @param mu_g Component mean vector for the covariates.
 #' @param sigma_g Component covariance matrix for the covariates.
 #' @param mod_g Component regression model.
-#' @param y_sigma_g Component regression standard deviation for the response.
+#' @param weighted_rmse_g The square root of the weighted mean of the squared
+#'                        residuals for this component.
 #'
 #' @returns
 #' `distrib_diff_lcwm_lcwm_g` returns a list with the following elements:
@@ -225,13 +227,13 @@ distrib_diff_lcwm_g <- function(
     mu_g,
     sigma_g,
     mod_g,
-    y_sigma_g,
+    weighted_rmse_g,
     dd_weight = 0.5) {
   dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
   diff_g_x <- dd_g_x$diff
   dens_g_x <- dd_g_x$dens
 
-  dd_g_y <- distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
+  dd_g_y <- distrib_diff_residual(x, z_g, mod_g, weighted_rmse_g)
   diff_g_y <- dd_g_y$diff
   dens_g_y <- dd_g_y$dens
 
@@ -269,7 +271,7 @@ distrib_diff_residual <- function(
     x,
     z_g,
     mod_g,
-    y_sigma_g) {
+    weighted_rmse_g) {
   # Let rss_zg = sqrt(sum(z_g * (mod_g$residuals^2)))
   # flexCWM uses y_sigma_g = rss_zg / sqrt(n_g)
   # stats::sigma uses rss_zg / sqrt(nrow(x) - 2))
@@ -285,7 +287,9 @@ distrib_diff_residual <- function(
 
   hat_g <- stats::hatvalues(mod_g)
 
-  student_resids_g <- mod_g$residuals / (y_sigma_g * sqrt(1 - hat_g))
+  sqrt_weighted_rss_g <- sqrt(n_g) * weighted_rmse_g
+  sigma_hat_g <- sqrt_weighted_rss_g / sqrt(df_g)
+  student_resids_g <- mod_g$residuals / (sigma_hat_g * sqrt(1 - hat_g))
   scsqst_res_g <- student_resids_g^2 / df_g
   scsqst_res_ewcdf_g_func <- spatstat.univar::ewcdf(scsqst_res_g, z_g / n_g)
 
@@ -297,7 +301,7 @@ distrib_diff_residual <- function(
 
   distrib_diff_g_y <- mean(abs(cdf_diffs))
 
-  dens_g_y <- stats::dnorm(mod_g$residuals, mean = 0, sd = y_sigma_g)
+  dens_g_y <- stats::dnorm(mod_g$residuals, mean = 0, sd = sigma_hat_g)
 
   list(
     diff = distrib_diff_g_y,

@@ -199,7 +199,9 @@ ombc_lcwm <- function(
 
     mod_list <- lapply(lcwm$models[[1]]$GLModel, function(x) x$model)
     names(mod_list) <- paste0("comp.", seq_along(mod_list))
-    y_sigma <- vapply(lcwm$models[[1]]$GLModel, function(x) x$sigma, double(1L))
+    weighted_rmse <- vapply(
+      lcwm$models[[1]]$GLModel, function(x) x$sigma, double(1L)
+    )
 
     dd <- distrib_diff_lcwm(
       x,
@@ -208,7 +210,7 @@ ombc_lcwm <- function(
       lcwm$models[[1]]$concomitant$normal.mu,
       lcwm$models[[1]]$concomitant$normal.Sigma,
       mod_list,
-      y_sigma,
+      weighted_rmse,
       dd_weight
     )
 
