@@ -17,10 +17,9 @@ test_outlier_ombc(
 )
 }
 \arguments{
-\item{outlier_type}{Character string governing whether the outliers are
-outlying with respect to the explanatory variable only
-(\code{"x_only"}), the response variable only (\code{"y_only"}), or
-both (\code{"x_and_y"}). \code{"x_and_y"} is the default value.}
+\item{outlier_type}{Character string governing whether the outliers are outlying with respect to
+the explanatory variable only (\code{"x_only"}), the response variable only
+(\code{"y_only"}), or both (\code{"x_and_y"}). \code{"x_and_y"} is the default value.}
 
 \item{mu}{List of component mean vectors.}
 

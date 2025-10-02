@@ -313,3 +313,92 @@ plot_comparison_bic <- function(ombc_list) {
 
   gg
 }
+
+# ==============================================================================
+
+#' @title Plot three dissimilarity curves for `outlierMBC-LCWM`.
+#'
+#' @description
+#' Given the output from [ombc_lcwm], this function extracts three dissimilarity
+#' values associated with each outlier number and plots them as a
+#' curve. These represent the actual overall aggregated dissimilarity, and two
+#' aggregated dissimilarities corresponding to the explanatory variables and the
+#' response variable, respectively. It also draws a vertical line at the outlier
+#' number which minimised the overall aggregated dissimilarity.
+#'
+#' @param ombc_out An `"outliermbc_lcwm"` object, i.e. an output from
+#'                 `ombc_lcwm`.
+#'
+#' @returns
+#' `plot_lcwm_dual` returns a ggplot object showing three dissimilarity curves
+#' and marking the minimum solution with a vertical line.
+#'
+#' @export
+plot_lcwm_dual <- function(ombc_out) {
+  gross_num <- sum(ombc_out$gross_outs)
+  max_out <- max(ombc_out$outlier_rank) - 1
+  outlier_num <- ombc_out$outlier_num
+  distrib_diff_vec <- ombc_out$distrib_diff_vec
+  distrib_diff_dual <- ombc_out$distrib_diff_dual
+
+  outlier_seq <- seq(gross_num, max_out)
+  point_size <- 1 - min(0.9, max(0, -0.1 + max_out / 250))
+
+  diff <- decomp <- minimum <- NULL
+  curve_df <- rbind(
+    data.frame(
+      "outlier_seq" = outlier_seq,
+      "minimum" = as.integer(outlier_num),
+      "decomp" = "Aggregated",
+      "diff" = distrib_diff_vec
+    ),
+    data.frame(
+      "outlier_seq" = outlier_seq,
+      "minimum" = as.integer(outlier_num),
+      "decomp" = "Explanatory",
+      "diff" = distrib_diff_dual[, "expl"]
+    ),
+    data.frame(
+      "outlier_seq" = outlier_seq,
+      "minimum" = as.integer(outlier_num),
+      "decomp" = "Response",
+      "diff" = distrib_diff_dual[, "resp"]
+    )
+  )
+  curve <- curve_df |>
+    ggplot2::ggplot(
+      ggplot2::aes(x = outlier_seq, y = diff, linetype = decomp)
+    ) +
+    ggplot2::geom_line(
+      ggplot2::aes(colour = decomp)
+    ) +
+    ggplot2::geom_point(
+      ggplot2::aes(colour = decomp),
+      size = point_size
+    ) +
+    ggplot2::geom_vline(
+      ggplot2::aes(
+        xintercept = minimum, colour = "Minimum", linetype = "Minimum"
+      ),
+      linewidth = 0.75
+    ) +
+    ggplot2::scale_colour_manual(values = c(
+      Aggregated = "#000000", Explanatory = "#E69F00", Response = "#56B4E9",
+      Minimum = "#CC79A7"
+    )) +
+    ggplot2::scale_linetype_manual(values = c(
+      Aggregated = "solid", Explanatory = "dashed", Response = "dotted",
+      Minimum = "solid"
+    )) +
+    ggplot2::labs(
+      title = paste0("outlierMBC: Number of Outliers = ", outlier_num),
+      x = "Outlier Number",
+      y = "Dissimilarity",
+      colour = "", linetype = ""
+    ) +
+    ggplot2::scale_x_continuous(breaks = pretty(outlier_seq)) +
+    ggplot2::expand_limits(y = 0) +
+    ggplot2::theme(legend.position = "bottom")
+
+  curve
+}

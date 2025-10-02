@@ -142,6 +142,11 @@ distrib_diff_mahalanobis <- function(
 #'   \item{`removal_dens`}{Value of the lowest mixture density.}
 #'   \item{`distrib_diff_mat`}{Two-column matrix containing response and
 #'                             covariate dissimilarities across components.}
+#'   \item{`distrib_diff_mat`}{Two-column matrix containing response and
+#'                             covariate dissimilarities across components.}
+#'   \item{`distrib_diff_dual`}{Vector of length two containing aggregated
+#'                              explanatory and response variable
+#'                              dissimilarities.}
 #' }
 distrib_diff_lcwm <- function(
     x,
@@ -184,12 +189,18 @@ distrib_diff_lcwm <- function(
 
   distrib_diff <- sqrt(sum(prop * distrib_diff_vec^2))
 
+  distrib_diff_dual <- c(
+    sqrt(sum(prop * distrib_diff_mat[, 1]^2)),
+    sqrt(sum(prop * distrib_diff_mat[, 2]^2))
+  )
+
   list(
     distrib_diff = distrib_diff,
     distrib_diff_vec = distrib_diff_vec,
     choice_id = choice_id,
     removal_dens = removal_dens,
-    distrib_diff_mat = distrib_diff_mat
+    distrib_diff_mat = distrib_diff_mat,
+    distrib_diff_dual = distrib_diff_dual
   )
 }
 

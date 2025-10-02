@@ -65,6 +65,8 @@
 #'   \item{`distrib_diff_arr`}{Array of component-specific response and
 #'                             covariate dissimilarity values for each
 #'                             iteration.}
+#'   \item{`distrib_diff_dual`}{Matrix of aggregated explanatory and response
+#'                             dissimilarity values for each iteration.}
 #'   \item{`call`}{Arguments / parameter values used in this function call.}
 #'   \item{`version`}{Version of `outlierMBC` used in this function call.}
 #'   \item{`conv_status`}{Logical vector indicating which iterations' mixture
@@ -160,6 +162,7 @@ ombc_lcwm <- function(
   distrib_diff_arr <- array(dim = c(max_out + 1, comp_num, 2))
   distrib_diff_mat <- matrix(nrow = max_out + 1, ncol = comp_num)
   distrib_diff_vec <- double(max_out + 1)
+  distrib_diff_dual <- matrix(nrow = max_out + 1, ncol = 2)
   outlier_rank_temp <- rep(0, obs_num - gross_num)
   for (i in seq_len(max_out + 1)) {
     if (init_scheme %in% c("update", "reuse")) {
@@ -218,6 +221,7 @@ ombc_lcwm <- function(
     distrib_diff_mat[i, ] <- dd$distrib_diff_vec
     distrib_diff_vec[i] <- dd$distrib_diff
     removal_dens[i] <- dd$removal_dens
+    distrib_diff_dual[i, ] <- dd$distrib_diff_dual
 
     outlier_rank_temp[!outlier_rank_temp][dd$choice_id] <- i
     x <- x[-dd$choice_id, , drop = FALSE]
@@ -279,6 +283,7 @@ ombc_lcwm <- function(
   labels[!outlier_bool] <- lcwm$models[[1]]$cluster
 
   colnames(distrib_diff_mat) <- paste0("k", seq_len(comp_num))
+  colnames(distrib_diff_dual) <- c("expl", "resp")
 
   new_outliermbc_lcwm(list(
     labels = labels,
@@ -292,6 +297,7 @@ ombc_lcwm <- function(
     distrib_diff_vec = distrib_diff_vec,
     distrib_diff_mat = distrib_diff_mat,
     distrib_diff_arr = distrib_diff_arr,
+    distrib_diff_dual = distrib_diff_dual,
     call = this_call,
     version = ombc_version,
     conv_status = conv_status

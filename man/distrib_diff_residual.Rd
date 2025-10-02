@@ -5,7 +5,7 @@
 \title{Compute the response dissimilarity for a single component of a Linear
 CWM.}
 \usage{
-distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
+distrib_diff_residual(x, z_g, mod_g, weighted_rmse_g)
 }
 \arguments{
 \item{x}{Covariate data only.}
@@ -14,7 +14,8 @@ distrib_diff_residual(x, z_g, mod_g, y_sigma_g)
 
 \item{mod_g}{Component regression model.}
 
-\item{y_sigma_g}{Component regression standard deviation for the response.}
+\item{weighted_rmse_g}{The square root of the weighted mean of the squared
+residuals for this component.}
 }
 \value{
 \code{distrib_diff_lcwm_residual} returns a list with the following elements:

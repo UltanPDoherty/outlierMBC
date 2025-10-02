@@ -4,7 +4,15 @@
 \alias{distrib_diff_lcwm_g}
 \title{Compute the dissimilarity for a single component of a Linear CWM.}
 \usage{
-distrib_diff_lcwm_g(x, z_g, mu_g, sigma_g, mod_g, y_sigma_g, dd_weight = 0.5)
+distrib_diff_lcwm_g(
+  x,
+  z_g,
+  mu_g,
+  sigma_g,
+  mod_g,
+  weighted_rmse_g,
+  dd_weight = 0.5
+)
 }
 \arguments{
 \item{x}{Covariate data only.}
@@ -17,7 +25,8 @@ distrib_diff_lcwm_g(x, z_g, mu_g, sigma_g, mod_g, y_sigma_g, dd_weight = 0.5)
 
 \item{mod_g}{Component regression model.}
 
-\item{y_sigma_g}{Component regression standard deviation for the response.}
+\item{weighted_rmse_g}{The square root of the weighted mean of the squared
+residuals for this component.}
 
 \item{dd_weight}{A value between \code{0} and \code{1} which controls the weighting of
 the response and covariate dissimilarities when aggregating.}

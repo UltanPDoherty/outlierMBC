@@ -5,7 +5,16 @@
 \title{Compute the dissimilarity for a linear cluster-weighted model and
 identify the lowest density observation.}
 \usage{
-distrib_diff_lcwm(x, z, prop, mu, sigma, mod_list, y_sigma, dd_weight = 0.5)
+distrib_diff_lcwm(
+  x,
+  z,
+  prop,
+  mu,
+  sigma,
+  mod_list,
+  weighted_rmse,
+  dd_weight = 0.5
+)
 }
 \arguments{
 \item{x}{Covariate data only.}
@@ -20,7 +29,8 @@ distrib_diff_lcwm(x, z, prop, mu, sigma, mod_list, y_sigma, dd_weight = 0.5)
 
 \item{mod_list}{List of component regression models.}
 
-\item{y_sigma}{Vector of component regression standard deviations.}
+\item{weighted_rmse}{The square root of the weighted mean of the squared
+residuals for each component.}
 
 \item{dd_weight}{A value between \code{0} and \code{1} which controls the weighting of
 the response and covariate dissimilarities when aggregating.}
@@ -35,6 +45,11 @@ component.}
 \item{\code{removal_dens}}{Value of the lowest mixture density.}
 \item{\code{distrib_diff_mat}}{Two-column matrix containing response and
 covariate dissimilarities across components.}
+\item{\code{distrib_diff_mat}}{Two-column matrix containing response and
+covariate dissimilarities across components.}
+\item{\code{distrib_diff_dual}}{Vector of length two containing aggregated
+explanatory and response variable
+dissimilarities.}
 }
 }
 \description{

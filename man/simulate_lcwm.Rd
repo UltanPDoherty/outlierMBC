@@ -31,24 +31,19 @@ simulate_lcwm(
 
 \item{outlier_num}{Desired number of outliers.}
 
-\item{outlier_type}{Character string governing whether the outliers are
-outlying with respect to the explanatory variable only
-(\code{"x_only"}), the response variable only (\code{"y_only"}), or
-both (\code{"x_and_y"}). \code{"x_and_y"} is the default value.}
+\item{outlier_type}{Character string governing whether the outliers are outlying with respect to
+the explanatory variable only (\code{"x_only"}), the response variable only
+(\code{"y_only"}), or both (\code{"x_and_y"}). \code{"x_and_y"} is the default value.}
 
 \item{seed}{Seed.}
 
 \item{prob_range}{Values for uniform sample rejection.}
 
-\item{range_multipliers}{For every explanatory variable, the sampling region
-The sampling region for the Uniform distribution
-used to simulate proposed outliers is
-controlled by multiplying the component widths by
-these values.}
+\item{range_multipliers}{The sampling region for the Uniform distribution used to simulate proposed
+outliers is controlled by multiplying the component widths by these values.}
 
-\item{more_extreme}{Whether to return a column in the data frame consisting
-of the probabilities of sampling more extreme true
-observations than the simulated outliers.}
+\item{more_extreme}{Whether to return a column in the data frame consisting of the probabilities
+of sampling more extreme true observations than the simulated outliers.}
 }
 \value{
 \code{simulate_lcwm} returns a \code{data.frame} with continuous variables

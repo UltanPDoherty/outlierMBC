@@ -93,6 +93,8 @@ for each iteration.}
 \item{\code{distrib_diff_arr}}{Array of component-specific response and
 covariate dissimilarity values for each
 iteration.}
+\item{\code{distrib_diff_dual}}{Matrix of aggregated explanatory and response
+dissimilarity values for each iteration.}
 \item{\code{call}}{Arguments / parameter values used in this function call.}
 \item{\code{version}}{Version of \code{outlierMBC} used in this function call.}
 \item{\code{conv_status}}{Logical vector indicating which iterations' mixture

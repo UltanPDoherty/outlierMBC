@@ -7,11 +7,8 @@
 uniform_spans_lcwm(range_multipliers, covariates_g, errors_g)
 }
 \arguments{
-\item{range_multipliers}{For every explanatory variable, the sampling region
-The sampling region for the Uniform distribution
-used to simulate proposed outliers is
-controlled by multiplying the component widths by
-these values.}
+\item{range_multipliers}{The sampling region for the Uniform distribution used to simulate proposed
+outliers is controlled by multiplying the component widths by these values.}
 
 \item{covariates_g}{Covariate values of the sampled observations.}
 
