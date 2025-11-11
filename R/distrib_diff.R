@@ -299,7 +299,7 @@ distrib_diff_residual <- function(
   hat_g <- stats::hatvalues(mod_g)
 
   sqrt_weighted_rss_g <- sqrt(n_g) * weighted_rmse_g
-  sigma_hat_g <- sqrt_weighted_rss_g / sqrt(n_g)
+  sigma_hat_g <- sqrt_weighted_rss_g / sqrt(df_g)
 
   student_resids_g <- mod_g$residuals / (sigma_hat_g * sqrt(1 - hat_g))
   scsqst_res_g <- student_resids_g^2 / df_g
