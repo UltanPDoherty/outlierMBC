@@ -21,7 +21,6 @@ Roxygen: list(markdown = TRUE)
 Imports:
     ClusterR,
     dbscan,
-    flexCWM,
     ggplot2,
     mixture,
     mvtnorm,

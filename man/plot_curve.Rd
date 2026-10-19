@@ -7,15 +7,15 @@
 plot_curve(ombc_out)
 }
 \arguments{
-\item{ombc_out}{An \code{"outliermbc_gmm"} or \code{"outliermbc_lcwm"} object, i.e. an
-output from \code{ombc_gmm} or \code{ombc_lcwm}.}
+\item{ombc_out}{An \code{"outliermbc_gmm"} object, i.e. an
+output from \code{ombc_gmm}.}
 }
 \value{
 \code{plot_curve} returns a ggplot object showing the dissimilarity values as a
 curve and marking the minimum solution with a vertical line.
 }
 \description{
-Given the output from \link{ombc_gmm} or \link{ombc_lcwm}, this function extracts the
+Given the output from \link{ombc_gmm}, this function extracts the
 dissimilarity value associated with each outlier number and plots them as a
 curve. It also draws a vertical line at the outlier number which minimised
 the dissimilarity.
