@@ -77,7 +77,8 @@ plot.outliermbc_gmm <- function(x, backtrack = FALSE, ...) {
 #' @returns A ggplot
 #' @export
 print.outliermbc_gmm <- function(
-    x, backtrack = FALSE, max_total_rise = 0.1, max_step_rise = 0.05, ...) {
+  x, backtrack = FALSE, max_total_rise = 0.1, max_step_rise = 0.05, ...
+) {
   obs_num <- length(x$labels)
   max_out <- x$call$max_out
   gross_num <- sum(x$gross_outs)
@@ -188,6 +189,7 @@ plot.outliermbc_lcwm <- function(x, backtrack = FALSE, ...) {
 #' @returns A ggplot
 #' @export
 print.outliermbc_lcwm <- function(
-    x, backtrack = FALSE, max_total_rise = 0.1, max_step_rise = 0.05, ...) {
+  x, backtrack = FALSE, max_total_rise = 0.1, max_step_rise = 0.05, ...
+) {
   print.outliermbc_gmm(x, backtrack, max_total_rise, max_step_rise)
 }

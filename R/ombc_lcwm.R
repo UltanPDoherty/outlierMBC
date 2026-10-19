@@ -88,22 +88,23 @@
 #'   gross_outs = gross_lcwm_k3n1000o10$gross_bool
 #' )
 ombc_lcwm <- function(
-    xy,
-    x,
-    y_formula,
-    comp_num,
-    max_out,
-    gross_outs = rep(FALSE, nrow(x)),
-    init_scheme = c("update", "reinit", "reuse"),
-    mnames = "VVV",
-    nmax = 1000,
-    atol = 1e-8,
-    init_z = NULL,
-    init_method = c("hc", "kmpp"),
-    init_scaling = TRUE,
-    kmpp_seed = 123,
-    verbose = TRUE,
-    dd_weight = 0.5) {
+  xy,
+  x,
+  y_formula,
+  comp_num,
+  max_out,
+  gross_outs = rep(FALSE, nrow(x)),
+  init_scheme = c("update", "reinit", "reuse"),
+  mnames = "VVV",
+  nmax = 1000,
+  atol = 1e-8,
+  init_z = NULL,
+  init_method = c("hc", "kmpp"),
+  init_scaling = TRUE,
+  kmpp_seed = 123,
+  verbose = TRUE,
+  dd_weight = 0.5
+) {
   init_method <- match.arg(init_method)
   init_scheme <- match.arg(init_scheme)
   init_model <- NULL

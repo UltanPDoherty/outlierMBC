@@ -23,7 +23,8 @@
 #'   \item{`removal_dens`}{Value of the lowest mixture density.}
 #' }
 distrib_diff_gmm <- function(
-    x, z, prop, mu, sigma, logdet) {
+  x, z, prop, mu, sigma, logdet
+) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
 
@@ -79,11 +80,12 @@ distrib_diff_gmm <- function(
 #'                    observations with respect to this component.}
 #' }
 distrib_diff_mahalanobis <- function(
-    x,
-    z_g,
-    mu_g,
-    sigma_g,
-    logdet_g) {
+  x,
+  z_g,
+  mu_g,
+  sigma_g,
+  logdet_g
+) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
   stopifnot("A cluster has become too small (< 4 points).\n" = n_g > 3)
@@ -149,14 +151,15 @@ distrib_diff_mahalanobis <- function(
 #'                              dissimilarities.}
 #' }
 distrib_diff_lcwm <- function(
-    x,
-    z,
-    prop,
-    mu,
-    sigma,
-    mod_list,
-    weighted_rmse,
-    dd_weight = 0.5) {
+  x,
+  z,
+  prop,
+  mu,
+  sigma,
+  mod_list,
+  weighted_rmse,
+  dd_weight = 0.5
+) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
 
@@ -233,13 +236,14 @@ distrib_diff_lcwm <- function(
 #'   \item{`dens_y`}{Response density of all observations for this component.}
 #' }
 distrib_diff_lcwm_g <- function(
-    x,
-    z_g,
-    mu_g,
-    sigma_g,
-    mod_g,
-    weighted_rmse_g,
-    dd_weight = 0.5) {
+  x,
+  z_g,
+  mu_g,
+  sigma_g,
+  mod_g,
+  weighted_rmse_g,
+  dd_weight = 0.5
+) {
   dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
   diff_g_x <- dd_g_x$diff
   dens_g_x <- dd_g_x$dens
@@ -279,10 +283,11 @@ distrib_diff_lcwm_g <- function(
 #'   \item{`dens`}{Response density of all observations for this component.}
 #' }
 distrib_diff_residual <- function(
-    x,
-    z_g,
-    mod_g,
-    weighted_rmse_g) {
+  x,
+  z_g,
+  mod_g,
+  weighted_rmse_g
+) {
   # Let rss_zg = sqrt(sum(z_g * (mod_g$residuals^2)))
   # flexCWM uses y_sigma_g = rss_zg / sqrt(n_g)
   # stats::sigma uses rss_zg / sqrt(nrow(x) - 2))

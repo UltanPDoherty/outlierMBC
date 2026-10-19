@@ -28,12 +28,13 @@
 #'
 #' @export
 find_gross <- function(
-    x,
-    max_out,
-    multiplier = 3,
-    k_neighbours = floor(nrow(x) / 100),
-    manual_threshold = NULL,
-    scale = TRUE) {
+  x,
+  max_out,
+  multiplier = 3,
+  k_neighbours = floor(nrow(x) / 100),
+  manual_threshold = NULL,
+  scale = TRUE
+) {
   outlier_number <- seq_len(2 * max_out)
 
   if (scale) {

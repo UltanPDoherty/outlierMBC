@@ -61,15 +61,16 @@
 #'   col = gmm_k3n1000o10$G + 1, pch = gmm_k3n1000o10$G + 1
 #' )
 simulate_gmm <- function(
-    n,
-    mu,
-    sigma,
-    outlier_num,
-    seed = NULL,
-    crit_val = 0.9999,
-    range_multiplier = 1.5,
-    verbose = TRUE,
-    max_rejection = 1e6) {
+  n,
+  mu,
+  sigma,
+  outlier_num,
+  seed = NULL,
+  crit_val = 0.9999,
+  range_multiplier = 1.5,
+  verbose = TRUE,
+  max_rejection = 1e6
+) {
   var_num <- length(mu[[1]])
   comp_num <- length(n)
 

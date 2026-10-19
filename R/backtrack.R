@@ -85,7 +85,8 @@ backtrack <- function(x, max_total_rise = 0.1, max_step_rise = 0.05) {
 #'
 #' @export
 plot_backtrack <- function(
-    ombc_out, max_total_rise = 0.1, max_step_rise = 0.05) {
+  ombc_out, max_total_rise = 0.1, max_step_rise = 0.05
+) {
   gross_num <- sum(ombc_out$gross_outs)
   max_out <- max(ombc_out$outlier_rank) - 1
   minimum_num <- ombc_out$outlier_num
@@ -187,10 +188,11 @@ plot_backtrack <- function(
 #'
 #' backtrack_gmm(gmm_k3n1000o10[, 1:2], ombc_gmm_k3n1000o10)
 backtrack_gmm <- function(
-    x, ombc_out,
-    max_total_rise = 0.1, max_step_rise = 0.05,
-    init_model = NULL, init_z = NULL, manual_outlier_num = NULL,
-    verbose = TRUE) {
+  x, ombc_out,
+  max_total_rise = 0.1, max_step_rise = 0.05,
+  init_model = NULL, init_z = NULL, manual_outlier_num = NULL,
+  verbose = TRUE
+) {
   this_call <- call(
     "backtrack_gmm",
     "x" = substitute(x), "ombc_out" = substitute(ombc_out),
@@ -401,10 +403,11 @@ backtrack_gmm <- function(
 #'   ombc_lcwm_out = ombc_lcwm_k3n1000o10
 #' )
 backtrack_lcwm <- function(
-    xy, x, ombc_lcwm_out,
-    max_total_rise = 0.1, max_step_rise = 0.05,
-    init_z = NULL, manual_outlier_num = NULL,
-    verbose = TRUE) {
+  xy, x, ombc_lcwm_out,
+  max_total_rise = 0.1, max_step_rise = 0.05,
+  init_z = NULL, manual_outlier_num = NULL,
+  verbose = TRUE
+) {
   this_call <- call(
     "backtrack_lcwm",
     "xy" = substitute(xy), "x" = substitute(x),

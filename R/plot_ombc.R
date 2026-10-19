@@ -80,7 +80,8 @@ plot_curve <- function(ombc_out) {
 #'
 #' @export
 plot_selection <- function(
-    ombc_list, x_axis = c("comp_num", "outlier_num", "param_num")) {
+  ombc_list, x_axis = c("comp_num", "outlier_num", "param_num")
+) {
   x_axis <- match.arg(x_axis)
   x_label <- switch(x_axis,
     comp_num = "Number of Components",

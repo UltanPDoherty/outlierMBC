@@ -96,17 +96,18 @@
 #'   pch = lcwm_k3n1000o10$G + 1
 #' )
 simulate_lcwm <- function(
-    n,
-    mu,
-    sigma,
-    beta,
-    error_sd,
-    outlier_num,
-    outlier_type = c("x_and_y", "x_only", "y_only"),
-    seed = NULL,
-    prob_range = c(1e-8, 1e-6),
-    range_multipliers = c(3, 3),
-    more_extreme = FALSE) {
+  n,
+  mu,
+  sigma,
+  beta,
+  error_sd,
+  outlier_num,
+  outlier_type = c("x_and_y", "x_only", "y_only"),
+  seed = NULL,
+  prob_range = c(1e-8, 1e-6),
+  range_multipliers = c(3, 3),
+  more_extreme = FALSE
+) {
   outlier_type <- match.arg(outlier_type)
 
   var_num <- length(mu[[1]])
@@ -212,9 +213,10 @@ uniform_spans_lcwm <- function(range_multipliers, covariates_g, errors_g) {
 #' final element is the probability of sampling a more extreme Gaussian point
 #' from this outlier's associated component.
 uniform_outlier_ombc <- function(
-    outlier_type,
-    mu, sigma, beta, error_sd, g,
-    uniform_spans, prob_range) {
+  outlier_type,
+  mu, sigma, beta, error_sd, g,
+  uniform_spans, prob_range
+) {
   test <- FALSE
 
   while (!test) {
@@ -264,7 +266,8 @@ uniform_outlier_ombc <- function(
 #'   \item{`y`}{Response value.}
 #' }
 uniform_sample_lcwm <- function(
-    outlier_type, mu_g, sigma_g, beta_g, error_sd_g, uniform_spans_g) {
+  outlier_type, mu_g, sigma_g, beta_g, error_sd_g, uniform_spans_g
+) {
   var_num <- length(beta_g) - 1
 
   if (outlier_type == "y_only") {
@@ -312,9 +315,10 @@ uniform_sample_lcwm <- function(
 #' whether the new sample satisfies the outlier checks, and a numeric value
 #' giving the probability of sampling a more extreme point from component `g`.
 test_outlier_ombc <- function(
-    outlier_type,
-    mu, sigma, beta, error_sd,
-    x_sample, y_sample, prob_range, g) {
+  outlier_type,
+  mu, sigma, beta, error_sd,
+  x_sample, y_sample, prob_range, g
+) {
   comp_num <- length(mu)
   var_num <- length(mu[[1]])
 

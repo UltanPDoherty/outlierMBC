@@ -82,21 +82,22 @@
 #'
 #' plot_curve(ombc_gmm_k3n1000o10)
 ombc_gmm <- function(
-    x,
-    comp_num,
-    max_out,
-    gross_outs = rep(FALSE, nrow(x)),
-    init_scheme = c("update", "reinit", "reuse"),
-    mnames = "VVV",
-    nmax = 1000,
-    atol = 1e-8,
-    init_z = NULL,
-    init_model = NULL,
-    init_method = c("hc", "kmpp"),
-    init_scaling = FALSE,
-    kmpp_seed = 123,
-    fixed_labels = NULL,
-    verbose = TRUE) {
+  x,
+  comp_num,
+  max_out,
+  gross_outs = rep(FALSE, nrow(x)),
+  init_scheme = c("update", "reinit", "reuse"),
+  mnames = "VVV",
+  nmax = 1000,
+  atol = 1e-8,
+  init_z = NULL,
+  init_model = NULL,
+  init_method = c("hc", "kmpp"),
+  init_scaling = FALSE,
+  kmpp_seed = 123,
+  fixed_labels = NULL,
+  verbose = TRUE
+) {
   init_method <- match.arg(init_method)
   init_scheme <- match.arg(init_scheme)
 
@@ -269,9 +270,10 @@ ombc_gmm <- function(
 #'
 #' @returns A component assignment matrix for initialisation.
 get_init_z <- function(
-    comp_num,
-    dist_mat = NULL, x = NULL,
-    init_method = c("hc", "kmpp"), kmpp_seed = NULL) {
+  comp_num,
+  dist_mat = NULL, x = NULL,
+  init_method = c("hc", "kmpp"), kmpp_seed = NULL
+) {
   init_method <- match.arg(init_method)
 
   if (init_method == "hc") {
