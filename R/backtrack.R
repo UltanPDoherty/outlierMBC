@@ -377,8 +377,7 @@ backtrack_gmm <- function(
 #'   \item{`outlier_bool`}{Logical vector indicating if an observation has been
 #'                         classified as an outlier.}
 #'   \item{`outlier_num`}{Number of observations classified as outliers.}
-#'   \item{`lcwm`}{Output from flexCWM::cwm fitted to the non-outlier
-#'                 observations.}
+#'   \item{`lcwm`}{Output from `cwm` fitted to the non-outlier observations.}
 #'   \item{`call`}{Arguments / parameter values used in this function call.}
 #' }
 #'
@@ -509,7 +508,7 @@ backtrack_lcwm <- function(
     short_outlier_bool <- outlier_bool[!ombc_lcwm_out$gross_outs]
     z <- z0[!short_outlier_bool, !short_outlier_bool]
 
-    invisible(utils::capture.output(lcwm <- flexCWM::cwm(
+    invisible(utils::capture.output(lcwm <- cwm(
       formulaY = ombc_lcwm_out$call$y_formula,
       familyY = stats::gaussian(link = "identity"),
       data = xy0[!outlier_bool, , drop = FALSE],
@@ -531,7 +530,7 @@ backtrack_lcwm <- function(
 
       removals <- c()
       for (i in seq(gross_num, outlier_num)) {
-        invisible(utils::capture.output(lcwm <- flexCWM::cwm(
+        invisible(utils::capture.output(lcwm <- cwm(
           formulaY = ombc_lcwm_out$call$y_formula,
           familyY = stats::gaussian(link = "identity"),
           data = xy,
@@ -559,7 +558,7 @@ backtrack_lcwm <- function(
         }
       }
     } else {
-      invisible(utils::capture.output(lcwm <- flexCWM::cwm(
+      invisible(utils::capture.output(lcwm <- cwm(
         formulaY = ombc_lcwm_out$call$y_formula,
         familyY = stats::gaussian(link = "identity"),
         data = xy,

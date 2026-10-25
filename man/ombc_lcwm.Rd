@@ -41,9 +41,9 @@ ombc_lcwm(
 
 \item{mnames}{Model names for mixture::gpcm.}
 
-\item{nmax}{Maximum number of iterations for \code{flexCWM::cwm}.}
+\item{nmax}{Maximum number of iterations for \code{cwm}.}
 
-\item{atol}{EM convergence threshold for \code{flexCWM::cwm}.}
+\item{atol}{EM convergence threshold for \code{cwm}.}
 
 \item{init_z}{Initial component assignment probability matrix.}
 
@@ -80,8 +80,7 @@ Observations that were ever removed have rank \code{0}.}
 \item{\code{gross_outs}}{Logical vector identifying the gross outliers. This is
 identical to the \code{gross_outs} vector passed to this
 function as an argument / input.}
-\item{\code{lcwm}}{Output from \code{flexCWM::cwm} fitted to the non-outlier
-observations.}
+\item{\code{lcwm}}{Output from \code{cwm} fitted to the non-outlier observations.}
 \item{\code{loglike}}{Vector of log-likelihood values for each iteration.}
 \item{\code{removal_dens}}{Vector of mixture densities for the removed
 observations. These are the lowest mixture densities

@@ -42,8 +42,7 @@ global minimum dissimilarity, from each backward step.}
 \item{\code{outlier_bool}}{Logical vector indicating if an observation has been
 classified as an outlier.}
 \item{\code{outlier_num}}{Number of observations classified as outliers.}
-\item{\code{lcwm}}{Output from flexCWM::cwm fitted to the non-outlier
-observations.}
+\item{\code{lcwm}}{Output from \code{cwm} fitted to the non-outlier observations.}
 \item{\code{call}}{Arguments / parameter values used in this function call.}
 }
 }

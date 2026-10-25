@@ -21,12 +21,13 @@ Roxygen: list(markdown = TRUE)
 Imports:
     ClusterR,
     dbscan,
-    flexCWM,
     ggplot2,
     mixture,
     mvtnorm,
     spatstat.univar,
-    stats
+    stats,
+    mclust,
+    ContaminatedMixt
 Depends:
     R (>= 4.1.0)
 LazyData: true

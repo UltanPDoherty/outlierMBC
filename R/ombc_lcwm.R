@@ -26,8 +26,8 @@
 #' @param xy `data.frame` containing covariates and response.
 #' @param x Covariate data only.
 #' @param y_formula Regression formula.
-#' @param nmax Maximum number of iterations for `flexCWM::cwm`.
-#' @param atol EM convergence threshold for `flexCWM::cwm`.
+#' @param nmax Maximum number of iterations for `cwm`.
+#' @param atol EM convergence threshold for `cwm`.
 #' @param dd_weight A value between `0` and `1` which controls the weighting of
 #'                  the response and covariate dissimilarities when aggregating.
 #'
@@ -52,8 +52,7 @@
 #'   \item{`gross_outs`}{Logical vector identifying the gross outliers. This is
 #'                       identical to the `gross_outs` vector passed to this
 #'                       function as an argument / input.}
-#'   \item{`lcwm`}{Output from `flexCWM::cwm` fitted to the non-outlier
-#'                 observations.}
+#'   \item{`lcwm`}{Output from `cwm` fitted to the non-outlier observations.}
 #'   \item{`loglike`}{Vector of log-likelihood values for each iteration.}
 #'   \item{`removal_dens`}{Vector of mixture densities for the removed
 #'                         observations. These are the lowest mixture densities
@@ -167,7 +166,7 @@ ombc_lcwm <- function(
   outlier_rank_temp <- rep(0, obs_num - gross_num)
   for (i in seq_len(max_out + 1)) {
     if (init_scheme %in% c("update", "reuse")) {
-      suppressWarnings(invisible(utils::capture.output(lcwm <- flexCWM::cwm(
+      suppressWarnings(invisible(utils::capture.output(lcwm <- cwm(
         formulaY = y_formula,
         familyY = stats::gaussian(link = "identity"),
         data = xy,
@@ -184,7 +183,7 @@ ombc_lcwm <- function(
         comp_num = comp_num, dist_mat = dist_mat, x = xy,
         init_method = init_method, kmpp_seed = kmpp_seed
       )
-      suppressWarnings(invisible(utils::capture.output(lcwm <- flexCWM::cwm(
+      suppressWarnings(invisible(utils::capture.output(lcwm <- cwm(
         formulaY = y_formula,
         familyY = stats::gaussian(link = "identity"),
         data = xy,
@@ -267,7 +266,7 @@ ombc_lcwm <- function(
 
   outlier_bool <- outlier_rank <= outlier_num & outlier_rank != 0
 
-  invisible(utils::capture.output(lcwm <- flexCWM::cwm(
+  invisible(utils::capture.output(lcwm <- cwm(
     formulaY = y_formula,
     familyY = stats::gaussian(link = "identity"),
     data = xy0[!outlier_bool, , drop = FALSE],
