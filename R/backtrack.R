@@ -492,16 +492,16 @@ backtrack_lcwm <- function(
       kmpp_seed = ombc_lcwm_out$call$kmpp_seed
     )
 
-    invisible(utils::capture.output(lcwm <- flexCWM::cwm(
-      formulaY = ombc_lcwm_out$call$y_formula,
-      familyY = stats::gaussian(link = "identity"),
+    invisible(utils::capture.output(lcwm <- cwm(
+      formula_y = ombc_lcwm_out$call$y_formula,
+      family_y = stats::gaussian(link = "identity"),
       data = xy0[!outlier_bool, , drop = FALSE],
-      Xnorm = x0[!outlier_bool, , drop = FALSE],
-      modelXnorm = ombc_lcwm_out$call$mnames,
+      x_norm = x0[!outlier_bool, , drop = FALSE],
+      model_x_norm = ombc_lcwm_out$call$mnames,
       k = ombc_lcwm_out$call$comp_num,
       initialization = "manual",
-      start.z = z,
-      iter.max = ombc_lcwm_out$call$nmax,
+      start_z = z,
+      iter_max = ombc_lcwm_out$call$nmax,
       threshold = ombc_lcwm_out$call$atol
     )))
   } else if (init_scheme == "reuse") {
@@ -509,15 +509,15 @@ backtrack_lcwm <- function(
     z <- z0[!short_outlier_bool, !short_outlier_bool]
 
     invisible(utils::capture.output(lcwm <- cwm(
-      formulaY = ombc_lcwm_out$call$y_formula,
-      familyY = stats::gaussian(link = "identity"),
+      formula_y = ombc_lcwm_out$call$y_formula,
+      family_y = stats::gaussian(link = "identity"),
       data = xy0[!outlier_bool, , drop = FALSE],
-      Xnorm = x0[!outlier_bool, , drop = FALSE],
-      modelXnorm = ombc_lcwm_out$call$mnames,
+      x_norm = x0[!outlier_bool, , drop = FALSE],
+      model_x_norm = ombc_lcwm_out$call$mnames,
       k = ombc_lcwm_out$call$comp_num,
       initialization = "manual",
-      start.z = z,
-      iter.max = ombc_lcwm_out$call$nmax,
+      start_z = z,
+      iter_max = ombc_lcwm_out$call$nmax,
       threshold = ombc_lcwm_out$call$atol
     )))
   } else {
@@ -531,15 +531,15 @@ backtrack_lcwm <- function(
       removals <- c()
       for (i in seq(gross_num, outlier_num)) {
         invisible(utils::capture.output(lcwm <- cwm(
-          formulaY = ombc_lcwm_out$call$y_formula,
-          familyY = stats::gaussian(link = "identity"),
+          formula_y = ombc_lcwm_out$call$y_formula,
+          family_y = stats::gaussian(link = "identity"),
           data = xy,
-          Xnorm = x,
-          modelXnorm = ombc_lcwm_out$call$mnames,
+          x_norm = x,
+          model_x_norm = ombc_lcwm_out$call$mnames,
           k = ombc_lcwm_out$call$comp_num,
           initialization = "manual",
-          start.z = z,
-          iter.max = ombc_lcwm_out$call$nmax,
+          start_z = z,
+          iter_max = ombc_lcwm_out$call$nmax,
           threshold = ombc_lcwm_out$call$atol
         )))
 
@@ -559,15 +559,15 @@ backtrack_lcwm <- function(
       }
     } else {
       invisible(utils::capture.output(lcwm <- cwm(
-        formulaY = ombc_lcwm_out$call$y_formula,
-        familyY = stats::gaussian(link = "identity"),
+        formula_y = ombc_lcwm_out$call$y_formula,
+        family_y = stats::gaussian(link = "identity"),
         data = xy,
-        Xnorm = x,
-        modelXnorm = ombc_lcwm_out$call$mnames,
+        x_norm = x,
+        model_x_norm = ombc_lcwm_out$call$mnames,
         k = ombc_lcwm_out$call$comp_num,
         initialization = "manual",
-        start.z = z,
-        iter.max = ombc_lcwm_out$call$nmax,
+        start_z = z,
+        iter_max = ombc_lcwm_out$call$nmax,
         threshold = ombc_lcwm_out$call$atol
       )))
     }

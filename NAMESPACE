@@ -18,3 +18,18 @@ export(plot_lcwm_dual)
 export(plot_selection)
 export(simulate_gmm)
 export(simulate_lcwm)
+importFrom(mclust,
+  mstepE,
+  mstepEEE,
+  mstepEEI,
+  mstepEII,
+  mstepEVE,
+  mstepEVI,
+  mstepEVV,
+  mstepV,
+  mstepVEI,
+  mstepVEV,
+  mstepVII,
+  mstepVVI,
+  mstepVVV
+)
