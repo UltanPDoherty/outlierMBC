@@ -27,8 +27,7 @@ Imports:
     spatstat.univar,
     stats,
     mclust,
-    ContaminatedMixt,
-    statmod
+    ContaminatedMixt
 Depends:
     R (>= 4.1.0)
 LazyData: true

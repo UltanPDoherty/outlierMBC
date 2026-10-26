@@ -6,14 +6,9 @@
 \usage{
 cwm(
   formula_y = NULL,
-  family_y = stats::gaussian,
   data = NULL,
   x_norm = NULL,
-  x_binom = NULL,
-  x_poiss = NULL,
-  x_multinom = NULL,
   model_x_norm = NULL,
-  x_binom_trials = NULL,
   k = 1:3,
   initialization = c("random.soft", "random.hard", "kmeans", "mclust", "manual"),
   start_z = NULL,
@@ -31,37 +26,13 @@ cwm(
 one that can be coerced to that class): a symbolic description of the
 model to be fitted.}
 
-\item{family_y}{a description of the error distribution and link function to be used for the
-conditional distribution of \eqn{y} in each mixture component. This can be a
-character string naming a \code{\link[stats:family]{family function}}, a
-family function or the result of a call to a family function.
-The following family functions are supported:
-\itemize{
-\item \code{binomial(link = "logit")}
-\item \code{gaussian(link = "identity")}
-\item \code{gamma(link = "log")}
-\item \code{inverse_gaussian(link = "1/mu^2")}
-\item \code{poisson(link = "log")}
-\item \code{student_t(link = "identity")}
-}
-Default value is \code{gaussian(link = "identity")}.}
-
 \item{data}{an optional \code{\link[base:data.frame]{data.frame}},
 \code{\link[base:list]{list}}, or
 \code{\link[base:environment]{environment}} with the variables needed to
 use \code{formula_y}.}
 
 \item{x_norm}{an optional matrix containing variables to be used for marginalization
-having normal, binomial, Poisson and multinomial distributions.}
-
-\item{x_binom}{an optional matrix containing variables to be used for marginalization
-having normal, binomial, Poisson and multinomial distributions.}
-
-\item{x_poiss}{an optional matrix containing variables to be used for marginalization
-having normal, binomial, Poisson and multinomial distributions.}
-
-\item{x_multinom}{an optional matrix containing variables to be used for marginalization
-having normal, binomial, Poisson and multinomial distributions.}
+having normal distributions.}
 
 \item{model_x_norm}{an optional vector of character strings indicating the parsimonious
 models to be fitted for variables in \code{x_norm}. The default is
@@ -69,10 +40,6 @@ models to be fitted for variables in \code{x_norm}. The default is
 \code{c("EII", "VII", "EEI", "VEI", "EVI", "VVI", "EEE", "VEE", "EVE",
 "EEV", "VVE", "VEV", "EVV", "VVV")} for multivariate continuous
 covariates (see \code{\link[mixture:gpcm]{mixture:gpcm} for details}).}
-
-\item{x_binom_trials}{an optional vector containing the number of trials for each column in
-\code{x_binom}. If omitted, the maximum of each column in \code{x_binom} is
-used.}
 
 \item{k}{an optional vector containing the numbers of mixture components to be tried.
 Default value is \code{1:3}.}
@@ -123,17 +90,12 @@ related to the model selected. It contains:
 \item{formula_y}{
 an object of class \code{\link[stats:formula]{formula}} containing a
 symbolic description of the model fitted.}
-\item{family_y}{
-the distribution used for the conditional distribution of \eqn{y} in each
-mixture component.}
 \item{data}{
 a \code{\link[base:data.frame]{data.frame}} with the variables needed to
 use \code{formula_y}.}
 \item{concomitant}{
-a list containing \code{x_norm}, \code{x_binom}, \code{x_poiss},
-\code{x_multinom}.
+a list containing \code{x_norm}
 }
-\item{\code{x_binom_trials}}{number of trials used for \code{x_binom}.}
 \item{models}{
 a list; each element is related to one of the models fitted. Each element
 is a list and contains:
@@ -149,60 +111,34 @@ is a list and contains:
 \item{\code{prior} weights for the mixture components}
 \item{\code{ic} list containing values of the information criteria }
 \item{\code{converged} logical; \code{TRUE} if EM algorithm converged}
-}
-\item{\code{GLModels}}{
+\item{\code{gl_model}
 a list;  each element is related to a mixture component and contains:
 }
 \itemize{
 \item{\code{model} a "\code{\link[stats:glm]{glm}}" class object.}
 \item{
-\code{sigma} estimated local scale parameters of the conditional
-distribution of \eqn{y}, when \code{family_y} is \code{gaussian} or
-\code{student_t}
-}
-\item{
-\code{t_df} estimated degrees of freedom of the t distribution, when
-\code{family_y} is \code{student_t}
-}
-\item{
-\code{nu_y} estimated shape parameter, when \code{family_y} is
-\code{gamma}. The gamma distribution is parameterized according to
-McCullagh & Nelder (1989, p. 30)
-}
-\item{
 \code{concomitant} a list with estimated concomitant variables
 parameters for each mixture component
 }
-\item{
-\code{normal.d, multinomial.d, poisson.d, binomial.d} marginal
-distribution of concomitant variables
-}
+\item{\code{normal.d} marginal distribution of concomitant variables}
 \item{\code{normal.mu} mixture component means for \code{x_norm}}
 \item{
 \code{normal.sigma} mixture component covariance matrices for
 \code{x_norm}
 }
-\item{\code{normal.model} models fitted for \code{x_norm} }
-\item{
-\code{multinomial.probs} multinomial distribution probabilities for
-\code{x_multinom}
+\item{\code{normal.model} models fitted for \code{x_norm}}
 }
-\item{\code{poisson.lambda} lambda parameters for \code{x_poiss}}
-\item{\code{binomial.p} binomial probabilities for \code{x_binom}}
 }
 }
 \description{
 Maximum likelihood fitting of the cluster-weighted model by the EM algorithm.
 }
 \details{
-When \code{family_y = binomial}, the response variable must be a matrix with
-two columns, where the first column is the number of "successes" and the
-second column is the number of "failures". When several models have been
-estimated, methods \code{summary} and \code{print} consider the best model
-according to the information criterion in \code{criterion}, among the
-estimated models having a number of components among those in \code{k} an
-error distribution among those in \code{family_y} and a parsimonious model
-among those in \code{model_x_norm}.
+When several models have been estimated, methods \code{summary} and
+\code{print} consider the best model according to the information criterion
+in \code{criterion}, among the estimated models having a number of components
+among those in \code{k} an error distribution among those in \code{family_y}
+and a parsimonious model among those in \code{model_x_norm}.
 }
 \references{
 {

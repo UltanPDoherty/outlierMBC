@@ -168,7 +168,6 @@ ombc_lcwm <- function(
     if (init_scheme %in% c("update", "reuse")) {
       suppressWarnings(invisible(utils::capture.output(lcwm <- cwm(
         formula_y = y_formula,
-        family_y = stats::gaussian(link = "identity"),
         data = xy,
         x_norm = x,
         model_x_norm = mnames,
@@ -185,7 +184,6 @@ ombc_lcwm <- function(
       )
       suppressWarnings(invisible(utils::capture.output(lcwm <- cwm(
         formula_y = y_formula,
-        family_y = stats::gaussian(link = "identity"),
         data = xy,
         x_norm = x,
         model_x_norm = mnames,
@@ -268,7 +266,6 @@ ombc_lcwm <- function(
 
   invisible(utils::capture.output(lcwm <- cwm(
     formula_y = y_formula,
-    family_y = stats::gaussian(link = "identity"),
     data = xy0[!outlier_bool, , drop = FALSE],
     x_norm = x0[!outlier_bool, , drop = FALSE],
     model_x_norm = mnames,
