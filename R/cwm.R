@@ -41,13 +41,6 @@
 #' @param eps
 #'  an optional scalar. It sets the smallest value for eigenvalues of covariance
 #'  matrices for \code{x_norm}. Default value is 1e-100.
-#' @param parallel
-#'  When \code{TRUE}, the package
-#'  \code{\link[parallel:parallel-package]{parallel}} is used for parallel
-#'  computation. When several models are estimated, computational time is
-#'  reduced. The number of cores to use may be set with the global option
-#'  \code{cl.cores}; default value is detected using
-#'  \code{\link[parallel:detectCores]{detectCores()}}.
 #' @param pwarning When \code{TRUE}, warnings are printed.
 #'
 #' @details
@@ -144,7 +137,6 @@ cwm <- function(
   iter_max = 1000,
   threshold = 1.0e-04,
   eps = 1.0e-100,
-  parallel = FALSE,
   pwarning = FALSE
 ) {
   # Preliminary checks and init ----------------------------------------------
@@ -244,31 +236,15 @@ cwm <- function(
       formula_y = formula_y, data = data, y = y,
       x_norm = x_norm, n = n, col_x_n = col_x_n, x_mod = x_mod,
       k = mm$k[i], model_x_norm = mm$model_x_norm[i],
-      family_y = family_y[[mm$family_y[i]]], method = "Nelder-Mead",
+      family_y = family_y[[mm$family_y[i]]],
       start_z = start_z, iter_max = iter_max, threshold = threshold,
       eps = eps, pwarning = pwarning
     )
   }
-  if (parallel) {
-    cores <- getOption("cl.cores", parallel::detectCores())
-    cat(paste("Using", cores, "cores\n"))
-    cl <- parallel::makeCluster(
-      cores,
-      outfile = file.path(tempdir(), "temp.out")
-    )
-    if (!is.null(seed)) parallel::clusterSetRNGStream(cl = cl, iseed = seed)
-    par <- parallel::parLapply(cl = cl, seq_len(nrow(mm)), function(i) {
-      foo <- job(i)
-      gc()
-      foo
-    })
-    parallel::stopCluster(cl)
-  } else {
-    if (!is.null(seed)) {
-      set.seed(seed)
-    }
-    par <- lapply(seq_len(nrow(mm)), function(i) job(i))
+  if (!is.null(seed)) {
+    set.seed(seed)
   }
+  par <- lapply(seq_len(nrow(mm)), function(i) job(i))
 
   cat("\n")
   res <- structure(list(
@@ -297,7 +273,7 @@ as_df <- function(ma, type) {
 cwm2 <- function(
   formula_y, data, y, x_norm, col_x_n,
   n, x_mod, k, model_x_norm, family_y,
-  method, start_z, iter_max, threshold, loglikplot,
+  start_z, iter_max, threshold,
   eps, pwarning
 ) {
   # Parameters definition ------------------------------------------------------
@@ -335,7 +311,7 @@ cwm2 <- function(
             ".family_y_gaussian",
             list(
               family_y = family_y, k = k, y = y, m_y = m_y, n = n,
-              data = data, z = z, method = method, formula_y = formula_y
+              data = data, z = z, formula_y = formula_y
             )
           )
         } else {

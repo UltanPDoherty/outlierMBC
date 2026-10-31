@@ -15,7 +15,6 @@ cwm(
   iter_max = 1000,
   threshold = 1e-04,
   eps = 1e-100,
-  parallel = FALSE,
   pwarning = FALSE
 )
 }
@@ -57,13 +56,6 @@ procedure. Default value is 1.0e-04.}
 
 \item{eps}{an optional scalar. It sets the smallest value for eigenvalues of covariance
 matrices for \code{x_norm}. Default value is 1e-100.}
-
-\item{parallel}{When \code{TRUE}, the package
-\code{\link[parallel:parallel-package]{parallel}} is used for parallel
-computation. When several models are estimated, computational time is
-reduced. The number of cores to use may be set with the global option
-\code{cl.cores}; default value is detected using
-\code{\link[parallel:detectCores]{detectCores()}}.}
 
 \item{pwarning}{When \code{TRUE}, warnings are printed.}
 }
