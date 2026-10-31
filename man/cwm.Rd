@@ -10,10 +10,8 @@ cwm(
   x_norm = NULL,
   model_x_norm = NULL,
   k = 1:3,
-  initialization = c("random.soft", "random.hard", "kmeans", "mclust", "manual"),
   start_z = NULL,
   seed = NULL,
-  max_init = 1,
   iter_max = 1000,
   threshold = 1e-04,
   eps = 1e-100,
@@ -44,26 +42,12 @@ covariates (see \code{\link[mixture:gpcm]{mixture:gpcm} for details}).}
 \item{k}{an optional vector containing the numbers of mixture components to be tried.
 Default value is \code{1:3}.}
 
-\item{initialization}{an optional character string. It sets the initialization strategy for the
-EM-algorithm. It can be:
-\itemize{
-\item \code{"random.soft"}
-\item \code{"random.hard"}
-\item \code{"kmeans"}
-\item \code{"mclust"}
-\item \code{"manual"}
-}
-Default value is \code{"random.soft"}.}
-
-\item{start_z}{matrix of soft or hard classification: it is used only if
-\code{initialization = "manual"}. Only models with the same number of
+\item{start_z}{matrix of soft or hard classification. Only models with the same number of
 mixture components as the columns of this matrix will be fit.}
 
 \item{seed}{an optional scalar. It sets the seed for the random number generator, when
 random initializations are used; if \code{NULL}, current seed is not
 changed. Default value is \code{NULL}.}
-
-\item{max_init}{number of initializations to be tried. Default value is 1.}
 
 \item{iter_max}{an optional scalar. It sets the maximum number of iterations in the
 EM-algorithm. Default value is 200.}

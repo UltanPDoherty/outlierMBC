@@ -498,7 +498,6 @@ backtrack_lcwm <- function(
       x_norm = x0[!outlier_bool, , drop = FALSE],
       model_x_norm = ombc_lcwm_out$call$mnames,
       k = ombc_lcwm_out$call$comp_num,
-      initialization = "manual",
       start_z = z,
       iter_max = ombc_lcwm_out$call$nmax,
       threshold = ombc_lcwm_out$call$atol
@@ -513,7 +512,6 @@ backtrack_lcwm <- function(
       x_norm = x0[!outlier_bool, , drop = FALSE],
       model_x_norm = ombc_lcwm_out$call$mnames,
       k = ombc_lcwm_out$call$comp_num,
-      initialization = "manual",
       start_z = z,
       iter_max = ombc_lcwm_out$call$nmax,
       threshold = ombc_lcwm_out$call$atol
@@ -534,7 +532,6 @@ backtrack_lcwm <- function(
           x_norm = x,
           model_x_norm = ombc_lcwm_out$call$mnames,
           k = ombc_lcwm_out$call$comp_num,
-          initialization = "manual",
           start_z = z,
           iter_max = ombc_lcwm_out$call$nmax,
           threshold = ombc_lcwm_out$call$atol
@@ -561,7 +558,6 @@ backtrack_lcwm <- function(
         x_norm = x,
         model_x_norm = ombc_lcwm_out$call$mnames,
         k = ombc_lcwm_out$call$comp_num,
-        initialization = "manual",
         start_z = z,
         iter_max = ombc_lcwm_out$call$nmax,
         threshold = ombc_lcwm_out$call$atol

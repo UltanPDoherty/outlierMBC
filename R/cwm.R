@@ -25,26 +25,13 @@
 #' @param k
 #'  an optional vector containing the numbers of mixture components to be tried.
 #'  Default value is \code{1:3}.
-#' @param initialization
-#'  an optional character string. It sets the initialization strategy for the
-#'  EM-algorithm. It can be:
-#'  \itemize{
-#'    \item \code{"random.soft"}
-#'    \item \code{"random.hard"}
-#'    \item \code{"kmeans"}
-#'    \item \code{"mclust"}
-#'    \item \code{"manual"}
-#'  }
-#'  Default value is \code{"random.soft"}.
 #' @param start_z
-#'  matrix of soft or hard classification: it is used only if
-#'  \code{initialization = "manual"}. Only models with the same number of
+#'  matrix of soft or hard classification. Only models with the same number of
 #'  mixture components as the columns of this matrix will be fit.
 #' @param seed
 #'  an optional scalar. It sets the seed for the random number generator, when
 #'  random initializations are used; if \code{NULL}, current seed is not
 #'  changed. Default value is \code{NULL}.
-#' @param max_init number of initializations to be tried. Default value is 1.
 #' @param iter_max
 #'  an optional scalar. It sets the maximum number of iterations in the
 #'  EM-algorithm. Default value is 200.
@@ -152,12 +139,8 @@ cwm <- function(
   x_norm = NULL,
   model_x_norm = NULL,
   k = 1:3,
-  initialization = c(
-    "random.soft", "random.hard", "kmeans", "mclust", "manual"
-  ),
   start_z = NULL,
   seed = NULL,
-  max_init = 1,
   iter_max = 1000,
   threshold = 1.0e-04,
   eps = 1.0e-100,
@@ -169,7 +152,6 @@ cwm <- function(
     stop("No data were entered.")
   }
 
-  initialization <- match.arg(initialization)
   lm <- list(k = k)
   # Get regression terms ----------------------------------------
   if (!is.null(formula_y)) {
@@ -201,16 +183,6 @@ cwm <- function(
   }
 
   # More checks ------------------------------------------
-  if (
-    (initialization == "mclust" || initialization == "kmeans") &&
-      is.null(x_norm) && is.null(data)
-  ) {
-    stop(paste0(
-      "when initialization is '", initialization, "', numeric variables are
-      needed."
-    ))
-  }
-
   if (col_x_n > 0) {
     if (col_x_n == 1) {
       model_x_norm_names <- c("E", "V")
@@ -271,12 +243,10 @@ cwm <- function(
       x_norm = x_norm, n = n, col_x_n = col_x_n, x_mod = x_mod,
       k = mm$k[i], model_x_norm = mm$model_x_norm[i],
       family_y = family_y[[mm$family_y[i]]], method = "Nelder-Mead",
-      initialization = initialization,
       start_z = start_z, iter_max = iter_max, threshold = threshold,
-      max_init = max_init, eps = eps, pwarning = pwarning
+      eps = eps, pwarning = pwarning
     )
   }
-  start_z <- start_z
   if (parallel) {
     cores <- getOption("cl.cores", parallel::detectCores())
     cat(paste("Using", cores, "cores\n"))
@@ -311,7 +281,9 @@ cwm <- function(
 as_df <- function(ma, type) {
   if (!is.null(ma)) {
     df <- data.frame(ma)
-    for (i in seq_len(ncol(ma))) attr(df[[i]], "type") <- type
+    for (i in seq_len(ncol(ma))) {
+      attr(df[[i]], "type") <- type
+    }
     df
   } else {
     NULL
@@ -321,196 +293,181 @@ as_df <- function(ma, type) {
 cwm2 <- function(
   formula_y, data, y, x_norm, col_x_n,
   n, x_mod, k, model_x_norm, family_y,
-  method, initialization, start_z, iter_max, threshold, loglikplot,
-  max_init, eps, pwarning
+  method, start_z, iter_max, threshold, loglikplot,
+  eps, pwarning
 ) {
-  if (initialization == "manual" || initialization == "mclust") {
-    max_init <- 1
-  }
-
   # Parameters definition ------------------------------------------------------
   prior <- numeric(k) # weights
 
   if (!is.null(data)) {
     m_y <- rep(1, nrow(y))
   }
-  result <- list()
   # Do Estimation --------------------------------------------------------------
-  for (r in 1:max_init) {
-    a <- try(
-      {
-        if (max_init > 1) cat(paste("\nrandom init.", r))
-        z <- .post_init(
-          initialization = initialization, y = y,
-          x_norm = x_norm, n = n, k = k,
-          start_z = start_z
+  a <- try(
+    {
+      z <- (start_z + 0.0001) / rowSums(start_z + 0.0001)
+
+      # EM algorithm --------------------------------------------------
+      # Preliminary definition of convergence criterions
+      check <- 0
+      iteration <- 1
+      loglik <- NULL
+      aloglik <- c(0, 0)
+      a <- c(0, 0)
+
+      while (check < 1) {
+        # M-step --------------------------------------------------
+        # Weights #
+        prior <- colMeans(z)
+        # Posterior probabilities
+        norm <- .p_x_norm(
+          col_x_n = col_x_n, x_norm = x_norm, model_x_norm = model_x_norm,
+          z = z, k = k, n = n, eps = eps
         )
 
-        # EM algorithm --------------------------------------------------
-        # Preliminary definition of convergence criterions
-        check <- 0
-        iteration <- 1
-        loglik <- NULL
-        aloglik <- c(0, 0)
-        a <- c(0, 0)
-
-        while (check < 1) {
-          # M-step --------------------------------------------------
-          # Weights #
-          prior <- colMeans(z)
-          # Posterior probabilities
-          norm <- .p_x_norm(
-            col_x_n = col_x_n, x_norm = x_norm, model_x_norm = model_x_norm,
-            z = z, k = k, n = n, eps = eps
-          )
-
-          # Y|x pag 45 of McCullag & Nelder (1989) -----------------------------
-          if (!is.null(data)) {
-            l <- do.call(
-              ".family_y_gaussian",
-              list(
-                family_y = family_y, k = k, y = y, m_y = m_y, n = n,
-                data = data, z = z, method = method, formula_y = formula_y
-              )
+        # Y|x pag 45 of McCullag & Nelder (1989) -----------------------------
+        if (!is.null(data)) {
+          l <- do.call(
+            ".family_y_gaussian",
+            list(
+              family_y = family_y, k = k, y = y, m_y = m_y, n = n,
+              data = data, z = z, method = method, formula_y = formula_y
             )
-          } else {
-            l <- list(p_y = 1)
-          }
-          # Global - Observed-data log-likelihood ##
-          dens <- matrix(rep(prior, n), n, k, byrow = TRUE) * norm$p_x * l$p_y
-          loglik[iteration] <- sum(log(rowSums(dens)))
+          )
+        } else {
+          l <- list(p_y = 1)
+        }
+        # Global - Observed-data log-likelihood ##
+        dens <- matrix(rep(prior, n), n, k, byrow = TRUE) * norm$p_x * l$p_y
+        loglik[iteration] <- sum(log(rowSums(dens)))
 
-          # Aitkane's Acceleration-Based Stopping Criterion # #
-          if (iteration > 2 & k > 1) {
-            if (
-              !is.na(loglik[iteration - 1] - loglik[iteration - 2]) &&
-                !is.na(loglik[iteration])
-            ) {
-              if (abs(loglik[iteration - 1] - loglik[iteration - 2]) > 0) {
-                loglik_diff01 <- loglik[iteration] - loglik[iteration - 1]
-                loglik_diff12 <- loglik[iteration - 1] - loglik[iteration - 2]
-                a[iteration - 1] <- loglik_diff01 / loglik_diff12
-                aloglik[iteration] <- loglik[iteration - 1] +
-                  (1 / (1 - a[iteration - 1]) * loglik_diff01)
-                if (abs(aloglik[iteration] - loglik[iteration]) < threshold) {
-                  check <- 1
-                }
-              } else {
+        # Aitkane's Acceleration-Based Stopping Criterion # #
+        if (iteration > 2 & k > 1) {
+          if (
+            !is.na(loglik[iteration - 1] - loglik[iteration - 2]) &&
+              !is.na(loglik[iteration])
+          ) {
+            if (abs(loglik[iteration - 1] - loglik[iteration - 2]) > 0) {
+              loglik_diff01 <- loglik[iteration] - loglik[iteration - 1]
+              loglik_diff12 <- loglik[iteration - 1] - loglik[iteration - 2]
+              a[iteration - 1] <- loglik_diff01 / loglik_diff12
+              aloglik[iteration] <- loglik[iteration - 1] +
+                (1 / (1 - a[iteration - 1]) * loglik_diff01)
+              if (abs(aloglik[iteration] - loglik[iteration]) < threshold) {
                 check <- 1
               }
+            } else {
+              check <- 1
             }
           }
-          if (iteration == iter_max | k == 1) check <- 1
-
-          cat("*")
-          iteration <- iteration + 1
-
-          # E-Step -------------------------------------------------------------
-          dens[dens == 0] <- 1E-320
-          z <- dens / matrix(rep(rowSums(dens), k), ncol = k) # (n x k)
-
-          # z adjustment
-          if (min(colSums(z)) <= col_x_n) {
-            z <- (z + 0.0000001) / rowSums(z + 0.0000001)
-          }
         }
+        if (iteration == iter_max | k == 1) check <- 1
 
-        finalloglik <- loglik[iteration - 1]
+        cat("*")
+        iteration <- iteration + 1
 
-        # EM-algorithm is finished ---------------------------------------------
+        # E-Step -------------------------------------------------------------
+        dens[dens == 0] <- 1E-320
+        z <- dens / matrix(rep(rowSums(dens), k), ncol = k) # (n x k)
 
-        # Check the number of parameters -------------------------------
-        df_model <- length(stats::coef(l$lmodel_y[[1]])) * k
-        if (!is.null(model_x_norm)) {
-          df_model <-
-            df_model + ncovpar(
-              modelname = strtrim(paste0(model_x_norm, "II"), 3),
-              p = col_x_n, g = k
-            )
+        # z adjustment
+        if (min(colSums(z)) <= col_x_n) {
+          z <- (z + 0.0000001) / rowSums(z + 0.0000001)
         }
-        df <- df_model + (k - 1) + col_x_n * k
-        if (df >= n) {
-          warning(paste0(
-            df, "parameters with only ", n,
-            " observations; AICc and AICu are set to -Inf."
-          ), call. = FALSE)
-        }
+      }
 
-        # Classification Matrix ------------------------------------------------
-        cluster <- apply(z, 1, base::which.max)
+      finalloglik <- loglik[iteration - 1]
 
-        # Information criteria -------------------------------------------------
-        ic <- list()
-        ic$AIC <- 2 * finalloglik - df * 2
-        ic$BIC <- 2 * finalloglik - df * log(n)
-        ic$AIC3 <- 2 * finalloglik - df * 3
-        ic$CAIC <- 2 * finalloglik - df * (1 + log(n))
-        ic$AWE <- 2 * finalloglik - 2 * df * (3 / 2 + log(n))
-        if (n - df - 1 > 0) {
-          ic$AICc <- ic$AIC - (2 * df * (df + 1)) / (n - df - 1)
-          ic$AICu <- ic$AICc - n * log(n / (n - df - 1))
-        } else {
-          ic$AICc <- ic$AICu <- -Inf
-        }
+      # EM-algorithm is finished ---------------------------------------------
 
-        z_const <- (z < 10^(-322)) * 10^(-322) + (z > 10^(-322)) * z
-        # vincolo per evitare i NaN nel calcolo di tau*log(tau)
-        hard_z <-
-          (matrix(rep(apply(z, 1, max), k), n, k, byrow = FALSE) == z) * 1
-        ecm <- sum(hard_z * log(z_const))
-        ic$ICL <- ic$BIC + ecm
-        ## GLM parameters
-        gl_model <- NULL
-        if (!is.null(data)) {
-          gl_model <- list()
-          for (i in seq_len(k)) {
-            parameters <- list(model = l$lmodel_y[[i]])
-            parameters <- c(parameters, list(sigma = sqrt(l$var_y[1, i])))
-            gl_model[[i]] <- parameters
-          }
-          names(gl_model) <- paste0("comp.", 1:k)
-        }
-        ## Concomitant
-        concomitant <- NULL
-        if (!is.null(x_norm)) {
-          concomitant <- list()
-          normal <- list(
-            d = norm$p_x,
-            mu = norm$mu,
-            sigma = norm$sigma,
-            model = model_x_norm
+      # Check the number of parameters -------------------------------
+      df_model <- length(stats::coef(l$lmodel_y[[1]])) * k
+      if (!is.null(model_x_norm)) {
+        df_model <-
+          df_model + ncovpar(
+            modelname = strtrim(paste0(model_x_norm, "II"), 3),
+            p = col_x_n, g = k
           )
-          concomitant <- c(concomitant, normal = normal)
+      }
+      df <- df_model + (k - 1) + col_x_n * k
+      if (df >= n) {
+        warning(paste0(
+          df, "parameters with only ", n,
+          " observations; AICc and AICu are set to -Inf."
+        ), call. = FALSE)
+      }
+
+      # Classification Matrix ------------------------------------------------
+      cluster <- apply(z, 1, base::which.max)
+
+      # Information criteria -------------------------------------------------
+      ic <- list()
+      ic$AIC <- 2 * finalloglik - df * 2
+      ic$BIC <- 2 * finalloglik - df * log(n)
+      ic$AIC3 <- 2 * finalloglik - df * 3
+      ic$CAIC <- 2 * finalloglik - df * (1 + log(n))
+      ic$AWE <- 2 * finalloglik - 2 * df * (3 / 2 + log(n))
+      if (n - df - 1 > 0) {
+        ic$AICc <- ic$AIC - (2 * df * (df + 1)) / (n - df - 1)
+        ic$AICu <- ic$AICc - n * log(n / (n - df - 1))
+      } else {
+        ic$AICc <- ic$AICu <- -Inf
+      }
+
+      z_const <- (z < 10^(-322)) * 10^(-322) + (z > 10^(-322)) * z
+      # vincolo per evitare i NaN nel calcolo di tau*log(tau)
+      hard_z <-
+        (matrix(rep(apply(z, 1, max), k), n, k, byrow = FALSE) == z) * 1
+      ecm <- sum(hard_z * log(z_const))
+      ic$ICL <- ic$BIC + ecm
+      ## GLM parameters
+      gl_model <- NULL
+      if (!is.null(data)) {
+        gl_model <- list()
+        for (i in seq_len(k)) {
+          parameters <- list(model = l$lmodel_y[[i]])
+          parameters <- c(parameters, list(sigma = sqrt(l$var_y[1, i])))
+          gl_model[[i]] <- parameters
         }
-        result[[r]] <- list(
-          posterior = z,
-          iter = iteration,
-          k = k,
-          size = table(cluster),
-          cluster = cluster,
-          logLik = finalloglik,
-          df = df,
-          prior = prior,
-          ic = ic,
-          converged = TRUE, # Logical, TRUE if EM algorithm converged.
-          gl_model = gl_model,
-          concomitant = concomitant
+        names(gl_model) <- paste0("comp.", 1:k)
+      }
+      ## Concomitant
+      concomitant <- NULL
+      if (!is.null(x_norm)) {
+        concomitant <- list()
+        normal <- list(
+          d = norm$p_x,
+          mu = norm$mu,
+          sigma = norm$sigma,
+          model = model_x_norm
         )
-      },
-      silent = !pwarning
-    )
-    if (!length(a) > 1) {
-      result[[r]] <- list(
+        concomitant <- c(concomitant, normal = normal)
+      }
+      result <- list(
+        posterior = z,
         iter = iteration,
         k = k,
-        ic = list(BIC = NA)
+        size = table(cluster),
+        cluster = cluster,
+        logLik = finalloglik,
+        df = df,
+        prior = prior,
+        ic = ic,
+        converged = TRUE, # Logical, TRUE if EM algorithm converged.
+        gl_model = gl_model,
+        concomitant = concomitant
       )
-      cat(" Not estimated")
-    }
-  } # max_init
-  m <- which.max(sapply(1:max_init, function(r) result[[r]]$ic$BIC))
-  if (length(m) == 0) m <- 1
-  result <- result[[m]]
+    },
+    silent = !pwarning
+  )
+  if (!length(a) > 1) {
+    result <- list(
+      iter = iteration,
+      k = k,
+      ic = list(BIC = NA)
+    )
+    cat(" Not estimated")
+  }
   class(result) <- "cwm"
 
   result
@@ -559,44 +516,6 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
   }
 
   npar
-}
-
-.post_init <- function(
-  initialization, y, x_norm, n, k, start_z
-) {
-  if (k == 1) {
-    z <- matrix(rep(1, n), ncol = 1)
-    return(z)
-  }
-  if (initialization == "mclust") {
-    data <- cbind(y[, 1], x_norm)
-    z <- mclust::Mclust(
-      data = data, modelNames = ifelse(ncol(data) == 1, "V", "VVV"), G = k
-    )$z
-  }
-  if (initialization == "kmeans") {
-    clusters <- stats::kmeans(
-      x = cbind(y, x_norm), centers = k
-    )
-    # clusters on D
-    z <- mclust::unmap(clusters$cluster, 1:k)
-  }
-  if (initialization == "random.soft") {
-    z <- array(stats::runif(n * k), c(n, k))
-    # soft posterior probabilities (no-normalized) (n x k)
-    z <- z / rowSums(z)
-    # soft posterior probabilities (n x k)
-  }
-  if (initialization == "random.hard") {
-    z <- t(stats::rmultinom(n, size = 1, prob = rep(1 / k, k)))
-    # hard posterior probabilities (n x k)
-  }
-  if (initialization == "manual") {
-    # z.start can be both soft and hard initialization
-    z <- start_z # posterior probabilities (n x k) no-normalized
-  }
-  z <- (z + 0.0001) / rowSums(z + 0.0001)
-  z
 }
 
 #' @importFrom mclust mstepE

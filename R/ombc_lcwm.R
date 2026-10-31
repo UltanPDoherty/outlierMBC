@@ -174,7 +174,6 @@ ombc_lcwm <- function(
         x_norm = x,
         model_x_norm = mnames,
         k = comp_num,
-        initialization = "manual",
         start_z = z,
         iter_max = nmax,
         threshold = atol
@@ -190,7 +189,6 @@ ombc_lcwm <- function(
         x_norm = x,
         model_x_norm = mnames,
         k = comp_num,
-        initialization = "manual",
         start_z = reinit_z,
         iter_max = nmax,
         threshold = atol
@@ -272,7 +270,6 @@ ombc_lcwm <- function(
     x_norm = x0[!outlier_bool, , drop = FALSE],
     model_x_norm = mnames,
     k = comp_num,
-    initialization = "manual",
     start_z = best_z,
     iter_max = nmax,
     threshold = atol,
