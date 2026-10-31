@@ -168,7 +168,9 @@ cwm <- function(
   }
 
   n <- unlist(sapply(list(y, x_norm), function(x) nrow(cbind(x))))
-  if (max(n) != min(n)) stop("Data length mismatch")
+  if (max(n) != min(n)) {
+    stop("Data length mismatch")
+  }
   n <- n[1]
 
   # Fix variables to use for marginal --------------------------
@@ -262,7 +264,9 @@ cwm <- function(
     })
     parallel::stopCluster(cl)
   } else {
-    if (!is.null(seed)) set.seed(seed)
+    if (!is.null(seed)) {
+      set.seed(seed)
+    }
     par <- lapply(seq_len(nrow(mm)), function(i) job(i))
   }
 
@@ -361,7 +365,9 @@ cwm2 <- function(
             }
           }
         }
-        if (iteration == iter_max | k == 1) check <- 1
+        if (iteration == iter_max | k == 1) {
+          check <- 1
+        }
 
         cat("*")
         iteration <- iteration + 1
@@ -453,7 +459,7 @@ cwm2 <- function(
         df = df,
         prior = prior,
         ic = ic,
-        converged = TRUE, # Logical, TRUE if EM algorithm converged.
+        converged = TRUE,
         gl_model = gl_model,
         concomitant = concomitant
       )
@@ -476,14 +482,11 @@ cwm2 <- function(
 ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
   if (is.null(p)) {
     stop("p is null")
-  }
-  if (is.null(g)) {
+  } else if (is.null(g)) {
     stop("g is null")
-  }
-  if (is.null(modelname)) {
+  } else if (is.null(modelname)) {
     stop("modelname is null")
-  }
-  if (modelname == "EII") {
+  } else if (modelname == "EII") {
     npar <- 1
   } else if (modelname == "VII") {
     npar <- g
@@ -585,8 +588,13 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
     model_y <- do.call(
       stats::glm,
       list(
-        formula = formula_y, data = data, family = family_y, weights = z[, h],
-        y = FALSE, model = FALSE, x = FALSE
+        formula = formula_y,
+        family = family_y,
+        data = data,
+        weights = z[, h],
+        model = FALSE,
+        x = FALSE,
+        y = FALSE
       )
     )
     sigma_hat <- sqrt(
@@ -606,7 +614,11 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
     list(1:n, paste("comp.", 1:k, sep = ""))
 
   list(
-    lmodel_y = lmodel_y, mu_y = mu_y, disp_y = as.vector(disp_y),
-    var_fun_y = var_fun_y, var_y = var_y, p_y = p_y
+    lmodel_y = lmodel_y,
+    mu_y = mu_y,
+    disp_y = as.vector(disp_y),
+    var_fun_y = var_fun_y,
+    var_y = var_y,
+    p_y = p_y
   )
 }
