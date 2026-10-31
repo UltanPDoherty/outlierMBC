@@ -22,6 +22,7 @@ residuals for this component.}
 \describe{
 \item{\code{diff}}{Response dissimilarity value for this component.}
 \item{\code{dens}}{Response density of all observations for this component.}
+\item{\code{dd_correction}}{Null-expectation normalising constant for LCWMs.}
 }
 }
 \description{

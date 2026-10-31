@@ -21,7 +21,8 @@ ombc_lcwm(
   init_scaling = TRUE,
   kmpp_seed = 123,
   verbose = TRUE,
-  dd_weight = 0.5
+  dd_weight = 0.5,
+  dd_correct = TRUE
 )
 }
 \arguments{
@@ -58,6 +59,8 @@ scaled for initialisation.}
 
 \item{dd_weight}{A value between \code{0} and \code{1} which controls the weighting of
 the response and covariate dissimilarities when aggregating.}
+
+\item{dd_correct}{Whether to apply a null-expectation normalising correction.}
 }
 \value{
 \code{ombc_lcwm} returns an object of class "outliermbc_lcwm", which is

@@ -70,6 +70,7 @@ distrib_diff_gmm <- function(
 #' @param mu_g Mean vector for component g.
 #' @param sigma_g Covariance matrix for component g.
 #' @param logdet_g Log-determinants of covariance matrix for component g.
+#' @inheritParams distrib_diff_lcwm dd_correct
 #'
 #' @returns
 #' `distrib_diff_mahalanobis` returns a list with the following elements:
@@ -78,13 +79,15 @@ distrib_diff_gmm <- function(
 #'   \item{`dens`}{Gaussian density of all observations for this component.}
 #'   \item{`mahalas`}{Scaled squared sample Mahalanobis distances for all
 #'                    observations with respect to this component.}
+#'   \item{`dd_correction`}{Null-expectation normalising constant for LCWMs.}
 #' }
 distrib_diff_mahalanobis <- function(
   x,
   z_g,
   mu_g,
   sigma_g,
-  logdet_g
+  logdet_g,
+  dd_correct = FALSE
 ) {
   var_num <- ncol(x)
   n_g <- sum(z_g)
@@ -102,6 +105,9 @@ distrib_diff_mahalanobis <- function(
   mahala_ewcdf_g_vals <- mahala_ewcdf_g_func(check_seq)
   beta_cdf_g_vals <- stats::pbeta(check_seq, param1, param2)
   cdf_diffs <- mahala_ewcdf_g_vals - beta_cdf_g_vals
+  dd_correction <- sqrt(2 / (pi * n_g)) * mean(
+    sqrt(beta_cdf_g_vals * (1 - beta_cdf_g_vals))
+  )
 
   distrib_diff_g_x <- mean(abs(cdf_diffs))
 
@@ -112,7 +118,8 @@ distrib_diff_mahalanobis <- function(
   list(
     diff = distrib_diff_g_x,
     dens = dens_g_x,
-    mahalas = scaled_mahalas_g
+    mahalas = scaled_mahalas_g,
+    dd_correction = dd_correction
   )
 }
 
@@ -135,7 +142,7 @@ distrib_diff_mahalanobis <- function(
 #'                      residuals for each component.
 #'
 #' @returns
-#' `distrib_diff_lcwm_lcwm` returns a list with the following elements:
+#' `distrib_diff_lcwm` returns a list with the following elements:
 #' \describe{
 #'   \item{`distrib_diff`}{Aggregated dissimilarity across components.}
 #'   \item{`distrib_diff_vec`}{Vector containing dissimilarity value for each
@@ -158,7 +165,8 @@ distrib_diff_lcwm <- function(
   sigma,
   mod_list,
   weighted_rmse,
-  dd_weight = 0.5
+  dd_weight = 0.5,
+  dd_correct = TRUE
 ) {
   obs_num <- nrow(x)
   comp_num <- ncol(z)
@@ -174,7 +182,8 @@ distrib_diff_lcwm <- function(
       as.matrix(sigma[, , g]),
       mod_list[[g]],
       weighted_rmse[g],
-      dd_weight
+      dd_weight,
+      dd_correct
     )
     distrib_diff_vec[g] <- dd_g$diff
     dens_mat[, g] <- dd_g$dens
@@ -225,7 +234,7 @@ distrib_diff_lcwm <- function(
 #'                        residuals for this component.
 #'
 #' @returns
-#' `distrib_diff_lcwm_lcwm_g` returns a list with the following elements:
+#' `distrib_diff_lcwm_g` returns a list with the following elements:
 #' \describe{
 #'   \item{`diff`}{Aggregated dissimilarity value for this component.}
 #'   \item{`dens`}{Joint (covariate & response) density of all observations for
@@ -242,17 +251,27 @@ distrib_diff_lcwm_g <- function(
   sigma_g,
   mod_g,
   weighted_rmse_g,
-  dd_weight = 0.5
+  dd_weight = 0.5,
+  dd_correct = TRUE
 ) {
   dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
   diff_g_x <- dd_g_x$diff
   dens_g_x <- dd_g_x$dens
+  correct_g_x <- dd_g_x$dd_correction
 
   dd_g_y <- distrib_diff_residual(x, z_g, mod_g, weighted_rmse_g)
   diff_g_y <- dd_g_y$diff
   dens_g_y <- dd_g_y$dens
+  correct_g_y <- dd_g_y$dd_correction
 
-  diff_g <- sqrt(dd_weight * diff_g_x^2 + (1 - dd_weight) * diff_g_y^2)
+  if (dd_correct) {
+    x_factor <- dd_weight / correct_g_x
+    y_factor <- (1 - dd_weight) / correct_g_y
+  } else {
+    x_factor <- dd_weight
+    y_factor <- 1 - dd_weight
+  }
+  diff_g <- sqrt(x_factor * diff_g_x^2 + y_factor * diff_g_y^2)
   dens_g <- dens_g_x * dens_g_y
 
   list(
@@ -281,6 +300,7 @@ distrib_diff_lcwm_g <- function(
 #' \describe{
 #'   \item{`diff`}{Response dissimilarity value for this component.}
 #'   \item{`dens`}{Response density of all observations for this component.}
+#'   \item{`dd_correction`}{Null-expectation normalising constant for LCWMs.}
 #' }
 distrib_diff_residual <- function(
   x,
@@ -289,7 +309,7 @@ distrib_diff_residual <- function(
   weighted_rmse_g
 ) {
   # Let rss_zg = sqrt(sum(z_g * (mod_g$residuals^2)))
-  # flexCWM used y_sigma_g = rss_zg / sqrt(n_g), therefore so does cwm
+  # flexCWM::cwm used y_sigma_g = rss_zg / sqrt(n_g), therefore so does cwm
   # stats::sigma uses rss_zg / sqrt(nrow(x) - 2))
 
   n_g <- sum(z_g)
@@ -315,6 +335,9 @@ distrib_diff_residual <- function(
   scsqst_res_ewcdf_g_vals <- scsqst_res_ewcdf_g_func(check_seq)
   beta_cdf_g_vals <- stats::pbeta(check_seq, param1, param2)
   cdf_diffs <- scsqst_res_ewcdf_g_vals - beta_cdf_g_vals
+  dd_correction <- sqrt(2 / (pi * n_g)) * mean(
+    sqrt(beta_cdf_g_vals * (1 - beta_cdf_g_vals))
+  )
 
   distrib_diff_g_y <- mean(abs(cdf_diffs))
 
@@ -322,6 +345,7 @@ distrib_diff_residual <- function(
 
   list(
     diff = distrib_diff_g_y,
-    dens = dens_g_y
+    dens = dens_g_y,
+    dd_correction = dd_correction
   )
 }

@@ -13,7 +13,8 @@ distrib_diff_lcwm(
   sigma,
   mod_list,
   weighted_rmse,
-  dd_weight = 0.5
+  dd_weight = 0.5,
+  dd_correct = TRUE
 )
 }
 \arguments{
@@ -34,9 +35,11 @@ residuals for each component.}
 
 \item{dd_weight}{A value between \code{0} and \code{1} which controls the weighting of
 the response and covariate dissimilarities when aggregating.}
+
+\item{dd_correct}{Whether to apply a null-expectation normalising correction.}
 }
 \value{
-\code{distrib_diff_lcwm_lcwm} returns a list with the following elements:
+\code{distrib_diff_lcwm} returns a list with the following elements:
 \describe{
 \item{\code{distrib_diff}}{Aggregated dissimilarity across components.}
 \item{\code{distrib_diff_vec}}{Vector containing dissimilarity value for each

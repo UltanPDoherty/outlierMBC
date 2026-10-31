@@ -11,7 +11,8 @@ distrib_diff_lcwm_g(
   sigma_g,
   mod_g,
   weighted_rmse_g,
-  dd_weight = 0.5
+  dd_weight = 0.5,
+  dd_correct = TRUE
 )
 }
 \arguments{
@@ -30,9 +31,11 @@ residuals for this component.}
 
 \item{dd_weight}{A value between \code{0} and \code{1} which controls the weighting of
 the response and covariate dissimilarities when aggregating.}
+
+\item{dd_correct}{Whether to apply a null-expectation normalising correction.}
 }
 \value{
-\code{distrib_diff_lcwm_lcwm_g} returns a list with the following elements:
+\code{distrib_diff_lcwm_g} returns a list with the following elements:
 \describe{
 \item{\code{diff}}{Aggregated dissimilarity value for this component.}
 \item{\code{dens}}{Joint (covariate & response) density of all observations for

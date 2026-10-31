@@ -5,7 +5,7 @@
 \title{Compute the dissimilarity for a single multivariate Gaussian
 distribution.}
 \usage{
-distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g)
+distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g, dd_correct = FALSE)
 }
 \arguments{
 \item{x}{Data.}
@@ -17,6 +17,8 @@ distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g)
 \item{sigma_g}{Covariance matrix for component g.}
 
 \item{logdet_g}{Log-determinants of covariance matrix for component g.}
+
+\item{dd_correct}{Whether to apply a null-expectation normalising correction.}
 }
 \value{
 \code{distrib_diff_mahalanobis} returns a list with the following elements:
@@ -25,6 +27,7 @@ distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, logdet_g)
 \item{\code{dens}}{Gaussian density of all observations for this component.}
 \item{\code{mahalas}}{Scaled squared sample Mahalanobis distances for all
 observations with respect to this component.}
+\item{\code{dd_correction}}{Null-expectation normalising constant for LCWMs.}
 }
 }
 \description{
