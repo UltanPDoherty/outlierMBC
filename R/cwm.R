@@ -263,7 +263,7 @@ cwm2 <- function(
           l <- do.call(
             ".family_y_gaussian",
             list(
-              family_y = stats::gaussian(), k = k, y = y, m_y = m_y, n = n,
+              k = k, y = y, m_y = m_y, n = n,
               data = data, z = z, formula_y = formula_y
             )
           )
@@ -274,7 +274,7 @@ cwm2 <- function(
         dens <- matrix(rep(prior, n), n, k, byrow = TRUE) * norm$p_x * l$p_y
         loglik[iteration] <- sum(log(rowSums(dens)))
 
-        # Aitkane's Acceleration-Based Stopping Criterion # #
+        # Aitken's Acceleration-Based Stopping Criterion # #
         if (iteration > 2 & k > 1) {
           if (
             !is.na(loglik[iteration - 1] - loglik[iteration - 2]) &&
@@ -349,8 +349,7 @@ cwm2 <- function(
         ic$AICc <- ic$AICu <- -Inf
       }
 
-      z_const <- (z < 10^(-322)) * 10^(-322) + (z > 10^(-322)) * z
-      # vincolo per evitare i NaN nel calcolo di tau*log(tau)
+      z_const <- ifelse(z < 10^(-322), 10^(-322), z)
       hard_z <-
         (matrix(rep(apply(z, 1, max), k), n, k, byrow = FALSE) == z) * 1
       ecm <- sum(hard_z * log(z_const))
@@ -500,7 +499,7 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
   list(p_x = p_x_norm, mu = mu_x, sigma = sigma)
 }
 
-.family_y_gaussian <- function(family_y, k, data, y, n, z, formula_y, ...) {
+.family_y_gaussian <- function(k, data, y, n, z, formula_y, ...) {
   beta <- var_fun_y <- var_y <- mu_y <- p_y <- disp_y <- NULL
   lmodel_y <- list()
   for (h in 1:k) {
@@ -508,7 +507,7 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
       stats::glm,
       list(
         formula = formula_y,
-        family = family_y,
+        family = stats::gaussian(),
         data = data,
         weights = z[, h],
         model = FALSE,
