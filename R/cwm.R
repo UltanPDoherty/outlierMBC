@@ -126,10 +126,10 @@
 #' }
 #'
 #' @author Mazza A., Punzo A., Ingrassia S.
-cwm <- function(
   formula_y = NULL,
   data = NULL,
   x_norm = NULL,
+fit_cwm <- function(
   model_x_norm = NULL,
   k = 1:3,
   start_z = NULL,

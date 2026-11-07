@@ -168,7 +168,7 @@ ombc_lcwm <- function(
   outlier_rank_temp <- rep(0, obs_num - gross_num)
   for (i in seq_len(max_out + 1)) {
     if (init_scheme %in% c("update", "reuse")) {
-      suppressWarnings(invisible(utils::capture.output(lcwm <- cwm(
+      suppressWarnings(invisible(utils::capture.output(lcwm <- fit_cwm(
         formula_y = y_formula,
         data = xy,
         x_norm = x,
@@ -183,7 +183,7 @@ ombc_lcwm <- function(
         comp_num = comp_num, dist_mat = dist_mat, x = xy,
         init_method = init_method, kmpp_seed = kmpp_seed
       )
-      suppressWarnings(invisible(utils::capture.output(lcwm <- cwm(
+      suppressWarnings(invisible(utils::capture.output(lcwm <- fit_cwm(
         formula_y = y_formula,
         data = xy,
         x_norm = x,
@@ -199,6 +199,7 @@ ombc_lcwm <- function(
     conv_status[i] <- lcwm$models[[1]]$converged
 
     mod_list <- lapply(lcwm$models[[1]]$gl_model, function(x) x$model)
+    browser()
     names(mod_list) <- paste0("comp.", seq_along(mod_list))
     weighted_rmse <- vapply(
       lcwm$models[[1]]$gl_model, function(x) x$sigma, double(1L)
@@ -264,7 +265,7 @@ ombc_lcwm <- function(
 
   outlier_bool <- outlier_rank <= outlier_num & outlier_rank != 0
 
-  invisible(utils::capture.output(lcwm <- cwm(
+  invisible(utils::capture.output(lcwm <- fit_cwm(
     formula_y = y_formula,
     data = xy0[!outlier_bool, , drop = FALSE],
     x_norm = x0[!outlier_bool, , drop = FALSE],
