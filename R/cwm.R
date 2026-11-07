@@ -126,12 +126,12 @@
 #' }
 #'
 #' @author Mazza A., Punzo A., Ingrassia S.
-  formula_y = NULL,
-  data = NULL,
-  x_norm = NULL,
 fit_cwm <- function(
+  formula_y,
+  data,
+  x_norm,
   model_x_norm = NULL,
-  k = 1:3,
+  k,
   start_z = NULL,
   seed = NULL,
   iter_max = 1000,
@@ -497,19 +497,9 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
   npar
 }
 
-#' @importFrom mclust mstepE
-#' @importFrom mclust mstepV
-#' @importFrom mclust mstepEII
-#' @importFrom mclust mstepVII
-#' @importFrom mclust mstepEEI
-#' @importFrom mclust mstepVEI
-#' @importFrom mclust mstepEVI
-#' @importFrom mclust mstepVVI
-#' @importFrom mclust mstepEEE
-#' @importFrom mclust mstepEVE
-#' @importFrom mclust mstepVEV
-#' @importFrom mclust mstepEVV
-#' @importFrom mclust mstepVVV
+#' @importFrom mclust mstepE mstepV mstepEEE mstepVVV
+#' @importFrom mclust mstepEII mstepVII mstepEEI mstepVEI mstepEVI mstepVVI
+#' @importFrom mclust mstepEEV mstepEVE mstepVEE mstepVEV mstepEVV mstepVVE
 .p_x_norm <- function(col_x_n, x_norm, model_x_norm, z, k, n, eps) {
   if (col_x_n > 0) {
     p_x_norm <- array(
