@@ -5,11 +5,11 @@
 \title{\code{cwm} function from Angelo Mazza's flexCWM package}
 \usage{
 fit_cwm(
-  formula_y = NULL,
-  data = NULL,
-  x_norm = NULL,
+  formula_y,
+  data,
+  x_norm,
   model_x_norm = NULL,
-  k = 1:3,
+  k,
   start_z = NULL,
   seed = NULL,
   iter_max = 1000,

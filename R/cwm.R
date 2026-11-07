@@ -139,104 +139,61 @@ fit_cwm <- function(
   eps = 1.0e-100,
   pwarning = FALSE
 ) {
-  # Preliminary checks and init ----------------------------------------------
-  if (is.null(formula_y) && is.null(x_norm)) {
-    stop("No data were entered.")
-  }
-
-  lm <- list(k = k)
-  # Get regression terms ----------------------------------------
-  if (!is.null(formula_y)) {
-    family_y <- list(family_y = stats::gaussian())
-    if (is.null(data)) {
-      data <- stats::get_all_vars(stats::as.formula(formula_y))
-    } else {
-      data <- stats::get_all_vars(stats::as.formula(formula_y), data)
-    }
-    y <- as.matrix(stats::model.response(stats::model.frame(formula_y, data)))
-    lm$family_y <- seq_along(family_y)
+  if (is.null(data)) {
+    data <- stats::get_all_vars(stats::as.formula(formula_y))
   } else {
-    y <- data <- family_y <- NULL
+    data <- stats::get_all_vars(stats::as.formula(formula_y), data)
+  }
+  y <- as.matrix(stats::model.response(stats::model.frame(formula_y, data)))
+
+  x_norm <- as.matrix(x_norm)
+  stopifnot("Data length mismatch" = nrow(x_norm) == nrow(y))
+
+  col_x_n <- ncol(x_norm)
+  if (is.null(colnames(x_norm))) {
+    colnames(x_norm) <- paste0("x_norm", seq_len(col_x_n))
   }
 
-  n <- unlist(sapply(list(y, x_norm), function(x) nrow(cbind(x))))
-  if (max(n) != min(n)) {
-    stop("Data length mismatch")
-  }
-  n <- n[1]
-
-  # Fix variables to use for marginal --------------------------
-  col_x_n <- 0
-  x_mod <- list()
-  if (!is.null(x_norm)) {
-    x_norm <- as.matrix(x_norm)
-    col_x_n <- ncol(x_norm)
-    if (is.null(colnames(x_norm))) {
-      colnames(x_norm) <- paste0("x_norm", 1:col_x_n)
-    }
-  }
-
-  # More checks ------------------------------------------
-  if (col_x_n > 0) {
-    if (col_x_n == 1) {
-      model_x_norm_names <- c("E", "V")
-      eqmod <- data.frame(name = model_x_norm_names, number = c(1, 1))
-    } else {
-      model_x_norm_names <- c(
-        "EII", "VII", "EEI", "VEI", "EVI", "VVI",
-        "EEE", "VEE", "EVE", "EEV", "VVE", "VEV", "EVV", "VVV"
-      )
-      eqmod <- data.frame(
-        name = model_x_norm_names,
-        number = c(1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3)
-      )
-    }
-    if (is.null(model_x_norm)) {
-      model_x_norm <- model_x_norm_names
-    } else {
-      model_x_norm <- match.arg(
-        model_x_norm, model_x_norm_names,
-        several.ok = TRUE
-      )
-    }
-    lm$model_x_norm <- model_x_norm
+  if (col_x_n == 1) {
+    model_x_names <- c("E", "V")
+    eqmod <- data.frame(name = model_x_names, number = c(1, 1))
   } else {
-    model_x_norm <- eqmod <- NULL
+    model_x_names <- c(
+      "EII", "VII", "EEI", "VEI", "EVI", "VVI",
+      "EEE", "VEE", "EVE", "EEV", "VVE", "VEV", "EVV", "VVV"
+    )
+    eqmod <- data.frame(name = model_x_names, number = rep(1:3, c(2, 4, 8)))
+  }
+  if (is.null(model_x_norm)) {
+    model_x_norm <- model_x_names
+  } else {
+    model_x_norm <- match.arg(model_x_norm, model_x_names, several.ok = TRUE)
   }
 
-  k <- as.integer(ceiling(k))
-  par <- list()
-  # Compute ----------------------------------------------
-  mm <- expand.grid(lm)
-  if (!is.null(model_x_norm) && 1 %in% k) {
+  mm <- expand.grid(list("k" = k, "model_x_norm" = model_x_norm))
+  if (1 %in% as.integer(ceiling(k))) {
     mm <- merge(mm, eqmod, by.x = "model_x_norm", by.y = "name")
     mm1 <- mm[mm$k == 1, ]
     mm2 <- mm1[!duplicated(subset(mm1, select = -model_x_norm, drop = FALSE)), ]
 
     if (nrow(mm1) > nrow(mm2)) {
-      cat(
-        "\nWith k=1, some models in model_x_norm are equivalent, so only the
-        first is estimated.\n"
-      )
+      cat(paste0(
+        "\nWith k = 1, some models in model_x_norm are equivalent, ",
+        "so only the first is estimated.\n"
+      ))
     }
     mm <- rbind(mm2, mm[mm$k != 1, ])
   }
   mm <- mm[order(mm$k), , drop = FALSE]
   job <- function(i) {
-    cat("\nEstimating model")
-    cat(paste0(" with k=", mm$k[i]))
-    if (!is.null(mm$model_x_norm[i])) {
-      cat(paste0(", x_norm=", mm$model_x_norm[i]))
-    }
-    if (!is.null(mm$family_y[i])) {
-      cat(paste0(", family_y=", family_y[[mm$family_y[i]]][1]))
-    }
-    cat(" ")
+    cat(paste0(
+      "\nEstimating model with k = ", mm$k[i],
+      ", x_norm = ", mm$model_x_norm[i], " "
+    ))
     cwm2(
       formula_y = formula_y, data = data, y = y,
-      x_norm = x_norm, n = n, col_x_n = col_x_n, x_mod = x_mod,
+      x_norm = x_norm, n = nrow(y), col_x_n = col_x_n,
       k = mm$k[i], model_x_norm = mm$model_x_norm[i],
-      family_y = family_y[[mm$family_y[i]]],
       start_z = start_z, iter_max = iter_max, threshold = threshold,
       eps = eps, pwarning = pwarning
     )
@@ -244,35 +201,31 @@ fit_cwm <- function(
   if (!is.null(seed)) {
     set.seed(seed)
   }
-  par <- lapply(seq_len(nrow(mm)), function(i) job(i))
+  models <- lapply(seq_len(nrow(mm)), \(i) job(i))
+
+  concomitant <- data.frame(x_norm)
+  for (i in seq_len(ncol(x_norm))) {
+    attr(concomitant[[i]], "type") <- "x_norm"
+  }
 
   cat("\n")
-  res <- structure(list(
-    call = match.call(),
-    formula_y = formula_y,
-    data = data,
-    concomitant = list(x_norm = as_df(x_norm, "x_norm")),
-    models = par
-  ), class = "cwm")
+  res <- structure(
+    list(
+      call = match.call(),
+      formula_y = formula_y,
+      data = data,
+      concomitant = concomitant,
+      models = models
+    ),
+    class = "cwm"
+  )
   print(res)
   invisible(res)
 }
 
-as_df <- function(ma, type) {
-  if (!is.null(ma)) {
-    df <- data.frame(ma)
-    for (i in seq_len(ncol(ma))) {
-      attr(df[[i]], "type") <- type
-    }
-    df
-  } else {
-    NULL
-  }
-}
-
 cwm2 <- function(
   formula_y, data, y, x_norm, col_x_n,
-  n, x_mod, k, model_x_norm, family_y,
+  n, k, model_x_norm,
   start_z, iter_max, threshold,
   eps, pwarning
 ) {
@@ -288,7 +241,7 @@ cwm2 <- function(
       z <- (start_z + 0.0001) / rowSums(start_z + 0.0001)
 
       # EM algorithm --------------------------------------------------
-      # Preliminary definition of convergence criterions
+      # Preliminary definition of convergence criteria
       check <- 0
       iteration <- 1
       loglik <- NULL
@@ -310,7 +263,7 @@ cwm2 <- function(
           l <- do.call(
             ".family_y_gaussian",
             list(
-              family_y = family_y, k = k, y = y, m_y = m_y, n = n,
+              family_y = stats::gaussian(), k = k, y = y, m_y = m_y, n = n,
               data = data, z = z, formula_y = formula_y
             )
           )

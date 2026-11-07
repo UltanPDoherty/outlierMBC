@@ -199,7 +199,6 @@ ombc_lcwm <- function(
     conv_status[i] <- lcwm$models[[1]]$converged
 
     mod_list <- lapply(lcwm$models[[1]]$gl_model, function(x) x$model)
-    browser()
     names(mod_list) <- paste0("comp.", seq_along(mod_list))
     weighted_rmse <- vapply(
       lcwm$models[[1]]$gl_model, function(x) x$sigma, double(1L)
