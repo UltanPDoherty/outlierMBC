@@ -262,14 +262,15 @@ cwm2 <- function(
           l <- do.call(
             ".family_y_gaussian",
             list(
-              k = k, y = y, m_y = m_y, n = n,
-              data = data, z = z, formula_y = formula_y
+              "k" = k, "y" = y, "m_y" = m_y, "n" = n,
+              "data" = data, "z" = z, "formula_y" = formula_y
             )
           )
         } else {
           l <- list(p_y = 1)
         }
-        dens <- matrix(rep(prior, n), n, k, byrow = TRUE) * norm$p_x * l$p_y
+
+        dens <- sweep(norm$p_x * l$p_y, MARGIN = 2, STATS = prior, FUN = "*")
         loglik[iter] <- sum(log(rowSums(dens)))
 
         if (iter > 2 & k > 1) {
@@ -288,13 +289,13 @@ cwm2 <- function(
           }
         }
 
-        exit_while <- iter == iter_max | k == 1
+        exit_while <- iter == iter_max || k == 1
 
         cat("*")
         iter <- iter + 1
 
-        dens[dens == 0] <- 1E-320
-        z <- dens / matrix(rep(rowSums(dens), k), ncol = k)
+        dens[dens == 0] <- 1e-320
+        z <- dens / rowSums(dens)
 
         if (min(colSums(z)) <= col_x_n) {
           z <- (z + 0.0000001) / rowSums(z + 0.0000001)
@@ -324,7 +325,7 @@ cwm2 <- function(
         for (i in seq_len(k)) {
           gl_model[[i]] <- c(
             list("model" = l$lmodel_y[[i]]),
-            list("sigma" = sqrt(l$var_y[1, i]))
+            list("sigma" = sqrt(l$disp_y[i]))
           )
         }
         names(gl_model) <- paste0("comp.", 1:k)
@@ -462,14 +463,14 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
 }
 
 .family_y_gaussian <- function(k, data, y, n, z, formula_y, ...) {
-  beta <- var_fun_y <- var_y <- mu_y <- p_y <- disp_y <- NULL
   lmodel_y <- list()
+  mu_y <- p_y <- matrix(NA, nrow = n, ncol = k)
+  disp_y <- c()
   for (h in seq_len(k)) {
-    model_y <- do.call(
+    lmodel_y[[h]] <- do.call(
       stats::glm,
       list(
         "formula" = formula_y,
-        "family" = stats::gaussian(),
         "data" = data,
         "weights" = z[, h],
         "model" = FALSE,
@@ -477,30 +478,15 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
         "y" = FALSE
       )
     )
-    sigma_hat <- sqrt(
-      crossprod(sqrt(z[, h] / sum(z[, h])) * (y - stats::fitted(model_y)))
+    mu_y[, h] <- stats::fitted(lmodel_y[[h]])
+    disp_y[h] <- as.numeric(
+      crossprod(sqrt(z[, h] / sum(z[, h])) * (y - mu_y[, h]))
     )
-    beta <- rbind(beta, stats::coef(model_y))
-    mu_y <- cbind(mu_y, stats::fitted(model_y))
-    disp_y <- rbind(disp_y, sigma_hat^2)
-    var_fun_y <- cbind(var_fun_y, rep(1, n))
-    var_y <- cbind(var_y, as.vector(sigma_hat^2) * rep(1, n))
-    p_y <- cbind(
-      p_y, stats::dnorm(y, mean = stats::fitted(model_y), sd = sigma_hat)
-    )
-    lmodel_y[[h]] <- model_y
+    p_y[, h] <- stats::dnorm(y, mean = mu_y[, h], sd = sqrt(disp_y[h]))
   }
-  dimnames(var_fun_y) <- dimnames(var_y) <- dimnames(mu_y) <- dimnames(p_y) <-
-    list(1:n, paste("comp.", 1:k, sep = ""))
+  colnames(mu_y) <- colnames(p_y) <- paste("comp.", 1:k, sep = "")
 
-  list(
-    "lmodel_y" = lmodel_y,
-    "mu_y" = mu_y,
-    "disp_y" = as.vector(disp_y),
-    "var_fun_y" = var_fun_y,
-    "var_y" = var_y,
-    "p_y" = p_y
-  )
+  list("lmodel_y" = lmodel_y, "mu_y" = mu_y, "disp_y" = disp_y, "p_y" = p_y)
 }
 
 compute_ic <- function(ll, n, df, z) {
