@@ -221,11 +221,11 @@ fit_cwm <- function(
   cat("\n")
   res <- structure(
     list(
-      call = match.call(),
-      formula_y = formula_y,
-      data = data,
-      concomitant = concomitant,
-      models = models
+      "call" = match.call(),
+      "formula_y" = formula_y,
+      "data" = data,
+      "concomitant" = concomitant,
+      "models" = models
     ),
     class = "cwm"
   )
@@ -234,10 +234,8 @@ fit_cwm <- function(
 }
 
 cwm2 <- function(
-  formula_y, data, y, x_norm, col_x_n,
-  n, k, model_x_norm,
-  start_z, iter_max, threshold,
-  eps, pwarning
+  formula_y, data, y, x_norm, col_x_n, n, k, model_x_norm,
+  start_z, iter_max, threshold, eps, pwarning
 ) {
   prior <- numeric(length = k)
 
@@ -248,7 +246,7 @@ cwm2 <- function(
     {
       z <- (start_z + 0.0001) / rowSums(start_z + 0.0001)
       exit_while <- FALSE
-      iteration <- 1
+      iter <- 1
       loglik <- NULL
       aloglik <- c(0, 0)
       a <- c(0, 0)
@@ -272,48 +270,45 @@ cwm2 <- function(
           l <- list(p_y = 1)
         }
         dens <- matrix(rep(prior, n), n, k, byrow = TRUE) * norm$p_x * l$p_y
-        loglik[iteration] <- sum(log(rowSums(dens)))
+        loglik[iter] <- sum(log(rowSums(dens)))
 
-        if (iteration > 2 & k > 1) {
-          loglik_diff12 <- loglik[iteration - 1] - loglik[iteration - 2]
-          if (!is.na(loglik_diff12) && !is.na(loglik[iteration])) {
+        if (iter > 2 & k > 1) {
+          loglik_diff12 <- loglik[iter - 1] - loglik[iter - 2]
+          if (!is.na(loglik_diff12) && !is.na(loglik[iter])) {
             if (abs(loglik_diff12) > 0) {
-              loglik_diff01 <- loglik[iteration] - loglik[iteration - 1]
-              a[iteration - 1] <- loglik_diff01 / loglik_diff12
-              aloglik[iteration] <- loglik[iteration - 1] +
-                (1 / (1 - a[iteration - 1]) * loglik_diff01)
-              if (abs(aloglik[iteration] - loglik[iteration]) < threshold) {
-                exit_while <- TRUE
-              }
-            } else {
-              exit_while <- TRUE
+              loglik_diff01 <- loglik[iter] - loglik[iter - 1]
+              a[iter - 1] <- loglik_diff01 / loglik_diff12
+              a_ratio <- 1 / (1 - a[iter - 1])
+              aloglik[iter] <- loglik[iter - 1] + a_ratio * loglik_diff01
+
+              exit_while <- abs(aloglik[iter] - loglik[iter]) < threshold
             }
+          } else {
+            exit_while <- TRUE
           }
         }
-        if (iteration == iter_max | k == 1) {
-          exit_while <- TRUE
-        }
+
+        exit_while <- iter == iter_max | k == 1
 
         cat("*")
-        iteration <- iteration + 1
+        iter <- iter + 1
 
         dens[dens == 0] <- 1E-320
-        z <- dens / matrix(rep(rowSums(dens), k), ncol = k) # (n x k)
+        z <- dens / matrix(rep(rowSums(dens), k), ncol = k)
 
         if (min(colSums(z)) <= col_x_n) {
           z <- (z + 0.0000001) / rowSums(z + 0.0000001)
         }
       }
 
-      finalloglik <- loglik[iteration - 1]
+      finalloglik <- loglik[iter - 1]
 
       df_model <- length(stats::coef(l$lmodel_y[[1]])) * k
       if (!is.null(model_x_norm)) {
-        df_model <-
-          df_model + ncovpar(
-            modelname = strtrim(paste0(model_x_norm, "II"), 3),
-            p = col_x_n, g = k
-          )
+        n_cov_par <- ncovpar(
+          modelname = strtrim(paste0(model_x_norm, "II"), 3), p = col_x_n, g = k
+        )
+        df_model <- df_model + n_cov_par
       }
       df <- df_model + (k - 1) + col_x_n * k
       if (df >= n) {
@@ -349,24 +344,24 @@ cwm2 <- function(
       cluster <- apply(z, 1, base::which.max)
 
       result <- list(
-        posterior = z,
-        iter = iteration,
-        k = k,
-        size = table(cluster),
-        cluster = cluster,
-        logLik = finalloglik,
-        df = df,
-        prior = prior,
-        ic = compute_ic(finalloglik, n, df, z),
-        converged = TRUE,
-        gl_model = gl_model,
-        concomitant = concomitant
+        "posterior" = z,
+        "iter" = iter,
+        "k" = k,
+        "size" = table(cluster),
+        "cluster" = cluster,
+        "logLik" = finalloglik,
+        "df" = df,
+        "prior" = prior,
+        "ic" = compute_ic(finalloglik, n, df, z),
+        "converged" = TRUE,
+        "gl_model" = gl_model,
+        "concomitant" = concomitant
       )
     },
     silent = !pwarning
   )
   if (!length(a) > 1) {
-    result <- list(iter = iteration, k = k, ic = list(BIC = NA))
+    result <- list(iter = iter, k = k, ic = list(BIC = NA))
     cat(" Not estimated")
   }
   class(result) <- "cwm"
@@ -463,23 +458,23 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
     p_x_norm <- 1
     mu_x <- sigma <- NULL
   }
-  list(p_x = p_x_norm, mu = mu_x, sigma = sigma)
+  list("p_x" = p_x_norm, "mu" = mu_x, "sigma" = sigma)
 }
 
 .family_y_gaussian <- function(k, data, y, n, z, formula_y, ...) {
   beta <- var_fun_y <- var_y <- mu_y <- p_y <- disp_y <- NULL
   lmodel_y <- list()
-  for (h in 1:k) {
+  for (h in seq_len(k)) {
     model_y <- do.call(
       stats::glm,
       list(
-        formula = formula_y,
-        family = stats::gaussian(),
-        data = data,
-        weights = z[, h],
-        model = FALSE,
-        x = FALSE,
-        y = FALSE
+        "formula" = formula_y,
+        "family" = stats::gaussian(),
+        "data" = data,
+        "weights" = z[, h],
+        "model" = FALSE,
+        "x" = FALSE,
+        "y" = FALSE
       )
     )
     sigma_hat <- sqrt(
@@ -499,12 +494,12 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
     list(1:n, paste("comp.", 1:k, sep = ""))
 
   list(
-    lmodel_y = lmodel_y,
-    mu_y = mu_y,
-    disp_y = as.vector(disp_y),
-    var_fun_y = var_fun_y,
-    var_y = var_y,
-    p_y = p_y
+    "lmodel_y" = lmodel_y,
+    "mu_y" = mu_y,
+    "disp_y" = as.vector(disp_y),
+    "var_fun_y" = var_fun_y,
+    "var_y" = var_y,
+    "p_y" = p_y
   )
 }
 
