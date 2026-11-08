@@ -327,23 +327,23 @@ cwm2 <- function(
       if (!is.null(data)) {
         gl_model <- list()
         for (i in seq_len(k)) {
-          parameters <- list(model = l$lmodel_y[[i]])
-          parameters <- c(parameters, list(sigma = sqrt(l$var_y[1, i])))
-          gl_model[[i]] <- parameters
+          gl_model[[i]] <- c(
+            list("model" = l$lmodel_y[[i]]),
+            list("sigma" = sqrt(l$var_y[1, i]))
+          )
         }
         names(gl_model) <- paste0("comp.", 1:k)
       }
 
-      concomitant <- NULL
-      if (!is.null(x_norm)) {
-        concomitant <- list()
-        normal <- list(
-          d = norm$p_x,
-          mu = norm$mu,
-          sigma = norm$sigma,
-          model = model_x_norm
-        )
-        concomitant <- c(concomitant, normal = normal)
+      if (is.null(x_norm)) {
+        concomitant <- NULL
+      } else {
+        concomitant <- c("normal" = list(
+          "d" = norm$p_x,
+          "mu" = norm$mu,
+          "sigma" = norm$sigma,
+          "model" = model_x_norm
+        ))
       }
 
       cluster <- apply(z, 1, base::which.max)
