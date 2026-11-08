@@ -247,13 +247,13 @@ cwm2 <- function(
   a <- try(
     {
       z <- (start_z + 0.0001) / rowSums(start_z + 0.0001)
-      check <- 0
+      exit_while <- FALSE
       iteration <- 1
       loglik <- NULL
       aloglik <- c(0, 0)
       a <- c(0, 0)
 
-      while (check < 1) {
+      while (!exit_while) {
         prior <- colMeans(z)
         norm <- .p_x_norm(
           col_x_n = col_x_n, x_norm = x_norm, model_x_norm = model_x_norm,
@@ -275,26 +275,23 @@ cwm2 <- function(
         loglik[iteration] <- sum(log(rowSums(dens)))
 
         if (iteration > 2 & k > 1) {
-          if (
-            !is.na(loglik[iteration - 1] - loglik[iteration - 2]) &&
-              !is.na(loglik[iteration])
-          ) {
-            if (abs(loglik[iteration - 1] - loglik[iteration - 2]) > 0) {
+          loglik_diff12 <- loglik[iteration - 1] - loglik[iteration - 2]
+          if (!is.na(loglik_diff12) && !is.na(loglik[iteration])) {
+            if (abs(loglik_diff12) > 0) {
               loglik_diff01 <- loglik[iteration] - loglik[iteration - 1]
-              loglik_diff12 <- loglik[iteration - 1] - loglik[iteration - 2]
               a[iteration - 1] <- loglik_diff01 / loglik_diff12
               aloglik[iteration] <- loglik[iteration - 1] +
                 (1 / (1 - a[iteration - 1]) * loglik_diff01)
               if (abs(aloglik[iteration] - loglik[iteration]) < threshold) {
-                check <- 1
+                exit_while <- TRUE
               }
             } else {
-              check <- 1
+              exit_while <- TRUE
             }
           }
         }
         if (iteration == iter_max | k == 1) {
-          check <- 1
+          exit_while <- TRUE
         }
 
         cat("*")
@@ -326,16 +323,6 @@ cwm2 <- function(
         ), call. = FALSE)
       }
 
-      cluster <- apply(z, 1, base::which.max)
-
-      ic <- compute_ic(finalloglik, n, df)
-
-      z_const <- ifelse(z < 10^(-322), 10^(-322), z)
-      hard_z <-
-        (matrix(rep(apply(z, 1, max), k), n, k, byrow = FALSE) == z) * 1
-      ecm <- sum(hard_z * log(z_const))
-      ic$ICL <- ic$BIC + ecm
-
       gl_model <- NULL
       if (!is.null(data)) {
         gl_model <- list()
@@ -358,6 +345,9 @@ cwm2 <- function(
         )
         concomitant <- c(concomitant, normal = normal)
       }
+
+      cluster <- apply(z, 1, base::which.max)
+
       result <- list(
         posterior = z,
         iter = iteration,
@@ -367,7 +357,7 @@ cwm2 <- function(
         logLik = finalloglik,
         df = df,
         prior = prior,
-        ic = ic,
+        ic = compute_ic(finalloglik, n, df, z),
         converged = TRUE,
         gl_model = gl_model,
         concomitant = concomitant
@@ -447,7 +437,7 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
         paste("comp.", 1:k, sep = "")
       )
     )
-    if (col_x_n > 1) { #  More than one normal concomitant
+    if (col_x_n > 1) {
       fit_m <- ContaminatedMixt::m.step(
         x = x_norm, modelname = model_x_norm, z = z, mtol = 1e-25, mmax = 10
       )
@@ -518,7 +508,7 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
   )
 }
 
-compute_ic <- function(ll, n, df) {
+compute_ic <- function(ll, n, df, z) {
   ic <- list()
   ic$AIC <- 2 * ll - df * 2
   ic$BIC <- 2 * ll - df * log(n)
@@ -531,6 +521,11 @@ compute_ic <- function(ll, n, df) {
   } else {
     ic$AICc <- ic$AICu <- -Inf
   }
+
+  z_const <- ifelse(z < 10^(-322), 10^(-322), z)
+  hard_z <- t(1 * apply(z, 1, \(u) u == max(u)))
+  ecm <- sum(hard_z * log(z_const))
+  ic$ICL <- ic$BIC + ecm
 
   ic
 }
