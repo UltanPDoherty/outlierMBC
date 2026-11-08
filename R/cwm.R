@@ -164,20 +164,24 @@ fit_cwm <- function(
     }
   }
 
-  if (col_x_n == 1) {
-    model_x_names <- c("E", "V")
-    eqmod <- data.frame(name = model_x_names, number = c(1, 1))
+  if (col_x_n > 0) {
+    if (col_x_n == 1) {
+      model_x_names <- c("E", "V")
+      eqmod <- data.frame(name = model_x_names, number = c(1, 1))
+    } else {
+      model_x_names <- c(
+        "EII", "VII", "EEI", "VEI", "EVI", "VVI",
+        "EEE", "VEE", "EVE", "EEV", "VVE", "VEV", "EVV", "VVV"
+      )
+      eqmod <- data.frame(name = model_x_names, number = rep(1:3, c(2, 4, 8)))
+    }
+    if (is.null(model_x_norm)) {
+      model_x_norm <- model_x_names
+    } else {
+      model_x_norm <- match.arg(model_x_norm, model_x_names, several.ok = TRUE)
+    }
   } else {
-    model_x_names <- c(
-      "EII", "VII", "EEI", "VEI", "EVI", "VVI",
-      "EEE", "VEE", "EVE", "EEV", "VVE", "VEV", "EVV", "VVV"
-    )
-    eqmod <- data.frame(name = model_x_names, number = rep(1:3, c(2, 4, 8)))
-  }
-  if (is.null(model_x_norm)) {
-    model_x_norm <- model_x_names
-  } else {
-    model_x_norm <- match.arg(model_x_norm, model_x_names, several.ok = TRUE)
+    model_x_norm <- eqmod <- NULL
   }
 
   mm <- expand.grid(list("k" = k, "model_x_norm" = model_x_norm))
@@ -239,6 +243,8 @@ cwm2 <- function(
 ) {
   prior <- numeric(length = k)
 
+  stats_gaussian <- stats::gaussian()
+
   if (!is.null(data)) {
     m_y <- rep(1, nrow(y))
   }
@@ -262,6 +268,7 @@ cwm2 <- function(
           l <- do.call(
             ".family_y_gaussian",
             list(
+              "stats_gaussian" = stats_gaussian,
               "k" = k, "y" = y, "m_y" = m_y, "n" = n,
               "data" = data, "z" = z, "formula_y" = formula_y
             )
@@ -457,7 +464,9 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
   list("p_x" = p_x_norm, "mu" = mu_x, "sigma" = sigma)
 }
 
-.family_y_gaussian <- function(k, data, y, n, z, formula_y, ...) {
+.family_y_gaussian <- function(
+  stats_gaussian, k, data, y, n, z, formula_y, ...
+) {
   lmodel_y <- list()
   mu_y <- p_y <- matrix(NA, nrow = n, ncol = k)
   disp_y <- c()
@@ -466,6 +475,7 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
       stats::glm,
       list(
         "formula" = formula_y,
+        "family" = stats_gaussian,
         "data" = data,
         "weights" = z[, h],
         "model" = FALSE,
