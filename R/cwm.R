@@ -239,19 +239,14 @@ cwm2 <- function(
   start_z, iter_max, threshold,
   eps, pwarning
 ) {
-  # Parameters definition ------------------------------------------------------
-  prior <- numeric(k) # weights
+  prior <- numeric(length = k)
 
   if (!is.null(data)) {
     m_y <- rep(1, nrow(y))
   }
-  # Do Estimation --------------------------------------------------------------
   a <- try(
     {
       z <- (start_z + 0.0001) / rowSums(start_z + 0.0001)
-
-      # EM algorithm --------------------------------------------------
-      # Preliminary definition of convergence criteria
       check <- 0
       iteration <- 1
       loglik <- NULL
@@ -259,16 +254,12 @@ cwm2 <- function(
       a <- c(0, 0)
 
       while (check < 1) {
-        # M-step --------------------------------------------------
-        # Weights #
         prior <- colMeans(z)
-        # Posterior probabilities
         norm <- .p_x_norm(
           col_x_n = col_x_n, x_norm = x_norm, model_x_norm = model_x_norm,
           z = z, k = k, n = n, eps = eps
         )
 
-        # Y|x pag 45 of McCullag & Nelder (1989) -----------------------------
         if (!is.null(data)) {
           l <- do.call(
             ".family_y_gaussian",
@@ -280,11 +271,9 @@ cwm2 <- function(
         } else {
           l <- list(p_y = 1)
         }
-        # Global - Observed-data log-likelihood ##
         dens <- matrix(rep(prior, n), n, k, byrow = TRUE) * norm$p_x * l$p_y
         loglik[iteration] <- sum(log(rowSums(dens)))
 
-        # Aitken's Acceleration-Based Stopping Criterion # #
         if (iteration > 2 & k > 1) {
           if (
             !is.na(loglik[iteration - 1] - loglik[iteration - 2]) &&
@@ -311,11 +300,9 @@ cwm2 <- function(
         cat("*")
         iteration <- iteration + 1
 
-        # E-Step -------------------------------------------------------------
         dens[dens == 0] <- 1E-320
         z <- dens / matrix(rep(rowSums(dens), k), ncol = k) # (n x k)
 
-        # z adjustment
         if (min(colSums(z)) <= col_x_n) {
           z <- (z + 0.0000001) / rowSums(z + 0.0000001)
         }
@@ -323,9 +310,6 @@ cwm2 <- function(
 
       finalloglik <- loglik[iteration - 1]
 
-      # EM-algorithm is finished ---------------------------------------------
-
-      # Check the number of parameters -------------------------------
       df_model <- length(stats::coef(l$lmodel_y[[1]])) * k
       if (!is.null(model_x_norm)) {
         df_model <-
@@ -342,29 +326,16 @@ cwm2 <- function(
         ), call. = FALSE)
       }
 
-      # Classification Matrix ------------------------------------------------
       cluster <- apply(z, 1, base::which.max)
 
-      # Information criteria -------------------------------------------------
-      ic <- list()
-      ic$AIC <- 2 * finalloglik - df * 2
-      ic$BIC <- 2 * finalloglik - df * log(n)
-      ic$AIC3 <- 2 * finalloglik - df * 3
-      ic$CAIC <- 2 * finalloglik - df * (1 + log(n))
-      ic$AWE <- 2 * finalloglik - 2 * df * (3 / 2 + log(n))
-      if (n - df - 1 > 0) {
-        ic$AICc <- ic$AIC - (2 * df * (df + 1)) / (n - df - 1)
-        ic$AICu <- ic$AICc - n * log(n / (n - df - 1))
-      } else {
-        ic$AICc <- ic$AICu <- -Inf
-      }
+      ic <- compute_ic(finalloglik, n, df)
 
       z_const <- ifelse(z < 10^(-322), 10^(-322), z)
       hard_z <-
         (matrix(rep(apply(z, 1, max), k), n, k, byrow = FALSE) == z) * 1
       ecm <- sum(hard_z * log(z_const))
       ic$ICL <- ic$BIC + ecm
-      ## GLM parameters
+
       gl_model <- NULL
       if (!is.null(data)) {
         gl_model <- list()
@@ -375,7 +346,7 @@ cwm2 <- function(
         }
         names(gl_model) <- paste0("comp.", 1:k)
       }
-      ## Concomitant
+
       concomitant <- NULL
       if (!is.null(x_norm)) {
         concomitant <- list()
@@ -405,11 +376,7 @@ cwm2 <- function(
     silent = !pwarning
   )
   if (!length(a) > 1) {
-    result <- list(
-      iter = iteration,
-      k = k,
-      ic = list(BIC = NA)
-    )
+    result <- list(iter = iteration, k = k, ic = list(BIC = NA))
     cat(" Not estimated")
   }
   class(result) <- "cwm"
@@ -549,4 +516,21 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
     var_y = var_y,
     p_y = p_y
   )
+}
+
+compute_ic <- function(ll, n, df) {
+  ic <- list()
+  ic$AIC <- 2 * ll - df * 2
+  ic$BIC <- 2 * ll - df * log(n)
+  ic$AIC3 <- 2 * ll - df * 3
+  ic$CAIC <- 2 * ll - df * (1 + log(n))
+  ic$AWE <- 2 * ll - 2 * df * (3 / 2 + log(n))
+  if (n - df - 1 > 0) {
+    ic$AICc <- ic$AIC - (2 * df * (df + 1)) / (n - df - 1)
+    ic$AICu <- ic$AICc - n * log(n / (n - df - 1))
+  } else {
+    ic$AICc <- ic$AICu <- -Inf
+  }
+
+  ic
 }
