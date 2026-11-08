@@ -244,7 +244,7 @@ cwm2 <- function(
   }
   a <- try(
     {
-      z <- (start_z + 0.0001) / rowSums(start_z + 0.0001)
+      z <- (start_z + 1e-4) / rowSums(start_z + 1e-4)
       exit_while <- FALSE
       iter <- 1
       loglik <- NULL
@@ -298,7 +298,7 @@ cwm2 <- function(
         z <- dens / rowSums(dens)
 
         if (min(colSums(z)) <= col_x_n) {
-          z <- (z + 0.0000001) / rowSums(z + 0.0000001)
+          z <- (z + 1e-7) / rowSums(z + 1e-7)
         }
       }
 
@@ -417,21 +417,16 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
 #' @importFrom mclust mstepEEV mstepEVE mstepVEE mstepVEV mstepEVV mstepVVE
 .p_x_norm <- function(col_x_n, x_norm, model_x_norm, z, k, n, eps) {
   if (col_x_n > 0) {
-    p_x_norm <- array(
-      1, c(n, k),
-      dimnames = list(1:n, paste("comp.", 1:k, sep = ""))
-    )
+    comp_names <- paste0("comp.", seq_len(k))
+
+    p_x_norm <- array(1, c(n, k), dimnames = list(seq_len(n), comp_names))
     mu_x <- array(
       0, c(col_x_n, k),
-      dimnames = list(dimnames(x_norm)[[2]], paste("comp.", 1:k, sep = ""))
+      dimnames = list(dimnames(x_norm)[[2]], comp_names)
     )
     sigma <- array(
       0, c(col_x_n, col_x_n, k),
-      dimnames = list(
-        dimnames(x_norm)[[2]],
-        dimnames(x_norm)[[2]],
-        paste("comp.", 1:k, sep = "")
-      )
+      dimnames = list(dimnames(x_norm)[[2]], dimnames(x_norm)[[2]], comp_names)
     )
     if (col_x_n > 1) {
       fit_m <- ContaminatedMixt::m.step(
