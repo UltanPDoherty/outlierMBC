@@ -5,9 +5,9 @@
 \title{\code{cwm} function from Angelo Mazza's flexCWM package}
 \usage{
 fit_cwm(
-  formula_y,
+  formula_y = NULL,
   data,
-  x_norm,
+  x_norm = NULL,
   model_x_norm = NULL,
   k,
   start_z = NULL,

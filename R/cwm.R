@@ -127,9 +127,9 @@
 #'
 #' @author Mazza A., Punzo A., Ingrassia S.
 fit_cwm <- function(
-  formula_y,
+  formula_y = NULL,
   data,
-  x_norm,
+  x_norm = NULL,
   model_x_norm = NULL,
   k,
   start_z = NULL,
@@ -139,19 +139,29 @@ fit_cwm <- function(
   eps = 1.0e-100,
   pwarning = FALSE
 ) {
-  if (is.null(data)) {
-    data <- stats::get_all_vars(stats::as.formula(formula_y))
-  } else {
-    data <- stats::get_all_vars(stats::as.formula(formula_y), data)
+  if (is.null(formula_y) && is.null(x_norm)) {
+    stop("Either formula_y or x_norm must be provided.")
   }
-  y <- as.matrix(stats::model.response(stats::model.frame(formula_y, data)))
 
-  x_norm <- as.matrix(x_norm)
-  stopifnot("Data length mismatch" = nrow(x_norm) == nrow(y))
+  if (!is.null(formula_y)) {
+    if (is.null(data)) {
+      data <- stats::get_all_vars(stats::as.formula(formula_y))
+    } else {
+      data <- stats::get_all_vars(stats::as.formula(formula_y), data)
+    }
+    y <- as.matrix(stats::model.response(stats::model.frame(formula_y, data)))
+  } else {
+    y <- data <- NULL
+  }
 
-  col_x_n <- ncol(x_norm)
-  if (is.null(colnames(x_norm))) {
-    colnames(x_norm) <- paste0("x_norm", seq_len(col_x_n))
+  col_x_n <- 0
+  if (!is.null(x_norm)) {
+    x_norm <- as.matrix(x_norm)
+    stopifnot("Data length mismatch" = nrow(x_norm) == nrow(y))
+    col_x_n <- ncol(x_norm)
+    if (is.null(colnames(x_norm))) {
+      colnames(x_norm) <- paste0("x_norm", seq_len(col_x_n))
+    }
   }
 
   if (col_x_n == 1) {
