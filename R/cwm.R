@@ -508,7 +508,7 @@ compute_ic <- function(ll, n, df, z) {
     ic$AICc <- ic$AICu <- -Inf
   }
 
-  z_const <- ifelse(z < 10^(-322), 10^(-322), z)
+  z_const <- ifelse(z < 1e-322, 1e-322, z)
   hard_z <- t(1 * apply(z, 1, \(u) u == max(u)))
   ecm <- sum(hard_z * log(z_const))
   ic$ICL <- ic$BIC + ecm
