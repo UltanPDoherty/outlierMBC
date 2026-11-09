@@ -285,7 +285,7 @@ cwm2 <- function(
           }
         }
 
-        exit_while <- iter == iter_max || k == 1
+        exit_while <- exit_while || iter == iter_max || k == 1
 
         cat("*")
         iter <- iter + 1
