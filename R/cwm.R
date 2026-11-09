@@ -199,17 +199,12 @@ fit_cwm <- function(
     mm <- rbind(mm2, mm[mm$k != 1, ])
   }
   mm <- mm[order(mm$k), , drop = FALSE]
-
-  if (!is.null(seed)) {
-    set.seed(seed)
-  }
-  models <- list()
-  for (i in seq_len(nrow(mm))) {
+  job <- function(i) {
     cat(paste0(
       "\nEstimating model with k = ", mm$k[i],
       ", x_norm = ", mm$model_x_norm[i], " "
     ))
-    models[[i]] <- cwm2(
+    cwm2(
       formula_y = formula_y, data = data, y = y,
       x_norm = x_norm, n = nrow(y), col_x_n = col_x_n,
       k = mm$k[i], model_x_norm = mm$model_x_norm[i],
@@ -217,6 +212,10 @@ fit_cwm <- function(
       eps = eps, pwarning = pwarning
     )
   }
+  if (!is.null(seed)) {
+    set.seed(seed)
+  }
+  models <- lapply(seq_len(nrow(mm)), \(i) job(i))
 
   concomitant <- data.frame(x_norm)
   for (i in seq_len(ncol(x_norm))) {
@@ -244,6 +243,11 @@ cwm2 <- function(
 ) {
   prior <- numeric(length = k)
 
+  stats_gaussian <- stats::gaussian()
+
+  if (!is.null(data)) {
+    m_y <- rep(1, nrow(y))
+  }
   a <- try(
     {
       z <- (start_z + 1e-4) / rowSums(start_z + 1e-4)
@@ -261,7 +265,14 @@ cwm2 <- function(
         )
 
         if (!is.null(data)) {
-          l <- .lm_loop("k" = k, "y" = y, "x" = x_norm, "n" = n, "z" = z)
+          l <- do.call(
+            ".family_y_gaussian",
+            list(
+              "stats_gaussian" = stats_gaussian,
+              "k" = k, "y" = y, "m_y" = m_y, "n" = n,
+              "data" = data, "z" = z, "formula_y" = formula_y
+            )
+          )
         } else {
           l <- list(p_y = 1)
         }
@@ -300,7 +311,7 @@ cwm2 <- function(
 
       finalloglik <- loglik[iter - 1]
 
-      df_model <- l$coef_num * k
+      df_model <- length(stats::coef(l$lmodel_y[[1]])) * k
       if (!is.null(model_x_norm)) {
         n_cov_par <- ncovpar(
           modelname = strtrim(paste0(model_x_norm, "II"), 3), p = col_x_n, g = k
@@ -317,15 +328,10 @@ cwm2 <- function(
 
       y_model <- NULL
       if (!is.null(data)) {
-        l <- .lm_final(
-          "k" = k, "y" = y, "n" = n,
-          "data" = data, "z" = z, "formula_y" = formula_y
-        )
-
         y_model <- list()
         for (i in seq_len(k)) {
           y_model[[i]] <- c(
-            list("model" = l$lm_out[[i]]),
+            list("model" = l$lmodel_y[[i]]),
             list("sigma" = sqrt(l$disp_y[i]))
           )
         }
@@ -458,36 +464,14 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
   list("p_x" = p_x_norm, "mu" = mu_x, "sigma" = sigma)
 }
 
-.lm_loop <- function(k, y, x, n, z) {
-  lm_wfit <- list()
+.family_y_gaussian <- function(
+  stats_gaussian, k, data, y, n, z, formula_y, ...
+) {
+  lmodel_y <- list()
   mu_y <- p_y <- matrix(NA, nrow = n, ncol = k)
   disp_y <- c()
   for (h in seq_len(k)) {
-    lm_wfit[[h]] <- do.call(
-      stats::lm.wfit,
-      list(
-        "x" = x,
-        "y" = y,
-        "w" = z[, h]
-      )
-    )
-    mu_y[, h] <- lm_wfit[[h]]$fitted.values
-    disp_y[h] <- as.numeric(
-      crossprod(sqrt(z[, h] / sum(z[, h])) * (y - mu_y[, h]))
-    )
-    p_y[, h] <- stats::dnorm(y, mean = mu_y[, h], sd = sqrt(disp_y[h]))
-  }
-  colnames(p_y) <- paste("comp.", 1:k, sep = "")
-
-  list("coef_num" = length(stats::coef(lm_wfit[[1]])), "p_y" = p_y)
-}
-
-.lm_final <- function(k, data, y, n, z, formula_y) {
-  lm_out <- list()
-  mu_y <- matrix(NA, nrow = n, ncol = k)
-  disp_y <- c()
-  for (h in seq_len(k)) {
-    lm_out[[h]] <- do.call(
+    lmodel_y[[h]] <- do.call(
       stats::lm,
       list(
         "formula" = formula_y,
@@ -498,13 +482,15 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
         "y" = FALSE
       )
     )
-    mu_y[, h] <- lm_out[[h]]$fitted.values
+    mu_y[, h] <- lmodel_y[[h]]$fitted.values
     disp_y[h] <- as.numeric(
       crossprod(sqrt(z[, h] / sum(z[, h])) * (y - mu_y[, h]))
     )
+    p_y[, h] <- stats::dnorm(y, mean = mu_y[, h], sd = sqrt(disp_y[h]))
   }
+  colnames(mu_y) <- colnames(p_y) <- paste("comp.", 1:k, sep = "")
 
-  list("lm_out" = lm_out, "disp_y" = disp_y)
+  list("lmodel_y" = lmodel_y, "mu_y" = mu_y, "disp_y" = disp_y, "p_y" = p_y)
 }
 
 compute_ic <- function(ll, n, df, z) {
