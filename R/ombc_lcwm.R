@@ -198,10 +198,10 @@ ombc_lcwm <- function(
     loglike[i] <- lcwm$models[[1]]$logLik
     conv_status[i] <- lcwm$models[[1]]$converged
 
-    mod_list <- lapply(lcwm$models[[1]]$gl_model, function(x) x$model)
+    mod_list <- lapply(lcwm$models[[1]]$y_model, function(x) x$model)
     names(mod_list) <- paste0("comp.", seq_along(mod_list))
     weighted_rmse <- vapply(
-      lcwm$models[[1]]$gl_model, function(x) x$sigma, double(1L)
+      lcwm$models[[1]]$y_model, function(x) x$sigma, double(1L)
     )
 
     dd <- distrib_diff_lcwm(
