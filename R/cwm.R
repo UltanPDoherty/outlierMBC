@@ -78,7 +78,7 @@
 #'      \item{\code{prior} weights for the mixture components}
 #'      \item{\code{ic} list containing values of the information criteria }
 #'      \item{\code{converged} logical; \code{TRUE} if EM algorithm converged}
-#'      \item{\code{y_model}
+#'      \item{\code{gl_model}
 #'        a list;  each element is related to a mixture component and contains:
 #'      }
 #'      \itemize{
@@ -326,16 +326,16 @@ cwm2 <- function(
         ), call. = FALSE)
       }
 
-      y_model <- NULL
+      gl_model <- NULL
       if (!is.null(data)) {
-        y_model <- list()
+        gl_model <- list()
         for (i in seq_len(k)) {
-          y_model[[i]] <- c(
+          gl_model[[i]] <- c(
             list("model" = l$lmodel_y[[i]]),
             list("sigma" = sqrt(l$disp_y[i]))
           )
         }
-        names(y_model) <- paste0("comp.", 1:k)
+        names(gl_model) <- paste0("comp.", 1:k)
       }
 
       if (is.null(x_norm)) {
@@ -362,7 +362,7 @@ cwm2 <- function(
         "prior" = prior,
         "ic" = compute_ic(finalloglik, n, df, z),
         "converged" = TRUE,
-        "y_model" = y_model,
+        "gl_model" = gl_model,
         "concomitant" = concomitant
       )
     },
@@ -472,9 +472,10 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
   disp_y <- c()
   for (h in seq_len(k)) {
     lmodel_y[[h]] <- do.call(
-      stats::lm,
+      stats::glm,
       list(
         "formula" = formula_y,
+        "family" = stats_gaussian,
         "data" = data,
         "weights" = z[, h],
         "model" = FALSE,
@@ -482,7 +483,7 @@ ncovpar <- function(modelname = NULL, p = NULL, g = NULL) {
         "y" = FALSE
       )
     )
-    mu_y[, h] <- lmodel_y[[h]]$fitted.values
+    mu_y[, h] <- stats::fitted(lmodel_y[[h]])
     disp_y[h] <- as.numeric(
       crossprod(sqrt(z[, h] / sum(z[, h])) * (y - mu_y[, h]))
     )
@@ -507,7 +508,7 @@ compute_ic <- function(ll, n, df, z) {
     ic$AICc <- ic$AICu <- -Inf
   }
 
-  z_const <- ifelse(z < 1e-322, 1e-322, z)
+  z_const <- ifelse(z < 10^(-322), 10^(-322), z)
   hard_z <- t(1 * apply(z, 1, \(u) u == max(u)))
   ecm <- sum(hard_z * log(z_const))
   ic$ICL <- ic$BIC + ecm

@@ -87,7 +87,7 @@ is a list and contains:
 \item{\code{prior} weights for the mixture components}
 \item{\code{ic} list containing values of the information criteria }
 \item{\code{converged} logical; \code{TRUE} if EM algorithm converged}
-\item{\code{y_model}
+\item{\code{gl_model}
 a list;  each element is related to a mixture component and contains:
 }
 \itemize{
