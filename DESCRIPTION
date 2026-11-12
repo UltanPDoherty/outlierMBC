@@ -6,7 +6,7 @@ Authors@R: c(
            "cph"), comment = c(ORCID = "0000-0003-1791-395X")),
     person("Paul D.", "McNicholas", , "paulmc@mcmaster.ca", role = c("aut"),
            comment = c(ORCID = "0000-0002-2482-523X")),
-    person("Andrea", "Cappozzo", , "andrea.cappozzo@unicatt.it", role = c("aut"
+    person("Andrea", "Cappozzo", , "andrea.cappozzo@unicatt.it", role = c("ctb"
            ), comment = c(ORCID = "0000-0001-9348-710X")),
     person("Arthur", "White", , "arwhite@tcd.ie", role = c("aut"),
            comment = c(ORCID = "0000-0002-7268-5163")))

@@ -15,8 +15,12 @@ Authors:
 \itemize{
   \item Ultán P. Doherty \email{dohertyu@tcd.ie} (\href{https://orcid.org/0000-0003-1791-395X}{ORCID}) [copyright holder]
   \item Paul D. McNicholas \email{paulmc@mcmaster.ca} (\href{https://orcid.org/0000-0002-2482-523X}{ORCID})
-  \item Andrea Cappozzo \email{andrea.cappozzo@unicatt.it} (\href{https://orcid.org/0000-0001-9348-710X}{ORCID})
   \item Arthur White \email{arwhite@tcd.ie} (\href{https://orcid.org/0000-0002-7268-5163}{ORCID})
+}
+
+Other contributors:
+\itemize{
+  \item Andrea Cappozzo \email{andrea.cappozzo@unicatt.it} (\href{https://orcid.org/0000-0001-9348-710X}{ORCID}) [contributor]
 }
 
 }
