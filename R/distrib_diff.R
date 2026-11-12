@@ -79,8 +79,8 @@ distrib_diff_gmm <- function(
 #'   \item{`dens`}{Gaussian density of all observations for this component.}
 #'   \item{`mahalas`}{Scaled squared sample Mahalanobis distances for all
 #'                    observations with respect to this component.}
-#'   \item{`balance_correction`}{Null-expectation normalising constant for
-#'                               LCWMs.}
+#'   \item{`correction_factor`}{Null-expectation normalising constant for
+#'                              LCWMs.}
 #' }
 distrib_diff_mahalanobis <- function(
   x,
@@ -106,7 +106,7 @@ distrib_diff_mahalanobis <- function(
   mahala_ewcdf_g_vals <- mahala_ewcdf_g_func(check_seq)
   beta_cdf_g_vals <- stats::pbeta(check_seq, param1, param2)
   cdf_diffs <- mahala_ewcdf_g_vals - beta_cdf_g_vals
-  balance_correction <- sqrt(2 / (pi * n_g)) * mean(
+  correction_factor <- sqrt(2 / (pi * n_g)) * mean(
     sqrt(beta_cdf_g_vals * (1 - beta_cdf_g_vals))
   )
 
@@ -120,7 +120,7 @@ distrib_diff_mahalanobis <- function(
     diff = distrib_diff_g_x,
     dens = dens_g_x,
     mahalas = scaled_mahalas_g,
-    balance_correction = balance_correction
+    correction_factor = correction_factor
   )
 }
 
@@ -258,12 +258,12 @@ distrib_diff_lcwm_g <- function(
   dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
   diff_g_x <- dd_g_x$diff
   dens_g_x <- dd_g_x$dens
-  correct_g_x <- dd_g_x$balance_correction
+  correct_g_x <- dd_g_x$correction_factor
 
   dd_g_y <- distrib_diff_residual(x, z_g, mod_g, weighted_rmse_g)
   diff_g_y <- dd_g_y$diff
   dens_g_y <- dd_g_y$dens
-  correct_g_y <- dd_g_y$balance_correction
+  correct_g_y <- dd_g_y$correction_factor
 
   if (balance_correction) {
     x_factor <- cwm_balance / correct_g_x
@@ -301,8 +301,8 @@ distrib_diff_lcwm_g <- function(
 #' \describe{
 #'   \item{`diff`}{Response dissimilarity value for this component.}
 #'   \item{`dens`}{Response density of all observations for this component.}
-#'   \item{`balance_correction`}{Null-expectation normalising constant for
-#'                               LCWMs.}
+#'   \item{`correction_factor`}{Null-expectation normalising constant for
+#'                              LCWMs.}
 #' }
 distrib_diff_residual <- function(
   x,
@@ -337,7 +337,7 @@ distrib_diff_residual <- function(
   scsqst_res_ewcdf_g_vals <- scsqst_res_ewcdf_g_func(check_seq)
   beta_cdf_g_vals <- stats::pbeta(check_seq, param1, param2)
   cdf_diffs <- scsqst_res_ewcdf_g_vals - beta_cdf_g_vals
-  balance_correction <- sqrt(2 / (pi * n_g)) * mean(
+  correction_factor <- sqrt(2 / (pi * n_g)) * mean(
     sqrt(beta_cdf_g_vals * (1 - beta_cdf_g_vals))
   )
 
@@ -348,6 +348,6 @@ distrib_diff_residual <- function(
   list(
     diff = distrib_diff_g_y,
     dens = dens_g_y,
-    balance_correction = balance_correction
+    correction_factor = correction_factor
   )
 }

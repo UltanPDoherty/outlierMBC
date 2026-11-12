@@ -35,7 +35,7 @@ correction.}
 \item{\code{dens}}{Gaussian density of all observations for this component.}
 \item{\code{mahalas}}{Scaled squared sample Mahalanobis distances for all
 observations with respect to this component.}
-\item{\code{balance_correction}}{Null-expectation normalising constant for
+\item{\code{correction_factor}}{Null-expectation normalising constant for
 LCWMs.}
 }
 }
