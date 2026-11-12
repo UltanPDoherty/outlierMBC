@@ -106,9 +106,14 @@ distrib_diff_mahalanobis <- function(
   mahala_ewcdf_g_vals <- mahala_ewcdf_g_func(check_seq)
   beta_cdf_g_vals <- stats::pbeta(check_seq, param1, param2)
   cdf_diffs <- mahala_ewcdf_g_vals - beta_cdf_g_vals
-  correction_factor <- sqrt(2 / (pi * n_g)) * mean(
-    sqrt(beta_cdf_g_vals * (1 - beta_cdf_g_vals))
-  )
+  if (balance_correction) {
+    correction_factor <- sqrt(2 / (pi * n_g)) * mean(
+      sqrt(beta_cdf_g_vals * (1 - beta_cdf_g_vals))
+    )
+  } else {
+    correction_factor <- NULL
+  }
+
 
   distrib_diff_g_x <- mean(abs(cdf_diffs))
 
@@ -255,7 +260,9 @@ distrib_diff_lcwm_g <- function(
   cwm_balance = 0.5,
   balance_correction = TRUE
 ) {
-  dd_g_x <- distrib_diff_mahalanobis(x, z_g, mu_g, sigma_g, log(det(sigma_g)))
+  dd_g_x <- distrib_diff_mahalanobis(
+    x, z_g, mu_g, sigma_g, log(det(sigma_g)), balance_correction
+  )
   diff_g_x <- dd_g_x$diff
   dens_g_x <- dd_g_x$dens
   correct_g_x <- dd_g_x$correction_factor
