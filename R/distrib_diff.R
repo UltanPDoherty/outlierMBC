@@ -114,7 +114,6 @@ distrib_diff_mahalanobis <- function(
     correction_factor <- NULL
   }
 
-
   distrib_diff_g_x <- mean(abs(cdf_diffs))
 
   dens_g_x <- exp(
