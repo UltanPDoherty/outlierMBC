@@ -11,8 +11,8 @@ distrib_diff_lcwm_g(
   sigma_g,
   mod_g,
   weighted_rmse_g,
-  dd_weight = 0.5,
-  dd_correct = TRUE
+  cwm_balance = 0.5,
+  balance_correction = TRUE
 )
 }
 \arguments{
@@ -29,10 +29,12 @@ distrib_diff_lcwm_g(
 \item{weighted_rmse_g}{The square root of the weighted mean of the squared
 residuals for this component.}
 
-\item{dd_weight}{A value between \code{0} and \code{1} which controls the weighting of
-the response and covariate dissimilarities when aggregating.}
+\item{cwm_balance}{A value between \code{0} and \code{1} which controls the weighting
+of the response and covariate dissimilarities when
+aggregating.}
 
-\item{dd_correct}{Whether to apply a null-expectation normalising correction.}
+\item{balance_correction}{Whether to apply a null-expectation normalising
+correction.}
 }
 \value{
 \code{distrib_diff_lcwm_g} returns a list with the following elements:

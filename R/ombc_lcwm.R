@@ -28,9 +28,11 @@
 #' @param y_formula Regression formula.
 #' @param nmax Maximum number of iterations for `cwm`.
 #' @param atol EM convergence threshold for `cwm`.
-#' @param dd_weight A value between `0` and `1` which controls the weighting of
-#'                  the response and covariate dissimilarities when aggregating.
-#' @param dd_correct Whether to apply a null-expectation normalising correction.
+#' @param cwm_balance A value between `0` and `1` which controls the weighting
+#'                    of the response and covariate dissimilarities when
+#'                    aggregating.
+#' @param balance_correction Whether to apply a null-expectation normalising
+#'                           correction.
 #'
 #' @returns
 #' `ombc_lcwm` returns an object of class "outliermbc_lcwm", which is
@@ -103,8 +105,8 @@ ombc_lcwm <- function(
   init_scaling = TRUE,
   kmpp_seed = 123,
   verbose = TRUE,
-  dd_weight = 0.5,
-  dd_correct = TRUE
+  cwm_balance = 0.5,
+  balance_correction = TRUE
 ) {
   init_method <- match.arg(init_method)
   init_scheme <- match.arg(init_scheme)
@@ -119,7 +121,7 @@ ombc_lcwm <- function(
     "init_z" = substitute(init_z),
     "init_method" = init_method, "init_scaling" = init_scaling,
     "kmpp_seed" = kmpp_seed, "verbose" = verbose,
-    "dd_weight" = dd_weight
+    "cwm_balance" = cwm_balance
   )
 
   ombc_version <- utils::packageVersion("outlierMBC")
@@ -212,7 +214,7 @@ ombc_lcwm <- function(
       lcwm$models[[1]]$concomitant$normal.sigma,
       mod_list,
       weighted_rmse,
-      dd_weight
+      cwm_balance
     )
 
     distrib_diff_arr[i, , ] <- dd$distrib_diff_mat
