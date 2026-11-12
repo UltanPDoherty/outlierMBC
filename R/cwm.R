@@ -1,4 +1,4 @@
-#' `cwm` function from Angelo Mazza's flexCWM package
+#' Modified, minimal version of the `cwm` function from the flexCWM package
 #'
 #' @description
 #' Maximum likelihood fitting of the cluster-weighted model by the EM algorithm.

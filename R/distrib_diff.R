@@ -311,7 +311,7 @@ distrib_diff_residual <- function(
   weighted_rmse_g
 ) {
   # Let rss_zg = sqrt(sum(z_g * (mod_g$residuals^2)))
-  # flexCWM::cwm used y_sigma_g = rss_zg / sqrt(n_g), therefore so does cwm
+  # flexCWM::cwm used y_sigma_g = rss_zg / sqrt(n_g), therefore so does fit_cwm
   # stats::sigma uses rss_zg / sqrt(nrow(x) - 2))
 
   n_g <- sum(z_g)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/cwm.R
 \name{fit_cwm}
 \alias{fit_cwm}
-\title{\code{cwm} function from Angelo Mazza's flexCWM package}
+\title{Modified, minimal version of the \code{cwm} function from the flexCWM package}
 \usage{
 fit_cwm(
   formula_y = NULL,
