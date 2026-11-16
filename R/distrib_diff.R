@@ -272,8 +272,8 @@ distrib_diff_lcwm_g <- function(
   correct_g_y <- dd_g_y$correction_factor
 
   if (balance_correction) {
-    x_factor <- cwm_balance / correct_g_x
-    y_factor <- (1 - cwm_balance) / correct_g_y
+    x_factor <- cwm_balance / correct_g_x^2
+    y_factor <- (1 - cwm_balance) / correct_g_y^2
   } else {
     x_factor <- cwm_balance
     y_factor <- 1 - cwm_balance
