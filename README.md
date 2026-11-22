@@ -9,9 +9,15 @@ Ultán P. Doherty
 gross_gmm_k3n1000o10 <- find_gross(gmm_k3n1000o10[, 1:2], max_out = 20)
 
 ombc_gmm_k3n1000o10 <- ombc_gmm(
-  gmm_k3n1000o10[, 1:2], comp_num = 3, max_out = 20, gross_outs = gross_gmm_k3n1000o10$gross_bool
+  gmm_k3n1000o10[, 1:2],
+  comp_num = 3, max_out = 20, gross_outs = gross_gmm_k3n1000o10$gross_bool
 )
+```
 
+    ## **********: 10 iterations.
+    ## ******
+
+``` r
 print(ombc_gmm_k3n1000o10)
 ```
 
@@ -43,9 +49,16 @@ gmm_k3n1000o10 |>
 gross_lcwm_k3n1000o10 <- find_gross(lcwm_k3n1000o10[, 1:2], max_out = 20)
 
 ombc_lcwm_k3n1000o10 <- ombc_gmm(
-  lcwm_k3n1000o10[, 1:2], comp_num = 3, max_out = 20, gross_outs = gross_lcwm_k3n1000o10$gross_bool
+  lcwm_k3n1000o10[, 1:2],
+  comp_num = 3, max_out = 20, gross_outs = gross_lcwm_k3n1000o10$gross_bool
 )
+```
 
+    ## **********: 10 iterations.
+    ## **********: 20 iterations.
+    ## *
+
+``` r
 print(ombc_lcwm_k3n1000o10)
 ```
 
