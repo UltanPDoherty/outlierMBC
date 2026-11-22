@@ -7,3 +7,4 @@
 ^\.Rhistory$
 ^data-raw$
 ^.github
+^CRAN-SUBMISSION$
