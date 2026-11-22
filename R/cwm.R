@@ -223,7 +223,7 @@ fit_cwm <- function(
   }
 
   cat("\n")
-  res <- structure(
+  structure(
     list(
       "call" = match.call(),
       "formula_y" = formula_y,
@@ -233,8 +233,6 @@ fit_cwm <- function(
     ),
     class = "cwm"
   )
-  print(res)
-  invisible(res)
 }
 
 cwm2 <- function(
